@@ -33,5 +33,25 @@
 			<artifactId>titan-lucene</artifactId>
 			<version>0.4.3-SNAPSHOT</version>
 		</dependency>
+		<!-- <dependency>
+			<groupId>com.tinkerpop.blueprints</groupId>
+			<artifactId>blueprints</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tinkerpop</groupId>
+			<artifactId>frames</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tinkerpop.gremlin</groupId>
+			<artifactId>gremlin-java</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tinkerpop</groupId>
+			<artifactId>pipes</artifactId>
+			<version>2.4.0</version>
+		</dependency> -->
 	</dependencies>
 </project>

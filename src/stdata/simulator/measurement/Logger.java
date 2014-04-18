@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import stdata.datamodel.vertices.MeasuredDatum.TriggerType;
+
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 
 public class Logger {
@@ -19,10 +21,6 @@ public class Logger {
 	public static final String HOST_LOGFILE_SUBDIR = "hosts";
 	public static final String SIMULATION_LOGFILE_SUBDIR = "simulations";
 
-	public static enum TriggerType {
-		SPATIAL, TEMPORAL
-	};
-
 	/**
 	 * A trajectory logfile measures a particular trajectory each unit of
 	 * simulation time.
@@ -31,7 +29,7 @@ public class Logger {
 	 * 
 	 * Name: <simulationId>_<hostId>_<trajectoryId>_<TriggerType>.csv
 	 */
-	public static final String TRAJECTORY_LOGFILE_HEADER = "time,size,age,length,time_0,lat_0,lon_0,lat_p,lon_p,lat_h,lon_h,dist_h_0,dist_p_0";
+	public static final String TRAJECTORY_LOGFILE_HEADER = "time,size,length,age,time_0,lat_0,lon_0,lat_p,lon_p,lat_h,lon_h,dist_h_0,dist_p_0";
 
 	public static void appendTrajectoryMeasurement(String logDir,
 			String simulation, int host, int trajectory, TriggerType trigger,
@@ -45,8 +43,8 @@ public class Logger {
 		StringBuilder sb = new StringBuilder();
 		sb.append(Integer.toString(time)); // time
 		sb.append(LOGFILE_DELIMITER + Integer.toString(size)); // size
-		sb.append(LOGFILE_DELIMITER + Integer.toString(age)); // age
 		sb.append(LOGFILE_DELIMITER + Double.toString(length)); // length
+		sb.append(LOGFILE_DELIMITER + Integer.toString(age)); // age
 		sb.append(LOGFILE_DELIMITER + Integer.toString(time_0)); // time_0
 		sb.append(LOGFILE_DELIMITER
 				+ Float.toString(pos_0.getPoint().getLatitude())); // lat_0
@@ -80,8 +78,8 @@ public class Logger {
 	public static final String HOST_LOGFILE_HEADER = "time"
 			+ ",db_size"
 			+ ",size_avg,size_med,size_min,size_max,size_stdev"
-			+ ",age_avg,age_med,age_min,age_max,age_stdev"
 			+ ",length_avg,length_med,length_min,length_max,length_stdev"
+			+ ",age_avg,age_med,age_min,age_max,age_stdev"
 			+ ",dist_h_0_avg,dist_h_0_med,dist_h_0_min,dist_h_0_max,dist_h_0_stdev"
 			+ ",dist_p_0_avg,dist_p_0_med,dist_p_0_min,dist_p_0_max,dist_p_0_stdev";
 
@@ -115,8 +113,8 @@ public class Logger {
 	public static final String SIMULATION_LOGFILE_HEADER = "time"
 			+ ",db_size_avg,db_size_med,db_size_min,db_size_max,db_size_stdev"
 			+ ",size_avg,size_med,size_min,size_max,size_stdev"
-			+ ",age_avg,age_med,age_min,age_max,age_stdev"
 			+ ",length_avg,length_med,length_min,length_max,length_stdev"
+			+ ",age_avg,age_med,age_min,age_max,age_stdev"
 			+ ",dist_h_0_avg,dist_h_0_med,dist_h_0_min,dist_h_0_max,dist_h_0_stdev"
 			+ ",dist_p_0_avg,dist_p_0_med,dist_p_0_min,dist_p_0_max,dist_p_0_stdev";
 
@@ -148,8 +146,8 @@ public class Logger {
 	 */
 	public static final String OVERALL_LOGFILE_HEADER = "db_size_avg,db_size_med,db_size_min,db_size_max,db_size_stdev"
 			+ ",size_avg,size_med,size_min,size_max,size_stdev"
-			+ ",age_avg,age_med,age_min,age_max,age_stdev"
 			+ ",length_avg,length_med,length_min,length_max,length_stdev"
+			+ ",age_avg,age_med,age_min,age_max,age_stdev"
 			+ ",dist_h_0_avg,dist_h_0_med,dist_h_0_min,dist_h_0_max,dist_h_0_stdev"
 			+ ",dist_p_0_avg,dist_p_0_med,dist_p_0_min,dist_p_0_max,dist_p_0_stdev";
 

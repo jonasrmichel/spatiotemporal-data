@@ -21,14 +21,14 @@ public abstract class MovingObject {
 	protected ILocationManager locationManager;
 
 	/** An interface for a spatial (moving object) database. */
-	protected IMovingObjectDatabase database;
-
+	protected IMovingObjectDatabase objectDB;
+	
 	public MovingObject(int identifier, String type,
-			ILocationManager locationManager, IMovingObjectDatabase database) {
+			ILocationManager locationManager, IMovingObjectDatabase objectDB) {
 		this.identifier = identifier;
 		this.type = type;
 		this.locationManager = locationManager;
-		this.database = database;
+		this.objectDB = objectDB;
 	}
 
 	/**
@@ -46,7 +46,7 @@ public abstract class MovingObject {
 	 * 
 	 * @param time
 	 */
-	protected abstract void step(int time);
+	public abstract void step(int time);
 
 	/**
 	 * Advances the moving object to the provided simulation time.
@@ -61,10 +61,7 @@ public abstract class MovingObject {
 		
 		// if necessary, update the the moving objects database
 		if (!prevLocation.equals(location))
-			database.updatePosition(identifier, type, time, location);
-		
-		// perform simulation step tasks
-		step(time);
+			objectDB.updatePosition(identifier, type, time, location);
 	}
 
 }

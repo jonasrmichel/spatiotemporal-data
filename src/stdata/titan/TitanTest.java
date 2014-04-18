@@ -9,7 +9,7 @@ import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfigu
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 
-import stdata.datamodel.MyFrameInitializer;
+import stdata.datamodel.SpatiotemporalFrameInitializer;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.SpaceTimePosition;
 
@@ -60,7 +60,7 @@ public class TitanTest {
 		FramedGraphFactory factory = new FramedGraphFactory(
 				new JavaHandlerModule(), new AbstractModule() {
 					public void doConfigure(FramedGraphConfiguration config) {
-						config.addFrameInitializer(new MyFrameInitializer());
+						config.addFrameInitializer(new SpatiotemporalFrameInitializer());
 					}
 				});
 		FramedGraph<TitanGraph> framedGraph = factory.create(titanGraph);

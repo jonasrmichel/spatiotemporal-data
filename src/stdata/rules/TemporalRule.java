@@ -3,12 +3,14 @@ package stdata.rules;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public abstract class TemporalRule extends Rule {
+import com.tinkerpop.frames.FramedGraph;
+
+public abstract class TemporalRule<G extends FramedGraph<?>> extends Rule<G> {
 	/** The rule's timer. */
 	Timer timer = null;
 
-	public TemporalRule(IRuleDelegate delegate, long delay, long period) {
-		super(delegate);
+	public TemporalRule(G graph, IRuleDelegate delegate, long delay, long period) {
+		super(graph, delegate);
 
 		start(delay, period);
 	}

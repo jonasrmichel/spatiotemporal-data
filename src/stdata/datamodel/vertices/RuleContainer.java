@@ -1,12 +1,16 @@
 package stdata.datamodel.vertices;
 
+import stdata.rules.IRuleDelegate;
 import stdata.rules.Rule;
 
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
+import com.tinkerpop.frames.modules.javahandler.JavaHandler;
+import com.tinkerpop.frames.modules.javahandler.JavaHandlerContext;
 
-public interface RuleContainer extends VertexFrame {
+public interface RuleContainer extends VertexFrame, IRuleDelegate {
 
 	/** The contained rule. */
 	@Property("rule")

@@ -2,10 +2,12 @@ package stdata.datamodel.vertices;
 
 import stdata.datamodel.edges.Context;
 
+import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Incidence;
+import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
 import com.tinkerpop.frames.modules.javahandler.JavaHandler;
 import com.tinkerpop.frames.modules.javahandler.JavaHandlerContext;
@@ -17,6 +19,13 @@ public interface Datum extends VertexFrame {
 
 	/** Trajectory temporal resolution. */
 	// TODO @Property
+
+	/** Initial geospatial location of the sensed phenomenon this datum represents. */
+	@Property("initial-phenomenon-location")
+	public Geoshape getInitialPhenomenonLocation();
+
+	@Property("initial-phenomenon-location")
+	public void setInitialPhenomenonLocation(Geoshape location);
 
 	/** The head of the datum's trajectory. */
 	@Adjacency(label = "trajectory-head")

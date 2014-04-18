@@ -7,10 +7,13 @@ import java.util.HashSet;
 import java.util.Map;
 
 import stdata.simulator.movingobjects.Host;
+import stdata.simulator.movingobjects.IHostDelegate;
 import stdata.simulator.movingobjects.MovingObject;
 import stdata.simulator.movingobjects.Phenomenon;
 
-public class SimulationDriver {
+import com.thinkaurelius.titan.core.attribute.Geoshape;
+
+public class SimulationDriver implements IHostDelegate {
 
 	/** Simulation options. */
 	int startTime, stopTime;
@@ -118,8 +121,10 @@ public class SimulationDriver {
 		int numHosts = hostLocationManager.getNumTraces();
 		for (int i = 0; i < numHosts; i++)
 			hosts.put(i, new Host(i, SimulationManager.HOST_OBJECT_TYPE,
-					hostLocationManager, database, graphDir, indexDir,
-					logDir, temporalResolution, spatialResolution));
+					hostLocationManager, database, this, graphDir, indexDir,
+					logDir, SimulationManager.phenomenaSensingRange,
+					SimulationManager.phenomenaSensingInterval,
+					temporalResolution, spatialResolution));
 	}
 
 	private void loadPhenomena() {
@@ -197,8 +202,12 @@ public class SimulationDriver {
 						for (MovingObject movingObject : movingObjects)
 							movingObject.advance(time);
 						
-						// TODO perform time aggregate temporal resolution measurements+logging
-						// TODO perform time aggregate spatial resolution measurements+logging
+						// instruct each moving object to perform a simulation step
+						for (MovingObject movingObject : movingObjects)
+							movingObject.step(time);
+						
+						// TODO perform time:simulation aggregate temporal resolution measurements+logging
+						// TODO perform time:simulation aggregate spatial resolution measurements+logging
 
 						// advance the simulation time
 						time++;
@@ -217,5 +226,11 @@ public class SimulationDriver {
 				} // end of spatiotemporal resolution
 			} // end of host mobility
 		} // end of phenomenon mobility
+	}
+	
+	/* IHostDelegate interface implementation. */
+	@Override
+	public Geoshape getPhenomenonLocation(int identifier, int time) {
+		return phenomenonLocationManager.getLocation(identifier, time);
 	}
 }

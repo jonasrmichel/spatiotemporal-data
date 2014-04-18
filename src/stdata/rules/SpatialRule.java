@@ -1,9 +1,11 @@
 package stdata.rules;
 
-public abstract class SpatialRule extends Rule {
+import com.tinkerpop.frames.FramedGraph;
 
-	public SpatialRule(IRuleDelegate delegate) {
-		super(delegate);
+public abstract class SpatialRule<G extends FramedGraph<?>> extends Rule<G> {
+
+	public SpatialRule(G graph, IRuleDelegate delegate) {
+		super(graph, delegate);
 		// TODO Auto-generated constructor stub
 	}
 

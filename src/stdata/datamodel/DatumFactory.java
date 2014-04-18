@@ -4,8 +4,8 @@ import java.util.List;
 
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.SpaceTimePosition;
+import stdata.rules.IRuleRegistry;
 import stdata.rules.Rule;
-import stdata.rules.RuleRegistry;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Graph;
@@ -13,9 +13,9 @@ import com.tinkerpop.frames.FramedGraph;
 
 public class DatumFactory<T extends Graph> implements IDatumFactory {
 	FramedGraph<T> graph;
-	RuleRegistry<T> ruleRegistry;
+	IRuleRegistry ruleRegistry;
 
-	public DatumFactory(FramedGraph<T> graph, RuleRegistry<T> ruleRegistry) {
+	public DatumFactory(FramedGraph<T> graph, IRuleRegistry ruleRegistry) {
 		this.graph = graph;
 		this.ruleRegistry = ruleRegistry;
 	}
@@ -24,7 +24,7 @@ public class DatumFactory<T extends Graph> implements IDatumFactory {
 
 	@Override
 	public Datum addDatum(double latitude, double longitude, long timestamp,
-			String domain, List<Datum> context, List<Rule> rules) {
+			String domain, List<Datum> context, Rule rule) {
 		// create the datum
 		Datum datum = graph.addVertex(null, Datum.class);
 
@@ -40,7 +40,7 @@ public class DatumFactory<T extends Graph> implements IDatumFactory {
 		datum.setContextData(context);
 
 		// register the datum's rules
-		ruleRegistry.registerRules(datum, rules);
+		ruleRegistry.registerRule(rule, datum);
 
 		return datum;
 	}

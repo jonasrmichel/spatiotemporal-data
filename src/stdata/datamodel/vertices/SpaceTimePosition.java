@@ -7,27 +7,28 @@ import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
 
 public interface SpaceTimePosition extends VertexFrame {
-
-	/** Place property. */
-	@Property("location")
+	public static final String LOCATION_KEY = "location";
+	
+	/** Location property. */
+	@Property(LOCATION_KEY)
 	public Geoshape getLocation();
 	
-	@Property("location")
+	@Property(LOCATION_KEY)
 	public void setLocation(Geoshape location);
 	
 //	/** Latitude property. */
 //	@Property("latitude")
-//	public double getLatitude();
+//	public float getLatitude();
 //
 //	@Property("latitude")
-//	public void setLatitude(double latitude);
+//	public void setLatitude(float latitude);
 //
 //	/** Longitude property. */
 //	@Property("longitude")
-//	public double getLongitude();
+//	public float getLongitude();
 //
 //	@Property("longitude")
-//	public void setLongitude(double longitude);
+//	public void setLongitude(float longitude);
 
 	/** Timestamp property. */
 	@Property("timestamp")
@@ -42,7 +43,7 @@ public interface SpaceTimePosition extends VertexFrame {
 
 	@Property("domain")
 	public void setDomain(String domain);
-
+	
 	/** Datum whose trajectory this space-time position is part of. */
 	@Adjacency(label = "trajectory")
 	public Datum getDatum();

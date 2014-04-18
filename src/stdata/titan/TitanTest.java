@@ -1,4 +1,4 @@
-package pervasivedata.titan;
+package stdata.titan;
 
 import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration.INDEX_BACKEND_KEY;
 import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration.INDEX_NAMESPACE;
@@ -9,9 +9,9 @@ import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfigu
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 
-import pervasivedata.datamodel.MyFrameInitializer;
-import pervasivedata.datamodel.vertices.Datum;
-import pervasivedata.datamodel.vertices.SpaceTimePosition;
+import stdata.datamodel.MyFrameInitializer;
+import stdata.datamodel.vertices.Datum;
+import stdata.datamodel.vertices.SpaceTimePosition;
 
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;

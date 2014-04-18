@@ -1,6 +1,6 @@
-package pervasivedata.datamodel.vertices;
+package stdata.datamodel.vertices;
 
-import pervasivedata.datamodel.edges.Context;
+import stdata.datamodel.edges.Context;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Vertex;

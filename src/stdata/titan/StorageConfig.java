@@ -1,4 +1,4 @@
-package pervasivedata.titan;
+package stdata.titan;
 
 
 import com.thinkaurelius.titan.core.TitanFactory;

@@ -1,4 +1,4 @@
-package pervasivedata.rules;
+package stdata.rules;
 
 import java.util.Timer;
 import java.util.TimerTask;

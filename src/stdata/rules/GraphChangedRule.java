@@ -1,4 +1,4 @@
-package pervasivedata.rules;
+package stdata.rules;
 
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
 

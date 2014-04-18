@@ -6,9 +6,6 @@ import com.thinkaurelius.titan.core.attribute.Geoshape;
 
 public interface IMovingObjectDatabase {
 
-	/** Shuts down the moving object database connection. */
-	public void shutdown();
-
 	/**
 	 * Inserts a new time-location position for the moving object with the
 	 * provided identifier and type.

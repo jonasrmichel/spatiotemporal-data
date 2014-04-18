@@ -1,8 +1,8 @@
-package pervasivedata.rules;
+package stdata.rules;
 
 import java.util.List;
 
-import pervasivedata.datamodel.vertices.Datum;
+import stdata.datamodel.vertices.Datum;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;

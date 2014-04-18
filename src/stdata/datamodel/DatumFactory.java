@@ -1,11 +1,11 @@
-package pervasivedata.datamodel;
+package stdata.datamodel;
 
 import java.util.List;
 
-import pervasivedata.datamodel.vertices.Datum;
-import pervasivedata.datamodel.vertices.SpaceTimePosition;
-import pervasivedata.rules.Rule;
-import pervasivedata.rules.RuleRegistry;
+import stdata.datamodel.vertices.Datum;
+import stdata.datamodel.vertices.SpaceTimePosition;
+import stdata.rules.Rule;
+import stdata.rules.RuleRegistry;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Graph;

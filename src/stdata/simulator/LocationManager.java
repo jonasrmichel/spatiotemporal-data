@@ -12,14 +12,14 @@ import java.util.NoSuchElementException;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 
-public class LocationManager {
-	/* Holds the global list of mobility traces. */
+public class LocationManager implements ILocationManager {
+	/** Holds the global list of mobility traces. */
 	private List<List<Point>> traces;
 
-	/* Holds the coordinate projection matrix. */
+	/** Holds the coordinate projection matrix. */
 	private Geoshape[][] projection;
 
-	/*
+	/**
 	 * Defines the min-max latitude-longitude bounds of the bounding box:
 	 * -97.7405273914,30.2825938192,-97.7338540554,30.2883008152 generated
 	 * using: http://boundingbox.klokantech.com/
@@ -39,7 +39,7 @@ public class LocationManager {
 																// negative), x
 																// max
 
-	/*
+	/**
 	 * Defines the map's height and width in meters. Generated using
 	 * http://andrew.hedges.name/experiments/haversine/ with above coordinates
 	 * it's important that these are the same as the mobility generator map's
@@ -49,13 +49,21 @@ public class LocationManager {
 												// acres
 	public static final int MAP_WIDTH = 643;
 
-	/* the mobility trace file */
+	/** the mobility trace file */
 	// private static final String MOBILITY_TRACE_FILE = "mobility_traces/" +
 	// Integer.toString(Settings.NUM_MOBILE_DEVICES) + "_nodes.txt";
 	// private static final String MOBILITY_TRACE_FILE =
 	// "mobility_traces/500_nodes.txt";
 
 	public LocationManager(String traceFile) {
+		this(traceFile, -1, -1);
+	}
+
+	public LocationManager(String traceFile, int startTime) {
+		this(traceFile, startTime, -1);
+	}
+
+	public LocationManager(String traceFile, int startTime, int stopTime) {
 		// create the coordinate projection matrix
 		projection = new Geoshape[MAP_WIDTH][MAP_HEIGHT];
 
@@ -66,26 +74,7 @@ public class LocationManager {
 		traces = new ArrayList<List<Point>>();
 
 		// load the global list of traces
-		loadTraces(traceFile);
-	}
-
-	/**
-	 * Retrieves the next sequential location point in the given mobile object's
-	 * trace.
-	 * 
-	 * @param identifier
-	 *            the unique identifier of a mobile object.
-	 * @param time
-	 *            the timestamp of the desired location
-	 * @return
-	 */
-	public Point getLocation(int identifier, int time)
-			throws NoSuchElementException {
-		// retrieve this objects's mobility trace
-		List<Point> trace = traces.get(identifier);
-
-		// remove and return the point at the head of the trace
-		return trace.get(time);
+		loadTraces(traceFile, startTime, stopTime);
 	}
 
 	/**
@@ -107,9 +96,9 @@ public class LocationManager {
 	/**
 	 * Loads the global list of mobility traces.
 	 */
-	private void loadTraces(String traceFile) {
-		if (SimulationManager.verbose)
-			Logging.report(LocationManager.class, "initializing");
+	private void loadTraces(String traceFile, int startTime, int stopTime) {
+		if (SimulationManager.debug)
+			Util.report(LocationManager.class, "initializing");
 		try {
 			FileReader fileReader = new FileReader(traceFile);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -117,8 +106,8 @@ public class LocationManager {
 			String line = null;
 			// skip lines until we reach the column name header
 			while ((line = bufferedReader.readLine()) != null) {
-				if (SimulationManager.verbose)
-					Logging.report(LocationManager.class, "skipping: " + line);
+				if (SimulationManager.debug)
+					Util.report(LocationManager.class, "skipping: " + line);
 
 				if (line.trim()
 						.replace("\n", "")
@@ -129,23 +118,34 @@ public class LocationManager {
 
 			// now process all subsequent lines (one trace's point per line)
 			String[] cols = null;
-			int identifier, posx, posy;
+			int time, identifier, posx, posy;
 			Point point;
 			List<Point> trace;
 			while ((line = bufferedReader.readLine()) != null) {
-				if (SimulationManager.verbose)
-					Logging.report(LocationManager.class, "parsing line: "
+				if (SimulationManager.debug)
+					Util.report(LocationManager.class, "parsing line: "
 							+ line);
 
 				// split the line into its columns
 				cols = line.split("\t");
 				// retrieve the fields of interest
+				time = Integer.parseInt(cols[0]);
 				identifier = Integer.parseInt(cols[1]);
 				posx = Integer.parseInt(cols[2]);
 				posy = Integer.parseInt(cols[3]);
 
-				if (SimulationManager.verbose)
-					Logging.report(LocationManager.class, "parsed: "
+				// if relevant, check if the current trace time is after the
+				// start time
+				if (startTime >= 0 && time < startTime)
+					continue;
+
+				// if relevant, check if the current trace time is before the
+				// stop time
+				if (stopTime > 0 && time > stopTime)
+					return;
+
+				if (SimulationManager.debug)
+					Util.report(LocationManager.class, "parsed: "
 							+ "identifier=" + Integer.toString(identifier)
 							+ " posx=" + Integer.toString(posx) + " posy="
 							+ Integer.toString(posy));
@@ -155,21 +155,21 @@ public class LocationManager {
 				try {
 					trace = traces.get(identifier);
 				} catch (IndexOutOfBoundsException e) {
-					if (SimulationManager.verbose)
-						Logging.report(
+					if (SimulationManager.debug)
+						Util.report(
 								LocationManager.class,
 								"creating new trace for node "
 										+ Integer.toString(identifier));
 
-					trace = new LinkedList<Point>();
+					trace = new ArrayList<Point>();
 					traces.add(identifier, trace);
 				}
 
 				// create the point
 				point = new Point(posx, posy);
 
-				if (SimulationManager.verbose)
-					Logging.report(
+				if (SimulationManager.debug)
+					Util.report(
 							LocationManager.class,
 							"appending projected point ("
 									+ Integer.toString(posx) + ","
@@ -181,8 +181,8 @@ public class LocationManager {
 				trace.add(point);
 			}
 
-			if (SimulationManager.verbose)
-				Logging.report(LocationManager.class,
+			if (SimulationManager.debug)
+				Util.report(LocationManager.class,
 						"completed initialization");
 
 			// close the file handle
@@ -192,17 +192,6 @@ public class LocationManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Performs a lookup on the coordinate projection matrix.
-	 * 
-	 * @param x
-	 * @param y
-	 * @return
-	 */
-	public Geoshape getProjectedPoint(int x, int y) {
-		return projection[x][y];
 	}
 
 	/**
@@ -229,13 +218,54 @@ public class LocationManager {
 		return x * (LONGITUDE_E - LONGITUDE_W) / MAP_WIDTH + LONGITUDE_W;
 	}
 
+	/**
+	 * Retrieves the Cartesian point in the given mobile object's trace at the
+	 * provided simulation time.
+	 * 
+	 * @param identifier
+	 *            the unique identifier of a mobile object.
+	 * @param time
+	 *            the timestamp of the desired location.
+	 * @return
+	 */
+	public Point getCartesianLocation(int identifier, int time)
+			throws NoSuchElementException {
+		return traces.get(identifier).get(time);
+	}
+
+	/**
+	 * Returns the geospatial point for the provided Cartesian coordinates.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public Geoshape getProjectedLocation(int x, int y) {
+		return projection[x][y];
+	}
+
+	/* ILocationManager interface implementation. */
+
+	@Override
+	public int getNumTraces() {
+		return traces.size();
+	}
+
+	@Override
+	public Geoshape getLocation(int identifier, int time) {
+		// get the cartesian location of this object at the given time
+		Point p = getCartesianLocation(identifier, time);
+		// retrieve the geospatial projected location
+		return getProjectedLocation(p.x, p.y);
+	}
+
 	public static void main(String[] args) {
 		LocationManager lm = new LocationManager(
 				"mobility_traces/500_nodes.txt");
 		int i = 0;
 		while (true) {
 			try {
-				Point p = lm.getLocation(0, i++);
+				Point p = lm.getCartesianLocation(0, i++);
 				System.out.println(Integer.toString(i) + ": ("
 						+ Integer.toString(p.x) + "," + Integer.toString(p.y)
 						+ ")");

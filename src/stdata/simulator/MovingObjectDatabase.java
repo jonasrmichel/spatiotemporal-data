@@ -36,7 +36,7 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 			try {
 				// attempt to connect to the moving object database
 				if (SimulationManager.verbose)
-					Logging.report(MovingObjectDatabase.class,
+					Util.report(MovingObjectDatabase.class,
 							"connecting to moving object database");
 
 				conn = DriverManager.getConnection(PG_URL + PG_DATABASE,
@@ -44,7 +44,7 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 
 			} catch (SQLException ex) {
 				if (SimulationManager.verbose)
-					Logging.report(MovingObjectDatabase.class,
+					Util.report(MovingObjectDatabase.class,
 							"moving object database does not exist");
 
 				conn = createDatabase();
@@ -64,7 +64,7 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 		Statement st = null;
 		try {
 			if (SimulationManager.verbose)
-				Logging.report(MovingObjectDatabase.class,
+				Util.report(MovingObjectDatabase.class,
 						"creating moving object database");
 
 			conn = DriverManager.getConnection(PG_URL, PG_USER, PG_PASSWORD);
@@ -75,7 +75,7 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 			st.executeUpdate(sqlCreateDatabase);
 
 			if (SimulationManager.verbose)
-				Logging.report(MovingObjectDatabase.class,
+				Util.report(MovingObjectDatabase.class,
 						"database created successfully");
 
 		} catch (SQLException ex) {
@@ -104,7 +104,7 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 		Statement st = null;
 		try {
 			if (SimulationManager.verbose)
-				Logging.report(MovingObjectDatabase.class,
+				Util.report(MovingObjectDatabase.class,
 						"(re)creating simulation moving object table");
 
 			// drop table
@@ -145,7 +145,7 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 			st.executeUpdate(sqlCreateIndexIdentifierTimestamp);
 
 			if (SimulationManager.verbose)
-				Logging.report(MovingObjectDatabase.class,
+				Util.report(MovingObjectDatabase.class,
 						"table (re)created successfully");
 
 		} catch (SQLException ex) {
@@ -162,12 +162,10 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 		}
 	}
 
-	/* IMovingObjectDatabase interface implementation. */
-
-	@Override
+	/** Shuts down the moving object database connection. */
 	public void shutdown() {
 		if (SimulationManager.verbose)
-			Logging.report(MovingObjectDatabase.class, "shutting down");
+			Util.report(MovingObjectDatabase.class, "shutting down");
 
 		try {
 			if (conn != null)
@@ -178,6 +176,8 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 
 		}
 	}
+
+	/* IMovingObjectDatabase interface implementation. */
 
 	@Override
 	public void updatePosition(int identifier, String type, int timestamp,
@@ -228,7 +228,7 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 
 			st = conn.createStatement();
 			rs = st.executeQuery(sql);
-			
+
 			nearby = new ArrayList<Integer>();
 			while (rs.next())
 				nearby.add(rs.getInt("identifier"));
@@ -253,7 +253,7 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 	}
 
 	public static void main(String[] args) {
-		IMovingObjectDatabase mod = new MovingObjectDatabase("test");
+		MovingObjectDatabase mod = new MovingObjectDatabase("test");
 		mod.shutdown();
 	}
 }

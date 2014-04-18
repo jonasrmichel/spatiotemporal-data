@@ -1,4 +1,4 @@
-package pervasivedata.datamodel.vertices;
+package stdata.datamodel.vertices;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Direction;

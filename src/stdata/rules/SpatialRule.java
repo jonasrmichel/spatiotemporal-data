@@ -1,4 +1,4 @@
-package pervasivedata.rules;
+package stdata.rules;
 
 public abstract class SpatialRule extends Rule {
 

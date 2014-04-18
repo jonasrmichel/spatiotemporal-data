@@ -16,8 +16,10 @@ import org.apache.commons.cli.ParseException;
 public class SimulationManager {
 
 	/** Simulation options. */
-	public static final int numHosts = 100;
-	public static final int numPhenomena = 1500;
+	public static final int NUM_HOSTS = 100;
+	public static final int NUM_PHENOMENA = 1500;
+	public static final String HOST_OBJECT_TYPE = "host";
+	public static final String PHENOMENON_OBJECT_TYPE = "phenomenon";
 
 	/** Verbose mode. */
 	public static boolean verbose = false;
@@ -26,7 +28,7 @@ public class SimulationManager {
 	/** Simulation start time (offset in mobility trace files). */
 	public static int startTime = 0;
 	/** Simulation stop time. */
-	public static int stopTime = 60 * 60 * 8;
+	public static int stopTime = 60 * 60 * 8; // 8 hours
 
 	/** Mobility trace file directory (used by LocationManager). */
 	public static String traceDir = "../traces";
@@ -34,13 +36,13 @@ public class SimulationManager {
 	public static String graphDir = "../graphs";
 	/** Index storage directory (used by Hosts). */
 	public static String indexDir = "../index";
-	/** Statistics logging directory. */
-	public static String statsDir = "../stats";
+	/** Measurement logfile directory. */
+	public static String logDir = "../logs";
 
 	/** Phenomena sensing range (meters). */
 	public static double phenomenaSensingRange = 30;
 	/** Phenomena sensing interval (seconds). */
-	public static int phenomenaSensingInterval = 60;
+	public static int phenomenaSensingInterval = 60 * 5; // 5 minutes
 
 	/** Degree of host mobility. */
 	public static String[] mobilityHosts = { "slow", "medium", "fast" };
@@ -88,8 +90,8 @@ public class SimulationManager {
 			if (line.hasOption("index-dir"))
 				indexDir = line.getOptionValue("index-dir");
 
-			if (line.hasOption("stats-dir"))
-				statsDir = line.getOptionValue("stats-dir");
+			if (line.hasOption("log-dir"))
+				logDir = line.getOptionValue("log-dir");
 
 			if (line.hasOption("sensing-range"))
 				phenomenaSensingRange = Double.parseDouble(line
@@ -147,8 +149,8 @@ public class SimulationManager {
 				"graph database home directory");
 		options.addOption("I", "index-dir", true,
 				"graph database index (lucene) home directory");
-		options.addOption("s", "stats-dir", true,
-				"statistics logging directory");
+		options.addOption("l", "log-dir", true,
+				"result logfile directory");
 
 		options.addOption("r", "sensing-range", true,
 				"phenomena sensing range (meters)");

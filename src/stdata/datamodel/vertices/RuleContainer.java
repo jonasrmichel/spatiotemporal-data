@@ -1,6 +1,6 @@
-package pervasivedata.datamodel.vertices;
+package stdata.datamodel.vertices;
 
-import pervasivedata.rules.Rule;
+import stdata.rules.Rule;
 
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;

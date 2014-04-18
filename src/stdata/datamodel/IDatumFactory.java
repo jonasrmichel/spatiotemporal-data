@@ -1,9 +1,9 @@
-package pervasivedata.datamodel;
+package stdata.datamodel;
 
 import java.util.List;
 
-import pervasivedata.datamodel.vertices.Datum;
-import pervasivedata.rules.Rule;
+import stdata.datamodel.vertices.Datum;
+import stdata.rules.Rule;
 
 public interface IDatumFactory {
 

@@ -1,8 +1,8 @@
-package pervasivedata.test;
+package stdata.test;
 
-import pervasivedata.datamodel.MyFrameInitializer;
-import pervasivedata.datamodel.vertices.Datum;
-import pervasivedata.datamodel.vertices.SpaceTimePosition;
+import stdata.datamodel.MyFrameInitializer;
+import stdata.datamodel.vertices.Datum;
+import stdata.datamodel.vertices.SpaceTimePosition;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Direction;

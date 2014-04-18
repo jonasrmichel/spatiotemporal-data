@@ -1,6 +1,6 @@
-package pervasivedata.datamodel.edges;
+package stdata.datamodel.edges;
 
-import pervasivedata.datamodel.vertices.Datum;
+import stdata.datamodel.vertices.Datum;
 
 import com.tinkerpop.frames.EdgeFrame;
 import com.tinkerpop.frames.InVertex;

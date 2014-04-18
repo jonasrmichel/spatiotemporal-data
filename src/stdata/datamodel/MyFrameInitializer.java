@@ -1,7 +1,7 @@
-package pervasivedata.datamodel;
+package stdata.datamodel;
 
-import pervasivedata.datamodel.vertices.Datum;
-import pervasivedata.datamodel.vertices.SpaceTimePosition;
+import stdata.datamodel.vertices.Datum;
+import stdata.datamodel.vertices.SpaceTimePosition;
 
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.frames.FrameInitializer;

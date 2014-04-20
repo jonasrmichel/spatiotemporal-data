@@ -18,6 +18,12 @@ public class TemporallyModulatedTrajectoryRule<G extends FramedGraph<?>> extends
 	/** The reference location. */
 	long referenceTime = -1L;
 
+	public TemporallyModulatedTrajectoryRule(G graph, long temporalResolution) {
+		super(graph);
+
+		this.temporalResolution = temporalResolution;
+	}
+	
 	public TemporallyModulatedTrajectoryRule(G graph, IRuleDelegate delegate, long temporalResolution) {
 		super(graph, delegate);
 

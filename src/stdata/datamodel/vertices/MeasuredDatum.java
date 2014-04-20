@@ -1,5 +1,9 @@
 package stdata.datamodel.vertices;
 
+import java.util.Map;
+
+import stdata.simulator.measurement.RunningStatistics;
+
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.frames.Property;
@@ -17,6 +21,13 @@ public interface MeasuredDatum extends Datum {
 	public static enum TriggerType {
 		SPATIAL, TEMPORAL
 	};
+
+	/** The sensed phenomenon's simulation identifier. */
+	@Property("phenomenon-identifier")
+	public int getPhenomenonIdentifier();
+
+	@Property("phenomenon-identifier")
+	public void setPhenomenonIdentifier(int identifier);
 
 	/**
 	 * Trigger type property indicates how this datum's trajectory updates are
@@ -132,7 +143,7 @@ public interface MeasuredDatum extends Datum {
 	 */
 	@JavaHandler
 	public void updateDistancePhenomenonCreation(Geoshape phenomenonLocation);
-
+	
 	abstract class Impl implements JavaHandlerContext<Vertex>, MeasuredDatum {
 		// We need to re-implement this here because we can't reference the
 		// super interface (Datum).
@@ -203,7 +214,7 @@ public interface MeasuredDatum extends Datum {
 		public void updateDistancePhenomenonCreation(Geoshape phenomenonLocation) {
 			// Geoshape.Point.distance() is in kilometers, convert to meters
 			setDistancePhenomenonCreation(phenomenonLocation.getPoint()
-					.distance(getInitialPhenomenonLocation().getPoint()) * 1000);
+					.distance(getLocation().getPoint()) * 1000);
 		}
 	}
 }

@@ -32,12 +32,12 @@ public class Logger {
 	public static final String TRAJECTORY_LOGFILE_HEADER = "time,size,length,age,time_0,lat_0,lon_0,lat_p,lon_p,lat_h,lon_h,dist_h_0,dist_p_0";
 
 	public static void appendTrajectoryMeasurement(String logDir,
-			String simulation, int host, int trajectory, TriggerType trigger,
-			int time, int size, int age, double length, int time_0,
+			String simulation, int host, Object trajectory, TriggerType trigger,
+			int time, int size, double length, int age, int time_0,
 			Geoshape pos_0, Geoshape pos_p, Geoshape pos_h, double dist_h_0,
 			double dist_p_0) {
 		String name = simulation + "_" + Integer.toString(host) + "_"
-				+ Integer.toString(trajectory) + "_"
+				+ trajectory.toString() + "_"
 				+ trigger.toString().toLowerCase();
 
 		StringBuilder sb = new StringBuilder();
@@ -77,15 +77,15 @@ public class Logger {
 	 */
 	public static final String HOST_LOGFILE_HEADER = "time"
 			+ ",db_size"
-			+ ",size_avg,size_med,size_min,size_max,size_stdev"
-			+ ",length_avg,length_med,length_min,length_max,length_stdev"
-			+ ",age_avg,age_med,age_min,age_max,age_stdev"
-			+ ",dist_h_0_avg,dist_h_0_med,dist_h_0_min,dist_h_0_max,dist_h_0_stdev"
-			+ ",dist_p_0_avg,dist_p_0_med,dist_p_0_min,dist_p_0_max,dist_p_0_stdev";
+			+ ",size_min,size_max,size_avg,size_var,size_stdev"
+			+ ",length_min,length_max,length_avg,length_var,length_stdev"
+			+ ",age_min,age_max,age_avg,age_var,age_stdev"
+			+ ",dist_h_0_min,dist_h_0_max,dist_h_0_avg,dist_h_0_var,dist_h_0_stdev"
+			+ ",dist_p_0_min,dist_p_0_max,dist_p_0_avg,dist_p_0_var,dist_p_0_stdev";
 
 	public static void appendHostMeasurement(String logDir, String simulation,
 			int host, TriggerType trigger, int time, int db_size,
-			Statistics<Double>... statistics) {
+			RunningStatistics... statistics) {
 		String name = simulation + "_" + Integer.toString(host) + "_"
 				+ trigger.toString().toLowerCase();
 
@@ -93,7 +93,7 @@ public class Logger {
 		sb.append(Integer.toString(time));
 		sb.append(LOGFILE_DELIMITER + Integer.toString(db_size));
 
-		for (Statistics<Double> s : statistics) {
+		for (RunningStatistics s : statistics) {
 			sb.append(s.toDelimitedString(LOGFILE_DELIMITER, true, false));
 		}
 
@@ -111,22 +111,22 @@ public class Logger {
 	 * Name: <simulationId>_<TriggerType>.csv
 	 */
 	public static final String SIMULATION_LOGFILE_HEADER = "time"
-			+ ",db_size_avg,db_size_med,db_size_min,db_size_max,db_size_stdev"
-			+ ",size_avg,size_med,size_min,size_max,size_stdev"
-			+ ",length_avg,length_med,length_min,length_max,length_stdev"
-			+ ",age_avg,age_med,age_min,age_max,age_stdev"
-			+ ",dist_h_0_avg,dist_h_0_med,dist_h_0_min,dist_h_0_max,dist_h_0_stdev"
-			+ ",dist_p_0_avg,dist_p_0_med,dist_p_0_min,dist_p_0_max,dist_p_0_stdev";
+			+ ",db_size_min,db_size_max,db_size_avg,db_size_var,db_size_stdev"
+			+ ",size_min,size_max,size_avg,size_var,size_stdev"
+			+ ",length_min,length_max,length_avg,length_var,length_stdev"
+			+ ",age_min,age_max,age_avg,age_var,age_stdev"
+			+ ",dist_h_0_min,dist_h_0_max,dist_h_0_avg,dist_h_0_var,dist_h_0_stdev"
+			+ ",dist_p_0_min,dist_p_0_max,dist_p_0_avg,dist_p_0_var,dist_p_0_stdev";
 
 	public static void appendSimulationMeasurement(String logDir,
 			String simulation, TriggerType trigger, int time,
-			Statistics<Double>... statistics) {
+			RunningStatistics... statistics) {
 		String name = simulation + "_" + trigger.toString().toLowerCase();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(Integer.toString(time));
 
-		for (Statistics<Double> s : statistics) {
+		for (RunningStatistics s : statistics) {
 			sb.append(s.toDelimitedString(LOGFILE_DELIMITER, true, false));
 		}
 
@@ -144,21 +144,21 @@ public class Logger {
 	 * 
 	 * Name: overall_<TriggerType>.csv
 	 */
-	public static final String OVERALL_LOGFILE_HEADER = "db_size_avg,db_size_med,db_size_min,db_size_max,db_size_stdev"
-			+ ",size_avg,size_med,size_min,size_max,size_stdev"
-			+ ",length_avg,length_med,length_min,length_max,length_stdev"
-			+ ",age_avg,age_med,age_min,age_max,age_stdev"
-			+ ",dist_h_0_avg,dist_h_0_med,dist_h_0_min,dist_h_0_max,dist_h_0_stdev"
-			+ ",dist_p_0_avg,dist_p_0_med,dist_p_0_min,dist_p_0_max,dist_p_0_stdev";
+	public static final String OVERALL_LOGFILE_HEADER = "db_size_min,db_size_max,db_size_avg,db_size_var,db_size_stdev"
+			+ ",size_min,size_max,size_avg,size_var,size_stdev"
+			+ ",length_min,length_max,length_avg,length_var,length_stdev"
+			+ ",age_min,age_max,age_avg,age_var,age_stdev"
+			+ ",dist_h_0_min,dist_h_0_max,dist_h_0_avg,dist_h_0_var,dist_h_0_stdev"
+			+ ",dist_p_0_min,dist_p_0_max,dist_p_0_avg,dist_p_0_var,dist_p_0_stdev";
 
 	public static void appendOverallMeasurement(String logDir,
-			TriggerType trigger, Statistics<Double>... statistics) {
+			TriggerType trigger, RunningStatistics... statistics) {
 		String name = "overall_" + trigger.toString().toLowerCase();
 
 		StringBuilder sb = new StringBuilder();
 
 		int statCount = 0;
-		for (Statistics<Double> s : statistics) {
+		for (RunningStatistics s : statistics) {
 			if (statCount++ != 0)
 				sb.append(s.toDelimitedString(LOGFILE_DELIMITER, false, false));
 			else

@@ -3,10 +3,33 @@ package stdata.datamodel;
 import java.util.List;
 
 import stdata.datamodel.vertices.Datum;
+import stdata.datamodel.vertices.MeasuredDatum;
+import stdata.datamodel.vertices.MeasuredDatum.TriggerType;
 import stdata.rules.Rule;
 
-public interface IDatumFactory {
+import com.thinkaurelius.titan.core.attribute.Geoshape;
 
-	public Datum addDatum(double latitude, double longitude, long timestamp,
-			String domain, List<Datum> context, Rule rule);
+public interface IDatumFactory<D extends Datum> {
+
+	/**
+	 * Creates a new datum with the provided parameters.
+	 * 
+	 * @param phenomenonLocation
+	 *            the sensed phenomenon's geospatial location.
+	 * @param hostLocation
+	 *            the host's geospatial location.
+	 * @param timestamp
+	 *            the current timestamp.
+	 * @param domain
+	 *            the logical domain.
+	 * @param context
+	 *            any initial explicit contextual relations this datum will
+	 *            have.
+	 * @param rule
+	 *            a rule that explicitly governs this datum.
+	 * @return the newly created datum.
+	 */
+	public D addDatum(Geoshape phenomenonLocation, Geoshape hostLocation,
+			long timestamp, String domain, List<D> context, Rule rule);
+
 }

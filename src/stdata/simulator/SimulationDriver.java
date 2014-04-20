@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import stdata.datamodel.vertices.MeasuredDatum.TriggerType;
 import stdata.simulator.movingobjects.Host;
 import stdata.simulator.movingobjects.IHostDelegate;
 import stdata.simulator.movingobjects.MovingObject;
@@ -103,7 +104,8 @@ public class SimulationDriver implements IHostDelegate {
 				startTime, stopTime);
 	}
 
-	private void loadHosts(int temporalResolution, double spatialResolution) {
+	private void loadHosts(int temporalResolution, double spatialResolution,
+			String simulationId) {
 		if (SimulationManager.verbose)
 			Util.report(
 					SimulationDriver.class,
@@ -122,7 +124,8 @@ public class SimulationDriver implements IHostDelegate {
 		for (int i = 0; i < numHosts; i++)
 			hosts.put(i, new Host(i, SimulationManager.HOST_OBJECT_TYPE,
 					hostLocationManager, database, this, graphDir, indexDir,
-					logDir, SimulationManager.phenomenaSensingRange,
+					logDir, simulationId,
+					SimulationManager.phenomenaSensingRange,
 					SimulationManager.phenomenaSensingInterval,
 					temporalResolution, spatialResolution));
 	}
@@ -180,7 +183,8 @@ public class SimulationDriver implements IHostDelegate {
 					// load the host moving objects with the required trajectory
 					// spatial and temporal resolutions
 					loadHosts(trajectoryTemporalResolution[stResolution],
-							trajectorySpatialResolution[stResolution]);
+							trajectorySpatialResolution[stResolution],
+							simulationId);
 
 					// create a collection containing all of the moving objects
 					Collection<MovingObject> movingObjects = new HashSet<MovingObject>();
@@ -201,21 +205,26 @@ public class SimulationDriver implements IHostDelegate {
 						// advance each moving object to the current time
 						for (MovingObject movingObject : movingObjects)
 							movingObject.advance(time);
-						
-						// instruct each moving object to perform a simulation step
+
+						// instruct each moving object to perform a simulation
+						// step
 						for (MovingObject movingObject : movingObjects)
 							movingObject.step(time);
-						
-						// TODO perform time:simulation aggregate temporal resolution measurements+logging
-						// TODO perform time:simulation aggregate spatial resolution measurements+logging
+
+						// TODO perform time:simulation aggregate temporal
+						// resolution measurements+logging
+						// TODO perform time:simulation aggregate spatial
+						// resolution measurements+logging
 
 						// advance the simulation time
 						time++;
 
 					} // end simulation
-					
-					// TODO perform overall aggregate temporal resolution measurements+logging
-					// TODO perform overall aggregate spatial resolution measurements+logging
+
+					// TODO perform overall aggregate temporal resolution
+					// measurements+logging
+					// TODO perform overall aggregate spatial resolution
+					// measurements+logging
 
 					// shutdown the simulation
 					for (MovingObject movingObject : movingObjects)
@@ -227,7 +236,43 @@ public class SimulationDriver implements IHostDelegate {
 			} // end of host mobility
 		} // end of phenomenon mobility
 	}
-	
+
+	/**
+	 * Performs simulation-level running aggregate measurements (over all hosts
+	 * up to the provided simulation time).
+	 * 
+	 * @param trigger
+	 *            the type of trajectories to measure.
+	 * @param time
+	 *            the simulation time.
+	 */
+	private void executeSimulationLevelMeasurements(TriggerType trigger,
+			int time) {
+		// TODO
+		// db_size (avg, median, minimum, maximum, stdev)
+		// size (avg, median, minimum, maximum, stdev)
+		// length (avg, median, minimum, maximum, stdev)
+		// age (avg, median, minimum, maximum, stdev)
+		// dist_h_0 (avg, median, minimum, maximum, stdev)
+		// dist_p_0 (avg, median, minimum, maximum, stdev)
+	}
+
+	/**
+	 * Performs overall aggregate measurements (over the entire simulation).
+	 * 
+	 * @param trigger
+	 *            the type of trajectories to measure.
+	 */
+	private void executeOverallMeasurements(TriggerType trigger) {
+		// TODO
+		// db_size (avg, median, minimum, maximum, stdev)
+		// size (avg, median, minimum, maximum, stdev)
+		// length (avg, median, minimum, maximum, stdev)
+		// age (avg, median, minimum, maximum, stdev)
+		// dist_h_0 (avg, median, minimum, maximum, stdev)
+		// dist_p_0 (avg, median, minimum, maximum, stdev)
+	}
+
 	/* IHostDelegate interface implementation. */
 	@Override
 	public Geoshape getPhenomenonLocation(int identifier, int time) {

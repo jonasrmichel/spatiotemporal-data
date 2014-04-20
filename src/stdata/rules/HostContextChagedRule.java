@@ -9,6 +9,11 @@ import com.tinkerpop.frames.FramedGraph;
 public abstract class HostContextChagedRule<G extends FramedGraph<?>> extends
 		GraphChangedRule<G> {
 
+	public HostContextChagedRule(G graph) {
+		super(graph);
+		// TODO Auto-generated constructor stub
+	}
+	
 	public HostContextChagedRule(G graph, IRuleDelegate delegate) {
 		super(graph, delegate);
 		// TODO Auto-generated constructor stub

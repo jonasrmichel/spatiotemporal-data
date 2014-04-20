@@ -11,35 +11,39 @@ import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.frames.FramedGraph;
 
-public class DatumFactory<T extends Graph> implements IDatumFactory {
-	FramedGraph<T> graph;
+public class DatumFactory<G extends Graph, D extends Datum> implements
+		IDatumFactory<D> {
+	FramedGraph<G> graph;
 	IRuleRegistry ruleRegistry;
+	Class<D> datumClass;
 
-	public DatumFactory(FramedGraph<T> graph, IRuleRegistry ruleRegistry) {
+	public DatumFactory(FramedGraph<G> graph, IRuleRegistry ruleRegistry,
+			Class<D> datumClass) {
 		this.graph = graph;
 		this.ruleRegistry = ruleRegistry;
+		this.datumClass = datumClass;
 	}
 
 	/* IDatumFactory interface implementation. */
 
 	@Override
-	public Datum addDatum(double latitude, double longitude, long timestamp,
-			String domain, List<Datum> context, Rule rule) {
+	public D addDatum(Geoshape phenomenonLocation, Geoshape hostLocation,
+			long timestamp, String domain, List<D> context, Rule rule) {
 		// create the datum
-		Datum datum = graph.addVertex(null, Datum.class);
+		D datum = graph.addVertex(null, datumClass);
 
 		// initialize the datum's spatiotemporal trajectory
 		SpaceTimePosition pos = graph.addVertex(null, SpaceTimePosition.class);
-		pos.setDatum(datum);
-		pos.setLocation(Geoshape.point(latitude, longitude));
+		pos.setLocation(hostLocation);
 		pos.setTimestamp(timestamp);
 		pos.setDomain(domain);
 
 		// configure the datum
-		datum.setTrajectoryHead(pos);
-		datum.setContextData(context);
+		datum.add(pos);
+		datum.setLocation(phenomenonLocation);
+		datum.setContextData((Iterable<Datum>) context);
 
-		// register the datum's rules
+		// register the datum's rule
 		ruleRegistry.registerRule(rule, datum);
 
 		return datum;

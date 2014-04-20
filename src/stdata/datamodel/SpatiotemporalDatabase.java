@@ -11,10 +11,11 @@ import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.FramedGraphConfiguration;
 import com.tinkerpop.frames.FramedGraphFactory;
+import com.tinkerpop.frames.VertexFrame;
 import com.tinkerpop.frames.modules.AbstractModule;
 import com.tinkerpop.frames.modules.javahandler.JavaHandlerModule;
 
-public abstract class SpatiotemporalDatabase<G extends Graph, V extends Datum> {
+public abstract class SpatiotemporalDatabase<G extends Graph, D extends Datum> {
 
 	/** Internal index name. */
 	public static final String INDEX = "spatiotemporal-index";
@@ -30,26 +31,30 @@ public abstract class SpatiotemporalDatabase<G extends Graph, V extends Datum> {
 	/** The database's graph index directory. */
 	protected String indexDir;
 
+	/** The database's datum class type. */
+	protected Class<D> datumClass;
+
 	/** Base graph database. */
 	protected G baseGraph;
 
 	/** Event graph wrapper. */
-	protected EventGraph<G> eventGraph;
+	public EventGraph<G> eventGraph;
 
 	/** Framed graph wrapper. */
-	protected FramedGraph<G> framedGraph;
+	public FramedGraph<G> framedGraph;
 
 	/** The spatiotemporal rule registry interface. */
 	public IRuleRegistry ruleRegistry;
 
 	/** The datum factory interface. */
-	public IDatumFactory datumFactory;
+	public IDatumFactory<D> datumFactory;
 
 	public SpatiotemporalDatabase(String instance, String graphDir,
-			String indexDir) {
+			String indexDir, Class<D> datumClass) {
 		this.instance = instance;
 		this.graphDir = graphDir;
 		this.indexDir = indexDir;
+		this.datumClass = datumClass;
 
 		// initialize the base graph implementation and wrappers
 		initializeBaseGraph();
@@ -57,7 +62,8 @@ public abstract class SpatiotemporalDatabase<G extends Graph, V extends Datum> {
 		initializeFramedGraph();
 
 		ruleRegistry = new RuleRegistry<G>(eventGraph, framedGraph);
-		datumFactory = new DatumFactory<G>(framedGraph, ruleRegistry);
+		datumFactory = new DatumFactory<G, D>(framedGraph, ruleRegistry,
+				datumClass);
 	}
 
 	/**
@@ -135,5 +141,20 @@ public abstract class SpatiotemporalDatabase<G extends Graph, V extends Datum> {
 	public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex,
 			String label) {
 		return baseGraph.addEdge(id, outVertex, inVertex, label);
+	}
+
+	/**
+	 * Returns an iterator over all the framed vertices in the graph database
+	 * with the provided frame class.
+	 * 
+	 * @param kind
+	 *            a VertexFrame class.
+	 * @return
+	 */
+	public <F extends VertexFrame> Iterable<F> getFramedVertices(Class<F> kind) {
+		return (Iterable<F>) baseGraph
+				.query()
+				.has(SpatiotemporalFrameInitializer.FRAMED_CLASS_KEY,
+						kind.getName()).vertices();
 	}
 }

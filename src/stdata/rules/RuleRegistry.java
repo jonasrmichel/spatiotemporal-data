@@ -25,21 +25,22 @@ public class RuleRegistry<T extends Graph> implements IRuleRegistry {
 
 	@Override
 	public RuleContainer registerRule(Rule rule) {
-		RuleContainer ruleContainer = framedGraph.addVertex(null,
-				RuleContainer.class);
-
-		rules.put(ruleContainer.asVertex().getId(), rule);
-
-		return ruleContainer;
+		return registerRule(rule, null);
 	}
 
 	@Override
 	public RuleContainer registerRule(Rule rule, Datum datum) {
+		// create the rule's container vertex
 		RuleContainer ruleContainer = framedGraph.addVertex(null,
 				RuleContainer.class);
+		
+		// set the rule's delegate (the container)
+		rule.setDelegate(ruleContainer);
 
+		// configure the graph references to governed data
 		ruleContainer.addGoverns(datum);
 
+		// register the rule
 		rules.put(ruleContainer.asVertex().getId(), rule);
 
 		return ruleContainer;

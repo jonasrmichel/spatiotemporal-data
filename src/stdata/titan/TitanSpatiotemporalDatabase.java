@@ -21,12 +21,12 @@ import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Vertex;
 
-public class TitanSpatiotemporalDatabase<V extends Datum> extends
-		SpatiotemporalDatabase<TitanGraph, V> {
+public class TitanSpatiotemporalDatabase<D extends Datum> extends
+		SpatiotemporalDatabase<TitanGraph, D> {
 
 	public TitanSpatiotemporalDatabase(String instance, String graphDir,
-			String indexDir) {
-		super(instance, graphDir, indexDir);
+			String indexDir, Class<D> datumClass) {
+		super(instance, graphDir, indexDir, datumClass);
 		// TODO Auto-generated constructor stub
 	}
 

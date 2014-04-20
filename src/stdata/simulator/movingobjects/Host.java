@@ -5,17 +5,23 @@ import java.util.List;
 import stdata.datamodel.SpatiotemporalDatabase;
 import stdata.datamodel.vertices.HostContext;
 import stdata.datamodel.vertices.MeasuredDatum;
-import stdata.rules.HostContextChagedRule;
+import stdata.datamodel.vertices.MeasuredDatum.TriggerType;
+import stdata.rules.SpatiallyModulatedTrajectoryRule;
+import stdata.rules.TemporallyModulatedTrajectoryRule;
 import stdata.simulator.ILocationManager;
 import stdata.simulator.IMovingObjectDatabase;
 import stdata.simulator.SimulationManager;
+import stdata.simulator.measurement.Logger;
 import stdata.titan.TitanSpatiotemporalDatabase;
 
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.attribute.Geoshape;
+import com.tinkerpop.frames.FramedGraph;
 
 public class Host extends MovingObject {
 	String graphDir, indexDir, logDir;
+
+	String simulationId;
 
 	double phenomenaSensingRange;
 	int phenomenaSensingInterval;
@@ -32,14 +38,16 @@ public class Host extends MovingObject {
 	public Host(int identifier, String type, ILocationManager locationManager,
 			IMovingObjectDatabase database, IHostDelegate delegate,
 			String graphDir, String indexDir, String logDir,
-			double phenomenaSensingRange, int phenomenaSensingInterval,
-			int trajectoryTemporalResolution, double trajectorySpatialResolution) {
+			String simulationId, double phenomenaSensingRange,
+			int phenomenaSensingInterval, int trajectoryTemporalResolution,
+			double trajectorySpatialResolution) {
 		super(identifier, type, locationManager, database);
 
 		this.delegate = delegate;
 		this.graphDir = graphDir;
 		this.indexDir = indexDir;
 		this.logDir = logDir;
+		this.simulationId = simulationId;
 		this.phenomenaSensingRange = phenomenaSensingRange;
 		this.phenomenaSensingInterval = phenomenaSensingInterval;
 		this.trajectoryTemporalResolution = trajectoryTemporalResolution;
@@ -62,14 +70,40 @@ public class Host extends MovingObject {
 				phenomenaSensingRange);
 
 		// create a new datum for each sensed phenomenon
-		Geoshape location;
+		Geoshape phenomenonLocation;
+		MeasuredDatum spatiallyModulatedDatum, temporallyModulatedDatum;
+		SpatiallyModulatedTrajectoryRule<FramedGraph<TitanGraph>> spatiallyModulatedRule;
+		TemporallyModulatedTrajectoryRule<FramedGraph<TitanGraph>> temporallyModulatedRule;
 		for (Integer phenomenon : nearbyPhenomena) {
 			// get the phenomenon's location
-			location = delegate.getPhenomenonLocation(phenomenon, time);
+			phenomenonLocation = delegate.getPhenomenonLocation(phenomenon,
+					time);
 
-			// TODO create two datums representing this sensed phenomenon
+			// create two datums representing this sensed phenomenon
 			// (spatially and temporally triggered)
-			// !!!: set its initial-phenomenon-location
+
+			// create a new spatially modulated rule
+			spatiallyModulatedRule = new SpatiallyModulatedTrajectoryRule<FramedGraph<TitanGraph>>(
+					spatiotemporalDB.framedGraph, trajectorySpatialResolution);
+			// create a datum with the spatially modulated rule
+			spatiallyModulatedDatum = spatiotemporalDB.datumFactory.addDatum(
+					phenomenonLocation, location, (long) time,
+					Integer.toString(identifier), null, spatiallyModulatedRule);
+			// configure the MeasuredDatum properties
+			spatiallyModulatedDatum.setPhenomenonIdentifier(phenomenon);
+			spatiallyModulatedDatum.setTriggerType(TriggerType.SPATIAL);
+
+			// create a new temporally modulated rule
+			temporallyModulatedRule = new TemporallyModulatedTrajectoryRule<FramedGraph<TitanGraph>>(
+					spatiotemporalDB.framedGraph, trajectoryTemporalResolution);
+			// create a datum with the temporally modulated rule
+			temporallyModulatedDatum = spatiotemporalDB.datumFactory
+					.addDatum(phenomenonLocation, location, (long) time,
+							Integer.toString(identifier), null,
+							temporallyModulatedRule);
+			// configure the MeasuredDatum properties
+			temporallyModulatedDatum.setPhenomenonIdentifier(phenomenon);
+			temporallyModulatedDatum.setTriggerType(TriggerType.TEMPORAL);
 		}
 	}
 
@@ -78,7 +112,8 @@ public class Host extends MovingObject {
 	@Override
 	protected void initialize() {
 		spatiotemporalDB = new TitanSpatiotemporalDatabase<MeasuredDatum>(
-				Integer.toString(identifier), graphDir, indexDir);
+				Integer.toString(identifier), graphDir, indexDir,
+				MeasuredDatum.class);
 
 		// create a special vertex in the spatiotemporal database for the host's
 		// position and simulation time
@@ -104,22 +139,66 @@ public class Host extends MovingObject {
 		hostContext.setLocation(location);
 
 		// trigger trajectory updates per temporal resolution
-		hostContext.setTimestampTrigger(true);
+		hostContext.triggerTimestampUpdate();
 
 		// trigger trajectory updates per spatial resolution
-		hostContext.setLocationTrigger(true);
+		hostContext.triggerLocationUpdate();
 
-		// TODO update each datum's age, distance-host-creation,
-		// distance-phenomenon-creation
+		// update each datum's measured properties
+		Iterable<MeasuredDatum> datums = spatiotemporalDB
+				.getFramedVertices(MeasuredDatum.class);
+		Geoshape phenomenonLocation;
+		for (MeasuredDatum datum : datums) {
+			// update age
+			datum.setAge((long) time - datum.getCreationTime());
 
-		// TODO perform time:per-trajectory temporal resolution
-		// measurements+logging
-		// TODO perform time:per-trajectory spatial resolution
-		// measurements+logging
+			// update distance(host's current location, host's creation
+			// location)
+			datum.setDistanceHostCreation(location.getPoint().distance(
+					datum.getCreationLocation().getPoint()));
 
-		// TODO perform time:host aggregate temporal resolution
-		// measurements+logging
-		// TODO perform time:host aggregate spatial resolution
-		// measurements+logging
+			// update distance(phenomenon's current location, phenomenon's
+			// creation location)
+			phenomenonLocation = delegate.getPhenomenonLocation(
+					datum.getPhenomenonIdentifier(), time);
+			datum.setDistancePhenomenonCreation(phenomenonLocation.getPoint()
+					.distance(datum.getLocation().getPoint()));
+
+			// perform the per-time per-trajectory measurements
+			Logger.appendTrajectoryMeasurement(logDir, simulationId,
+					identifier, datum.asVertex().getId(),
+					datum.getTriggerType(), time, datum.getSize(),
+					datum.getLength(), (int) datum.getAge(),
+					(int) datum.getCreationTime(), datum.getCreationLocation(),
+					phenomenonLocation, location,
+					datum.getDistanceHostCreation(),
+					datum.getDistancePhenomenonCreation());
+		}
+
+		// TODO perform the per-time host-level aggregate measurements
+
+		// perform time:host aggregate temporal resolution measurements+logging
+		executeHostLevelMeasurements(TriggerType.SPATIAL, time);
+		// perform time:host aggregate spatial resolution measurements+logging
+		executeHostLevelMeasurements(TriggerType.TEMPORAL, time);
+	}
+
+	/**
+	 * Performs host-level running aggregate measurements (over all trajectories
+	 * up to the provided simulation time).
+	 * 
+	 * @param trigger
+	 *            the type of trajectories to measure.
+	 * @param time
+	 *            the simulation time.
+	 */
+	private void executeHostLevelMeasurements(TriggerType trigger, int time) {
+		// TODO
+		// db_size
+		// size (avg, median, minimum, maximum, stdev)
+		// length (avg, median, minimum, maximum, stdev)
+		// age (avg, median, minimum, maximum, stdev)
+		// dist_h_0 (avg, median, minimum, maximum, stdev)
+		// dist_p_0 (avg, median, minimum, maximum, stdev)
 	}
 }

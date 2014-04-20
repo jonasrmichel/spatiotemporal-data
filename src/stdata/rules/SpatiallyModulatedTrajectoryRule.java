@@ -18,6 +18,13 @@ public class SpatiallyModulatedTrajectoryRule<G extends FramedGraph<?>> extends
 
 	/** The reference location. */
 	Geoshape referenceLocation = null;
+	
+	public SpatiallyModulatedTrajectoryRule(G graph,
+			double spatialResolution) {
+		super(graph);
+
+		this.spatialResolution = spatialResolution;
+	}
 
 	public SpatiallyModulatedTrajectoryRule(G graph, IRuleDelegate delegate,
 			double spatialResolution) {

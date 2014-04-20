@@ -14,18 +14,12 @@ import com.tinkerpop.frames.modules.javahandler.JavaHandlerContext;
 
 public interface Datum extends VertexFrame {
 
-	/** Trajectory spatial resolution. */
-	// TODO @Property
+	/** Geospatial location of the sensed phenomenon this datum represents. */
+	@Property("location")
+	public Geoshape getLocation();
 
-	/** Trajectory temporal resolution. */
-	// TODO @Property
-
-	/** Initial geospatial location of the sensed phenomenon this datum represents. */
-	@Property("initial-phenomenon-location")
-	public Geoshape getInitialPhenomenonLocation();
-
-	@Property("initial-phenomenon-location")
-	public void setInitialPhenomenonLocation(Geoshape location);
+	@Property("location")
+	public void setLocation(Geoshape location);
 
 	/** The head of the datum's trajectory. */
 	@Adjacency(label = "trajectory-head")

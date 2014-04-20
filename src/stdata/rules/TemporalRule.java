@@ -8,6 +8,12 @@ import com.tinkerpop.frames.FramedGraph;
 public abstract class TemporalRule<G extends FramedGraph<?>> extends Rule<G> {
 	/** The rule's timer. */
 	Timer timer = null;
+	
+	public TemporalRule(G graph, long delay, long period) {
+		super(graph);
+
+		start(delay, period);
+	}
 
 	public TemporalRule(G graph, IRuleDelegate delegate, long delay, long period) {
 		super(graph, delegate);

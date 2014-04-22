@@ -28,7 +28,7 @@ public class SimulationManager {
 	/** Simulation start time (offset in mobility trace files). */
 	public static int startTime = 0;
 	/** Simulation stop time. */
-	public static int stopTime = 60 * 60 * 8; // 8 hours
+	public static int stopTime = 60 * 60 * 1; // 1 hours
 
 	/** Mobility trace file directory (used by LocationManager). */
 	public static String traceDir = "../traces";

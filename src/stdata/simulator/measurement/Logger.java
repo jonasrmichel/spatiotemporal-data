@@ -111,6 +111,7 @@ public class Logger {
 				writer.write(line);
 			}
 
+			// TODO if verbose mode, report!
 			boolean successful = temp.renameTo(logfile);
 
 		} catch (IOException e) {

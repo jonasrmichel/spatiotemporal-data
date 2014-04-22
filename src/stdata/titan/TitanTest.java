@@ -104,6 +104,7 @@ public class TitanTest {
 					GraphSONMode.NORMAL);
 
 			System.out.println(datumJson);
+			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

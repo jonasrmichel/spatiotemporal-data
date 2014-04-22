@@ -3,13 +3,21 @@ package stdata.ibrdtn;
 import ibrdtn.example.api.APIHandlerType;
 import ibrdtn.example.api.DTNClient;
 import ibrdtn.example.api.PayloadType;
+
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 import stdata.datamodel.SpatiotemporalDatabase;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.HostContext;
+import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.titan.TitanSpatiotemporalDatabase;
 
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.attribute.Geoshape;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 
 public class IBRDTNHost {
 	/** Spatiotemporal database file paths. */
@@ -68,7 +76,7 @@ public class IBRDTNHost {
 	public Geoshape getLocation() {
 		return hostContext.getLocation();
 	}
-	
+
 	/**
 	 * Sets the host's current location.
 	 * 
@@ -96,5 +104,5 @@ public class IBRDTNHost {
 	public void setTime(long timestamp) {
 		hostContext.getTimestamp();
 	}
-	
+
 }

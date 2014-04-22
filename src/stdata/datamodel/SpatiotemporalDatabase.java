@@ -1,12 +1,19 @@
 package stdata.datamodel;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 import stdata.datamodel.vertices.Datum;
+import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.rules.IRuleRegistry;
 import stdata.rules.RuleRegistry;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.FramedGraphConfiguration;
@@ -156,5 +163,37 @@ public abstract class SpatiotemporalDatabase<G extends Graph, D extends Datum> {
 				.query()
 				.has(SpatiotemporalFrameInitializer.FRAMED_CLASS_KEY,
 						kind.getName()).vertices();
+	}
+	
+	/**
+	 * Marshalls (serializes) a datum (along with its trajectory) into JSON
+	 * form.
+	 * 
+	 * @param datum
+	 * @returns
+	 */
+	public JSONObject marshallDatum(Datum datum) throws JSONException {
+		// TODO
+		JSONObject datumJson = GraphSONUtility.jsonFromElement(datum.asVertex(),
+				datum.asVertex().getPropertyKeys(), GraphSONMode.NORMAL);
+		
+		JSONArray trajectory = new JSONArray();
+		for (SpaceTimePosition pos : datum.getTrajectory()) {
+			// TODO
+		}
+		
+		return datumJson;
+	}
+
+	/**
+	 * Unmarshalls (deserializes) a JSON object into a datum (with a
+	 * trajectory).
+	 * 
+	 * @param json
+	 * @return
+	 */
+	public Datum unmarshallDatum(JSONObject json) throws JSONException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

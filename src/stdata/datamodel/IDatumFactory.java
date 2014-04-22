@@ -3,8 +3,7 @@ package stdata.datamodel;
 import java.util.List;
 
 import stdata.datamodel.vertices.Datum;
-import stdata.datamodel.vertices.MeasuredDatum;
-import stdata.datamodel.vertices.MeasuredDatum.TriggerType;
+import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.rules.Rule;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
@@ -31,5 +30,14 @@ public interface IDatumFactory<D extends Datum> {
 	 */
 	public D addDatum(Geoshape phenomenonLocation, Geoshape hostLocation,
 			long timestamp, String domain, List<D> context, Rule rule);
+
+	/**
+	 * Inserts an existing datum with the provided trajectory into the
+	 * spatiotemporal database.
+	 * 
+	 * @param datum
+	 * @param trajectory
+	 */
+	public void insertDatum(Datum datum, SpaceTimePosition[] trajectory);
 
 }

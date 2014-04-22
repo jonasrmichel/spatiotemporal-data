@@ -49,4 +49,8 @@ public class DatumFactory<G extends Graph, D extends Datum> implements
 		return datum;
 	}
 
+	@Override
+	public void insertDatum(Datum datum, SpaceTimePosition[] trajectory) {
+		// TODO Auto-generated method stub
+	}
 }

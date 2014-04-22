@@ -8,6 +8,8 @@ import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfigu
 
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import stdata.datamodel.SpatiotemporalFrameInitializer;
 import stdata.datamodel.vertices.Datum;
@@ -19,6 +21,8 @@ import com.thinkaurelius.titan.core.TitanGraphQuery;
 import com.thinkaurelius.titan.core.attribute.Geo;
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.FramedGraphConfiguration;
 import com.tinkerpop.frames.FramedGraphFactory;
@@ -93,8 +97,21 @@ public class TitanTest {
 		for (Vertex v : q.vertices())
 			System.out.println("\t" + v + ", " + v.getPropertyKeys());
 
+		// json-ification
+		try {
+			JSONObject datumJson = GraphSONUtility.jsonFromElement(
+					datum.asVertex(), datum.asVertex().getPropertyKeys(),
+					GraphSONMode.NORMAL);
+
+			System.out.println(datumJson);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		titanGraph.shutdown();
 
 		System.out.println("Done.");
+
 	}
 }

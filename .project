@@ -3,6 +3,8 @@
 	<name>spatiotemporal-data</name>
 	<comment></comment>
 	<projects>
+		<project>IBRDTNAPI</project>
+		<project>IBRDTNExample</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

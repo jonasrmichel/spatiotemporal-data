@@ -44,6 +44,7 @@ public class DatumFactory<G extends Graph, D extends Datum> implements
 		// configure the datum
 		datum.add(pos);
 		datum.setLocation(phenomenonLocation);
+		if(context != null)
 		datum.setContextData((Iterable<Datum>) context);
 
 		// register the datum's rule

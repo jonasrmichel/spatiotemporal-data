@@ -2,8 +2,9 @@ package stdata.datamodel;
 
 import java.util.List;
 
+import org.codehaus.jettison.json.JSONObject;
+
 import stdata.datamodel.vertices.Datum;
-import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.rules.Rule;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
@@ -35,9 +36,9 @@ public interface IDatumFactory<D extends Datum> {
 	 * Inserts an existing datum with the provided trajectory into the
 	 * spatiotemporal database.
 	 * 
-	 * @param datum
-	 * @param trajectory
+	 * @param json
+	 *            a marshalled datum.
 	 */
-	public void insertDatum(Datum datum, SpaceTimePosition[] trajectory);
+	public D addDatum(JSONObject json, Rule rule);
 
 }

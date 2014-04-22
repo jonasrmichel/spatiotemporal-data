@@ -8,6 +8,8 @@ import com.tinkerpop.frames.VertexFrame;
 
 public interface SpaceTimePosition extends VertexFrame {
 	public static final String LOCATION_KEY = "location";
+	public static final String TIMESTAMP_KEY = "timestamp";
+	public static final String DOMAIN_KEY = "domain";
 	
 	/** Location property. */
 	@Property(LOCATION_KEY)
@@ -31,17 +33,17 @@ public interface SpaceTimePosition extends VertexFrame {
 //	public void setLongitude(float longitude);
 
 	/** Timestamp property. */
-	@Property("timestamp")
+	@Property(TIMESTAMP_KEY)
 	public long getTimestamp();
 
-	@Property("timestamp")
+	@Property(TIMESTAMP_KEY)
 	public void setTimestamp(long timestamp);
 
 	/** Logical ownership property. */
-	@Property("domain")
+	@Property(DOMAIN_KEY)
 	public String getDomain();
 
-	@Property("domain")
+	@Property(DOMAIN_KEY)
 	public void setDomain(String domain);
 	
 	/** Datum whose trajectory this space-time position is part of. */

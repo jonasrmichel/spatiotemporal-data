@@ -2,6 +2,8 @@ package stdata.datamodel;
 
 import java.util.List;
 
+import org.codehaus.jettison.json.JSONObject;
+
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.rules.IRuleRegistry;
@@ -15,12 +17,15 @@ public class DatumFactory<G extends Graph, D extends Datum> implements
 		IDatumFactory<D> {
 	FramedGraph<G> graph;
 	IRuleRegistry ruleRegistry;
+	ISpaceTimePositionFactory spaceTimePositionFactory;
 	Class<D> datumClass;
 
 	public DatumFactory(FramedGraph<G> graph, IRuleRegistry ruleRegistry,
+			ISpaceTimePositionFactory spaceTimePositionFactory,
 			Class<D> datumClass) {
 		this.graph = graph;
 		this.ruleRegistry = ruleRegistry;
+		this.spaceTimePositionFactory = spaceTimePositionFactory;
 		this.datumClass = datumClass;
 	}
 
@@ -33,10 +38,8 @@ public class DatumFactory<G extends Graph, D extends Datum> implements
 		D datum = graph.addVertex(null, datumClass);
 
 		// initialize the datum's spatiotemporal trajectory
-		SpaceTimePosition pos = graph.addVertex(null, SpaceTimePosition.class);
-		pos.setLocation(hostLocation);
-		pos.setTimestamp(timestamp);
-		pos.setDomain(domain);
+		SpaceTimePosition pos = spaceTimePositionFactory.addSpaceTimePosition(
+				hostLocation, timestamp, domain);
 
 		// configure the datum
 		datum.add(pos);
@@ -50,7 +53,8 @@ public class DatumFactory<G extends Graph, D extends Datum> implements
 	}
 
 	@Override
-	public void insertDatum(Datum datum, SpaceTimePosition[] trajectory) {
+	public D addDatum(JSONObject json, Rule rule) {
 		// TODO Auto-generated method stub
+		return null;
 	}
 }

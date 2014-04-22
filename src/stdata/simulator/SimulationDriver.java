@@ -5,8 +5,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import stdata.datamodel.vertices.MeasuredDatum.TriggerType;
+import stdata.simulator.measurement.Logger;
+import stdata.simulator.measurement.ReducibleRunningStatistics;
+import stdata.simulator.measurement.RunningStatistics;
+import stdata.simulator.measurement.RunningStatisticsMap;
 import stdata.simulator.movingobjects.Host;
 import stdata.simulator.movingobjects.IHostDelegate;
 import stdata.simulator.movingobjects.MovingObject;
@@ -151,6 +156,10 @@ public class SimulationDriver implements IHostDelegate {
 		// each simulation has a unique identifier
 		String simulationId;
 
+		// maps to hold simulation-level running and overall statistics for
+		// spatially- and temporally-modulated data.
+		RunningStatisticsMap<ReducibleRunningStatistics> spatiallyModulatedStatistics, temporallyModulatedStatistics;
+
 		for (String pMobility : mobilityPhenomena) {
 			// load the phenomenon mobility traces
 			loadMobilityTraces(phenomenonLocationManager,
@@ -168,6 +177,17 @@ public class SimulationDriver implements IHostDelegate {
 					simulationId = "stdata" + "_hm-" + hMobility + "_pm-"
 							+ pMobility + "_str-"
 							+ Integer.toString(stResolution);
+					
+					// clear any existing logging info for this simulation
+					Logger.clearLogs(logDir, simulationId);
+
+					// create the simulation's simulation-level statistics maps
+					spatiallyModulatedStatistics = new RunningStatisticsMap<ReducibleRunningStatistics>(
+							ReducibleRunningStatistics.class,
+							RunningStatisticsMap.HOST_LEVEL_KEYS);
+					temporallyModulatedStatistics = new RunningStatisticsMap<ReducibleRunningStatistics>(
+							ReducibleRunningStatistics.class,
+							RunningStatisticsMap.HOST_LEVEL_KEYS);
 
 					if (SimulationManager.verbose)
 						Util.report(SimulationDriver.class,
@@ -211,22 +231,44 @@ public class SimulationDriver implements IHostDelegate {
 						for (MovingObject movingObject : movingObjects)
 							movingObject.step(time);
 
-						// TODO perform time:simulation aggregate temporal
-						// resolution measurements+logging
-						// TODO perform time:simulation aggregate spatial
-						// resolution measurements+logging
+						for (Host host : hosts.values()) {
+							// update the running per-time simulation-level
+							// aggregate measurements
+							pushSimulationLevelMeasurements(
+									spatiallyModulatedStatistics, host,
+									TriggerType.SPATIAL);
+							pushSimulationLevelMeasurements(
+									temporallyModulatedStatistics, host,
+									TriggerType.TEMPORAL);
+
+						}
+
+						// log the running per-time simulation-level aggregate
+						// measurements
+						Logger.appendSimulationMeasurement(logDir,
+								simulationId, TriggerType.SPATIAL, time,
+								spatiallyModulatedStatistics
+										.getRunningStatistics());
+						Logger.appendSimulationMeasurement(logDir,
+								simulationId, TriggerType.TEMPORAL, time,
+								temporallyModulatedStatistics
+										.getRunningStatistics());
 
 						// advance the simulation time
 						time++;
 
 					} // end simulation
 
-					// TODO perform overall aggregate temporal resolution
-					// measurements+logging
-					// TODO perform overall aggregate spatial resolution
-					// measurements+logging
+					// log the overall aggregate measurements for this
+					// simulation
+					Logger.appendOverallMeasurement(logDir,
+							TriggerType.SPATIAL,
+							spatiallyModulatedStatistics.getRunningStatistics());
+					Logger.appendOverallMeasurement(logDir,
+							TriggerType.TEMPORAL, temporallyModulatedStatistics
+									.getRunningStatistics());
 
-					// shutdown the simulation
+					// shutdown the simulation objects
 					for (MovingObject movingObject : movingObjects)
 						movingObject.shutdown();
 
@@ -238,23 +280,26 @@ public class SimulationDriver implements IHostDelegate {
 	}
 
 	/**
-	 * Performs simulation-level running aggregate measurements (over all hosts
-	 * up to the provided simulation time).
+	 * Reduces the simulation-level running aggregate measurements with the
+	 * provided host's (host-level) running statistics.
 	 * 
+	 * @param statistics
+	 * @param host
 	 * @param trigger
-	 *            the type of trajectories to measure.
-	 * @param time
-	 *            the simulation time.
 	 */
-	private void executeSimulationLevelMeasurements(TriggerType trigger,
-			int time) {
-		// TODO
-		// db_size (avg, median, minimum, maximum, stdev)
-		// size (avg, median, minimum, maximum, stdev)
-		// length (avg, median, minimum, maximum, stdev)
-		// age (avg, median, minimum, maximum, stdev)
-		// dist_h_0 (avg, median, minimum, maximum, stdev)
-		// dist_p_0 (avg, median, minimum, maximum, stdev)
+	private void pushSimulationLevelMeasurements(
+			RunningStatisticsMap<ReducibleRunningStatistics> statistics,
+			Host host, TriggerType trigger) {
+		// push the db_size (host datum count) measure manually
+		// (it's not tracked as a host-level running statistic)
+		statistics.get(RunningStatisticsMap.DB_SIZE_KEY).push(
+				(double) host.getDatumCount());
+
+		RunningStatisticsMap<RunningStatistics> hostStatistics = host
+				.getStatistics(trigger);
+		for (Entry<String, RunningStatistics> entry : hostStatistics
+				.getEntries())
+			statistics.get(entry.getKey()).reduce(entry.getValue());
 	}
 
 	/**

@@ -1,5 +1,8 @@
 package stdata.test;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import stdata.datamodel.SpatiotemporalFrameInitializer;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.SpaceTimePosition;
@@ -146,6 +149,16 @@ public class Playground {
 		for (Edge e : position.asVertex().getEdges(Direction.BOTH,
 				"trajectory-head"))
 			System.out.println("\t" + e);
-
+		
+		HashMap<String, Integer> mmap = new LinkedHashMap<String, Integer>();
+		mmap.put("hey", 1);
+		mmap.put("you", 2);
+		mmap.put("guys", 3);
+		
+		for (String k : mmap.keySet())
+			System.out.println(k);
+		for (Integer i : mmap.values())
+			System.out.println(i);
 	}
+	
 }

@@ -5,16 +5,18 @@ package stdata.simulator.measurement;
  * 
  */
 public class RunningStatistics {
-	double minimum;
-	double maximum;
+	protected double minimum;
+	protected double maximum;
+	protected double sum;
 
-	int n;
-	double oldM, newM, oldS, newS;
+	protected int n;
+	protected double oldM, newM, oldS, newS;
 
 	public RunningStatistics() {
 		minimum = Double.MAX_VALUE;
 		maximum = Double.MIN_VALUE;
 		n = 0;
+		sum = 0;
 	}
 
 	public String toDelimitedString(String delimiter, boolean prepended,
@@ -61,6 +63,7 @@ public class RunningStatistics {
 
 		minimum = Math.min(minimum, value);
 		maximum = Math.max(maximum, value);
+		sum += value;
 
 		if (n == 1) {
 			oldM = newM = value;
@@ -76,5 +79,4 @@ public class RunningStatistics {
 		}
 
 	}
-
 }

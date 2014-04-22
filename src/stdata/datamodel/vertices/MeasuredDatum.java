@@ -1,8 +1,6 @@
 package stdata.datamodel.vertices;
 
-import java.util.Map;
-
-import stdata.simulator.measurement.RunningStatistics;
+import stdata.simulator.measurement.RunningStatisticsMap;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Vertex;
@@ -143,7 +141,7 @@ public interface MeasuredDatum extends Datum {
 	 */
 	@JavaHandler
 	public void updateDistancePhenomenonCreation(Geoshape phenomenonLocation);
-	
+
 	abstract class Impl implements JavaHandlerContext<Vertex>, MeasuredDatum {
 		// We need to re-implement this here because we can't reference the
 		// super interface (Datum).

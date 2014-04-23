@@ -161,6 +161,7 @@ public class IBRDTNHost {
 		Datum spatiallyModulatedDatum = spatiotemporalDB.datumFactory.addDatum(
 				phenomenonLocation, phenomenonLocation, System.currentTimeMillis(),
 				Integer.toString(identifier), null, spatiallyModulatedRule);
+		spatiallyModulatedDatum.asVertex().setProperty("Text", "Hello World!");
 		return spatiallyModulatedDatum;
 		
 		//If I understand correctly, at this point, this datum, which I also have a handle
@@ -182,7 +183,7 @@ public class IBRDTNHost {
 		if(jo != null){
 			try{
 				byte[] sendData = jo.toString().getBytes("utf-8");
-				sendBundle(dest, sendData);
+				sendBundle(dest, sendData, new TrackingExtensionBlock());
 			}
 			catch(UnsupportedEncodingException uee){
 				uee.printStackTrace();
@@ -190,7 +191,12 @@ public class IBRDTNHost {
 		}
 	}
 	
-	private void extractAndSendBundles(String dest){
+	private TrackingExtensionBlock createExtensionBlock(long interval){
+		TrackingExtensionBlock toReturn = new TrackingExtensionBlock(interval);
+		return toReturn;
+	}
+	
+	private void extractAndSendBundles(String dest, TrackingExtensionBlock teb){
 		Iterable<Datum> frames = spatiotemporalDB.getFramedVertices(Datum.class);
 		for(Datum d : frames){
 			JSONObject jo = null; 
@@ -203,7 +209,7 @@ public class IBRDTNHost {
 			if(jo != null){
 				try{
 					byte[] sendData = jo.toString().getBytes("utf-8");
-					sendBundle(dest, sendData);
+					sendBundle(dest, sendData, teb);
 				}
 				catch(UnsupportedEncodingException uee){
 					uee.printStackTrace();
@@ -216,7 +222,7 @@ public class IBRDTNHost {
      * Application-level method to prep a bundle and send down to the send method,
      * which will actually chuck it through the DTN daemon.
      */
-	private void sendBundle(String dest, byte[] data){
+	private void sendBundle(String dest, byte[] data, TrackingExtensionBlock teb){
 		System.out.println("Sending Bundle");
 		
 		EID destination = new SingletonEndpoint(dest);
@@ -233,8 +239,8 @@ public class IBRDTNHost {
 		bundle.setFlag(Bundle.Flags.DTNSEC_REQUEST_ENCRYPT, false);
 		bundle.setFlag(Bundle.Flags.DTNSEC_REQUEST_SIGN, false);
 
-		String text = "Hello world!";
-		bundle.appendBlock(new PayloadBlock(text.getBytes()));
+		//bundle.appendBlock(teb);
+		bundle.appendBlock(new PayloadBlock(data));
 		send(bundle);
 	}
 	
@@ -274,7 +280,8 @@ public class IBRDTNHost {
     	//I'm doing it this way because I can't seem to recover stuff from the database
     	host.hackSendBundle(args[0], d);
     	//Eventually, I think this should work
-    	host.extractAndSendBundles(args[0]);
+    	TrackingExtensionBlock teb = host.createExtensionBlock(30);
+    	host.extractAndSendBundles(args[0], teb);
     }
 
 }

@@ -6,34 +6,37 @@ import java.util.Map;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.RuleContainer;
 
-import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-public class RuleRegistry<T extends Graph> implements IRuleRegistry {
-	EventGraph<T> eventGraph;
-	FramedGraph<T> framedGraph;
-	Map<Object, Rule> rules;
+public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>> implements
+		IRuleRegistry<G, E, F> {
+	G baseGraph;
+	E eventGraph;
+	F framedGraph;
+	Map<Object, Rule<G, E, F>> rules;
 
-	public RuleRegistry(EventGraph<T> eventGraph, FramedGraph<T> framedGraph) {
+	public RuleRegistry(G baseGraph, E eventGraph, F framedGraph) {
+		this.baseGraph = baseGraph;
 		this.eventGraph = eventGraph;
 		this.framedGraph = framedGraph;
-		rules = new HashMap<Object, Rule>();
+		rules = new HashMap<Object, Rule<G, E, F>>();
 	}
 
 	/* IRuleRegistry interface implementation. */
 
 	@Override
-	public RuleContainer registerRule(Rule rule) {
+	public RuleContainer registerRule(Rule<G, E, F> rule) {
 		return registerRule(rule, null);
 	}
 
 	@Override
-	public RuleContainer registerRule(Rule rule, Datum datum) {
+	public RuleContainer registerRule(Rule<G, E, F> rule, Datum datum) {
 		// create the rule's container vertex
-		RuleContainer ruleContainer = framedGraph.addVertex(null,
+		RuleContainer ruleContainer = (RuleContainer) framedGraph.addVertex(null,
 				RuleContainer.class);
-		
+
 		// set the rule's delegate (the container)
 		rule.setDelegate(ruleContainer);
 
@@ -42,6 +45,9 @@ public class RuleRegistry<T extends Graph> implements IRuleRegistry {
 
 		// register the rule
 		rules.put(ruleContainer.asVertex().getId(), rule);
+		
+		// commit changes
+		baseGraph.commit();
 
 		return ruleContainer;
 	}

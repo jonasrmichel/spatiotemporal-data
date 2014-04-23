@@ -17,7 +17,7 @@ public class SimulationManager {
 
 	/** Simulation options. */
 	public static final int NUM_HOSTS = 100;
-	public static final int NUM_PHENOMENA = 100;
+	public static final int NUM_PHENOMENA = 1500;
 	public static final String HOST_OBJECT_TYPE = "host";
 	public static final String PHENOMENON_OBJECT_TYPE = "phenomenon";
 
@@ -34,8 +34,6 @@ public class SimulationManager {
 	public static String traceDir = "../traces";
 	/** Graph database storage directory (used by Hosts). */
 	public static String graphDir = "../graphs";
-	/** Index storage directory (used by Hosts). */
-	public static String indexDir = "../index";
 	/** Measurement logfile directory. */
 	public static String logDir = "../logs";
 
@@ -50,12 +48,10 @@ public class SimulationManager {
 	public static String[] mobilityPhenomena = { "slow", "medium", "fast" };
 
 	/** Trajectory temporal resolution (seconds). */
-	public static int[] trajectoryTemporalResolution = { 30 }; // 30, 60, 5*60, 10*60
+	public static int[] trajectoryTemporalResolution = { 30, 60, 5 * 60,
+			10 * 60 };
 	/** Trajectory spatial resolution (meters). */
-	public static double[] trajectorySpatialResolution = { 5 }; // 5,
-																			// 10,
-																			// 25,
-																			// 50
+	public static double[] trajectorySpatialResolution = { 5, 10, 25, 50 };
 
 	public static void main(String[] args) {
 		try {
@@ -89,9 +85,6 @@ public class SimulationManager {
 
 			if (line.hasOption("graph-dir"))
 				graphDir = line.getOptionValue("graph-dir");
-
-			if (line.hasOption("index-dir"))
-				indexDir = line.getOptionValue("index-dir");
 
 			if (line.hasOption("log-dir"))
 				logDir = line.getOptionValue("log-dir");
@@ -150,8 +143,6 @@ public class SimulationManager {
 		options.addOption("t", "trace-dir", true, "mobility trace directory");
 		options.addOption("g", "graph-dir", true,
 				"graph database home directory");
-		options.addOption("I", "index-dir", true,
-				"graph database index (lucene) home directory");
 		options.addOption("l", "log-dir", true, "result logfile directory");
 
 		options.addOption("r", "sensing-range", true,
@@ -193,9 +184,9 @@ public class SimulationManager {
 	}
 
 	private static void simulate() {
-		new SimulationDriver(startTime, stopTime, traceDir, graphDir, indexDir,
-				logDir, phenomenaSensingRange, phenomenaSensingInterval,
-				mobilityHosts, mobilityPhenomena, trajectoryTemporalResolution,
+		new SimulationDriver(startTime, stopTime, traceDir, graphDir, logDir,
+				phenomenaSensingRange, phenomenaSensingInterval, mobilityHosts,
+				mobilityPhenomena, trajectoryTemporalResolution,
 				trajectorySpatialResolution).runSimulations();
 	}
 }

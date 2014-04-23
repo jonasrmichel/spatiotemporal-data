@@ -9,7 +9,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import stdata.datamodel.vertices.MeasuredDatum.TriggerType;
+import stdata.datamodel.vertices.Datum.TriggerType;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 
@@ -32,15 +32,15 @@ public class Logger {
 	 */
 	public static void clearLogs(String logDir, String simulation) {
 		// clear trajectory-level log subdirectory
-		clearLogSubDir(logDir + File.pathSeparator + TRAJECTORY_LOGFILE_SUBDIR,
+		clearLogSubDir(logDir + File.separator + TRAJECTORY_LOGFILE_SUBDIR,
 				simulation);
 
 		// clear host-level log subdirectory
-		clearLogSubDir(logDir + File.pathSeparator + HOST_LOGFILE_SUBDIR,
+		clearLogSubDir(logDir + File.separator + HOST_LOGFILE_SUBDIR,
 				simulation);
 
 		// clear simulation-level log subdirectory
-		clearLogSubDir(logDir + File.pathSeparator + SIMULATION_LOGFILE_SUBDIR,
+		clearLogSubDir(logDir + File.separator + SIMULATION_LOGFILE_SUBDIR,
 				simulation);
 
 		// clear the overall logfile of this simulation's logging info
@@ -67,7 +67,7 @@ public class Logger {
 
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.matches(simulation + "_*" + LOGFILE_EXTENSION);
+				return name.matches("^" + simulation + "(\\w*)" + LOGFILE_EXTENSION);
 			}
 
 		});
@@ -185,7 +185,7 @@ public class Logger {
 		sb.append(LOGFILE_DELIMITER
 				+ Double.toString(age > 0 ? dist_p_0 / age : 0d)); // dist_p_0_per_age
 
-		appendLogFileLine(logDir + File.pathSeparator
+		appendLogFileLine(logDir + File.separator
 				+ TRAJECTORY_LOGFILE_SUBDIR, name, TRAJECTORY_LOGFILE_HEADER,
 				sb.toString());
 	}
@@ -227,7 +227,7 @@ public class Logger {
 			sb.append(s.toDelimitedString(LOGFILE_DELIMITER, true, false));
 		}
 
-		appendLogFileLine(logDir + File.pathSeparator + HOST_LOGFILE_SUBDIR,
+		appendLogFileLine(logDir + File.separator + HOST_LOGFILE_SUBDIR,
 				name, HOST_LOGFILE_HEADER, sb.toString());
 	}
 
@@ -266,7 +266,7 @@ public class Logger {
 			sb.append(s.toDelimitedString(LOGFILE_DELIMITER, true, false));
 		}
 
-		appendLogFileLine(logDir + File.pathSeparator
+		appendLogFileLine(logDir + File.separator
 				+ SIMULATION_LOGFILE_SUBDIR, name, SIMULATION_LOGFILE_HEADER,
 				sb.toString());
 	}

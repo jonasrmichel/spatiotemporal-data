@@ -1,20 +1,22 @@
 package stdata.rules;
 
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
 import com.tinkerpop.frames.FramedGraph;
 
-public abstract class GraphChangedRule<F extends FramedGraph<?>, E extends EventGraph<?>>
-		extends Rule<F, E> implements GraphChangedListener {
+public abstract class GraphChangedRule<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
+		extends Rule<G, E, F> implements GraphChangedListener {
 
-	public GraphChangedRule(F framedGraph, E eventGraph) {
-		super(framedGraph, eventGraph);
+	public GraphChangedRule(G baseGraph, E eventGraph, F framedGraph) {
+		super(baseGraph, eventGraph, framedGraph);
 
 		addListener();
 	}
 
-	public GraphChangedRule(F framedGraph, E eventGraph, IRuleDelegate delegate) {
-		super(framedGraph, eventGraph, delegate);
+	public GraphChangedRule(G baseGraph, E eventGraph, F framedGraph,
+			IRuleDelegate delegate) {
+		super(baseGraph, eventGraph, framedGraph, delegate);
 
 		addListener();
 	}

@@ -21,12 +21,14 @@ import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Vertex;
 
-public class TitanSpatiotemporalDatabase<D extends Datum> extends
-		SpatiotemporalDatabase<TitanGraph, D> {
+public class TitanSpatiotemporalDatabase extends
+		SpatiotemporalDatabase<TitanGraph> {
 
-	public TitanSpatiotemporalDatabase(String instance, String graphDir,
-			String indexDir, Class<D> datumClass) {
-		super(instance, graphDir, indexDir, datumClass);
+	/** Internal index name. */
+	public static final String INDEX = "spatiotemporal-index";
+
+	public TitanSpatiotemporalDatabase(String instance, String graphDir) {
+		super(instance, graphDir);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -34,21 +36,21 @@ public class TitanSpatiotemporalDatabase<D extends Datum> extends
 
 	@Override
 	protected void initializeBaseGraph() {
-		String storageDirectory = graphDir + File.separator + instance;
+		String homeDir = graphDir + File.separator + instance;
 		BaseConfiguration config = new BaseConfiguration();
 		config.subset(STORAGE_NAMESPACE)
 				.addProperty(STORAGE_BACKEND_KEY,
 						"com.thinkaurelius.titan.diskstorage.berkeleyje.BerkeleyJEStoreManager");
 		config.subset(STORAGE_NAMESPACE).addProperty(STORAGE_DIRECTORY_KEY,
-				storageDirectory);
+				homeDir);
 
 		// add index
 		Configuration sub = config.subset(STORAGE_NAMESPACE)
 				.subset(INDEX_NAMESPACE).subset(INDEX);
 		sub.setProperty(INDEX_BACKEND_KEY,
 				"com.thinkaurelius.titan.diskstorage.lucene.LuceneIndex");
-		sub.setProperty(STORAGE_DIRECTORY_KEY,
-				StorageConfig.getHomeDir(indexDir));
+		sub.setProperty(STORAGE_DIRECTORY_KEY, homeDir + File.separator
+				+ "lucene");
 
 		// create the base graph
 		baseGraph = TitanFactory.open(config);

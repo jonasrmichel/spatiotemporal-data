@@ -8,28 +8,30 @@ import stdata.datamodel.vertices.SpaceTimePosition;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-public class TemporallyModulatedTrajectoryRule<F extends FramedGraph<?>, E extends EventGraph<?>>
-		extends HostContextChagedRule<F, E> {
+public class TemporallyModulatedTrajectoryRule<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
+		extends HostContextChangedRule<G, E, F> {
+
 	/** The temporal trajectory resolution (seconds). */
 	double temporalResolution;
 
 	/** The reference location. */
 	long referenceTime = -1L;
 
-	public TemporallyModulatedTrajectoryRule(F framedGraph, E eventGraph,
-			long temporalResolution) {
-		super(framedGraph, eventGraph);
+	public TemporallyModulatedTrajectoryRule(G baseGraph, E eventGraph,
+			F framedGraph, long temporalResolution) {
+		super(baseGraph, eventGraph, framedGraph);
 
 		this.temporalResolution = temporalResolution;
 	}
 
-	public TemporallyModulatedTrajectoryRule(F framedGraph, E eventGraph,
-			IRuleDelegate delegate, long temporalResolution) {
-		super(framedGraph, eventGraph, delegate);
+	public TemporallyModulatedTrajectoryRule(G baseGraph, E eventGraph,
+			F framedGraph, IRuleDelegate delegate, long temporalResolution) {
+		super(baseGraph, eventGraph, framedGraph, delegate);
 
 		this.temporalResolution = temporalResolution;
 	}
@@ -103,6 +105,9 @@ public class TemporallyModulatedTrajectoryRule<F extends FramedGraph<?>, E exten
 
 			datum.add(pos);
 		}
+		
+		// commit changes
+		baseGraph.commit();
 
 		referenceTime = timestamp;
 

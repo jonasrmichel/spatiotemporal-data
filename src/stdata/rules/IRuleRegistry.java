@@ -3,7 +3,11 @@ package stdata.rules;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.RuleContainer;
 
-public interface IRuleRegistry {
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
+import com.tinkerpop.frames.FramedGraph;
+
+public interface IRuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>> {
 
 	/**
 	 * Registers a new rule with no explicitly governed data.
@@ -11,7 +15,7 @@ public interface IRuleRegistry {
 	 * @param rule
 	 * @return the rule's container in the graph database.
 	 */
-	public RuleContainer registerRule(Rule rule);
+	public RuleContainer registerRule(Rule<G, E, F> rule);
 
 	/**
 	 * Registers a new rule that explicitly governs the provided datum.
@@ -20,5 +24,5 @@ public interface IRuleRegistry {
 	 * @param datum
 	 * @return the rule's container in the graph database.
 	 */
-	public RuleContainer registerRule(Rule rule, Datum datum);
+	public RuleContainer registerRule(Rule<G, E, F> rule, Datum datum);
 }

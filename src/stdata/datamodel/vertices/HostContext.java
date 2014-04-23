@@ -9,7 +9,7 @@ import com.tinkerpop.frames.modules.javahandler.JavaHandlerContext;
 
 public interface HostContext extends VertexFrame {
 	public static final String LOCATION_TRIGGER_KEY = "location-trigger";
-	public static final String TIMESTAMP_TRIGGER_KEY = "timestamp";
+	public static final String TIMESTAMP_TRIGGER_KEY = "timestamp-trigger";
 
 	/** Location property. */
 	@Property("location")

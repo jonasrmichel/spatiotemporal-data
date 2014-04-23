@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 
-import stdata.datamodel.vertices.MeasuredDatum.TriggerType;
+import stdata.datamodel.vertices.Datum.TriggerType;
 import stdata.simulator.measurement.Logger;
 import stdata.simulator.measurement.ReducibleRunningStatistics;
 import stdata.simulator.measurement.RunningStatistics;
@@ -27,7 +27,7 @@ public class SimulationDriver implements IHostDelegate {
 	/** Simulation options. */
 	int startTime, stopTime;
 
-	String traceDir, graphDir, indexDir, logDir;
+	String traceDir, graphDir, logDir;
 
 	double phenomenaSensingRange;
 	int phenomenaSensingInterval;
@@ -49,17 +49,15 @@ public class SimulationDriver implements IHostDelegate {
 	LocationManager hostLocationManager, phenomenonLocationManager;
 
 	public SimulationDriver(int startTime, int stopTime, String traceDir,
-			String graphDir, String indexDir, String logDir,
-			double phenomenaSensingRange, int phenomenaSensingInterval,
-			String[] mobilityHosts, String[] mobilityPhenomena,
-			int[] trajectoryTemporalResolution,
+			String graphDir, String logDir, double phenomenaSensingRange,
+			int phenomenaSensingInterval, String[] mobilityHosts,
+			String[] mobilityPhenomena, int[] trajectoryTemporalResolution,
 			double[] trajectorySpatialResolution) {
 		this.startTime = startTime;
 		this.stopTime = stopTime;
 
 		this.traceDir = traceDir;
 		this.graphDir = graphDir;
-		this.indexDir = indexDir;
 		this.logDir = logDir;
 
 		this.phenomenaSensingRange = phenomenaSensingRange;
@@ -129,17 +127,15 @@ public class SimulationDriver implements IHostDelegate {
 
 		// clear out simulation-specific graph and index subdirectories
 		String simulationGraphDir = graphDir + File.separator + simulationId;
-		String simulationIndexDir = indexDir + File.separator + simulationId;
 
 		clearDirectory(simulationGraphDir);
-		clearDirectory(simulationIndexDir);
 
 		// load the required number of host moving objects
 		int numHosts = hostLocationManager.getNumTraces();
 		for (int i = 0; i < numHosts; i++)
 			hosts.put(i, new Host(i, SimulationManager.HOST_OBJECT_TYPE,
 					hostLocationManager, database, this, simulationGraphDir,
-					simulationIndexDir, logDir, simulationId,
+					logDir, simulationId,
 					SimulationManager.phenomenaSensingRange,
 					SimulationManager.phenomenaSensingInterval,
 					temporalResolution, spatialResolution));
@@ -193,6 +189,9 @@ public class SimulationDriver implements IHostDelegate {
 		// each simulation has a unique identifier
 		String simulationId;
 
+		// keep track of the wall time
+		long kickoffTime;
+
 		// maps to hold simulation-level running and overall statistics for
 		// spatially- and temporally-modulated data.
 		RunningStatisticsMap<ReducibleRunningStatistics> spatiallyModulatedStatistics, temporallyModulatedStatistics;
@@ -216,16 +215,19 @@ public class SimulationDriver implements IHostDelegate {
 					simulationId = "hm_" + hMobility + "_pm_" + pMobility
 							+ "_stres_" + Integer.toString(stResolution);
 
+					// set the kickoff time (wall time)
+					kickoffTime = System.currentTimeMillis();
+
 					// clear any existing logging info for this simulation
 					Logger.clearLogs(logDir, simulationId);
 
 					// create the simulation's simulation-level statistics maps
 					spatiallyModulatedStatistics = new RunningStatisticsMap<ReducibleRunningStatistics>(
 							ReducibleRunningStatistics.class,
-							RunningStatisticsMap.HOST_LEVEL_KEYS);
+							RunningStatisticsMap.SIMULATION_LEVEL_KEYS);
 					temporallyModulatedStatistics = new RunningStatisticsMap<ReducibleRunningStatistics>(
 							ReducibleRunningStatistics.class,
-							RunningStatisticsMap.HOST_LEVEL_KEYS);
+							RunningStatisticsMap.SIMULATION_LEVEL_KEYS);
 
 					if (SimulationManager.verbose)
 						Util.report(SimulationDriver.class,
@@ -258,7 +260,10 @@ public class SimulationDriver implements IHostDelegate {
 									SimulationDriver.class,
 									Float.toString(100 * ((float) time)
 											/ totalTime)
-											+ "%");
+											+ "% ~"
+											+ Integer.toString((int) (System
+													.currentTimeMillis() - kickoffTime) / 1000 / 60)
+											+ " minutes elapsed");
 
 						// advance each moving object to the current time
 						for (MovingObject movingObject : movingObjects)
@@ -283,14 +288,20 @@ public class SimulationDriver implements IHostDelegate {
 
 						// log the running per-time simulation-level aggregate
 						// measurements
-						Logger.appendSimulationMeasurement(logDir,
-								simulationId, TriggerType.SPATIAL, time,
-								spatiallyModulatedStatistics
-										.getRunningStatistics());
-						Logger.appendSimulationMeasurement(logDir,
-								simulationId, TriggerType.TEMPORAL, time,
-								temporallyModulatedStatistics
-										.getRunningStatistics());
+						Logger.appendSimulationMeasurement(
+								logDir,
+								simulationId,
+								TriggerType.SPATIAL,
+								time,
+								RunningStatisticsMap
+										.getReducibleRunningStatisticsArray(spatiallyModulatedStatistics));
+						Logger.appendSimulationMeasurement(
+								logDir,
+								simulationId,
+								TriggerType.TEMPORAL,
+								time,
+								RunningStatisticsMap
+										.getReducibleRunningStatisticsArray(temporallyModulatedStatistics));
 
 						// advance the simulation time
 						time++;
@@ -299,12 +310,16 @@ public class SimulationDriver implements IHostDelegate {
 
 					// log the overall aggregate measurements for this
 					// simulation
-					Logger.appendOverallMeasurement(logDir,
+					Logger.appendOverallMeasurement(
+							logDir,
 							TriggerType.SPATIAL,
-							spatiallyModulatedStatistics.getRunningStatistics());
-					Logger.appendOverallMeasurement(logDir,
-							TriggerType.TEMPORAL, temporallyModulatedStatistics
-									.getRunningStatistics());
+							RunningStatisticsMap
+									.getReducibleRunningStatisticsArray(spatiallyModulatedStatistics));
+					Logger.appendOverallMeasurement(
+							logDir,
+							TriggerType.TEMPORAL,
+							RunningStatisticsMap
+									.getReducibleRunningStatisticsArray(temporallyModulatedStatistics));
 
 					// shutdown the simulation objects
 					for (MovingObject movingObject : movingObjects)

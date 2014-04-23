@@ -3,23 +3,24 @@ package stdata.rules;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-public abstract class TemporalRule<F extends FramedGraph<?>, E extends EventGraph<?>>
-		extends Rule<F, E> {
+public abstract class TemporalRule<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
+		extends Rule<G, E, F> {
 	/** The rule's timer. */
 	Timer timer = null;
 
-	public TemporalRule(F framedGraph, E eventGraph, long delay, long period) {
-		super(framedGraph, eventGraph);
+	public TemporalRule(G baseGraph, E eventGraph, F framedGraph, long delay, long period) {
+		super(baseGraph, eventGraph, framedGraph);
 
 		start(delay, period);
 	}
 
-	public TemporalRule(F framedGraph, E eventGraph, IRuleDelegate delegate,
+	public TemporalRule(G baseGraph, E eventGraph, F framedGraph, IRuleDelegate delegate,
 			long delay, long period) {
-		super(framedGraph, eventGraph, delegate);
+		super(baseGraph, eventGraph, framedGraph, delegate);
 
 		start(delay, period);
 	}

@@ -8,28 +8,29 @@ import stdata.datamodel.vertices.SpaceTimePosition;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-public class SpatiallyModulatedTrajectoryRule<F extends FramedGraph<?>, E extends EventGraph<?>>
-		extends HostContextChagedRule<F, E> {
+public class SpatiallyModulatedTrajectoryRule<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
+		extends HostContextChangedRule<G, E, F> {
 	/** The spatial trajectory resolution (meters). */
 	double spatialResolution;
 
 	/** The reference location. */
 	Geoshape referenceLocation = null;
 
-	public SpatiallyModulatedTrajectoryRule(F framedGraph, E eventGraph,
-			double spatialResolution) {
-		super(framedGraph, eventGraph);
+	public SpatiallyModulatedTrajectoryRule(G baseGraph, E eventGraph,
+			F framedGraph, double spatialResolution) {
+		super(baseGraph, eventGraph, framedGraph);
 
 		this.spatialResolution = spatialResolution;
 	}
 
-	public SpatiallyModulatedTrajectoryRule(F framedGraph, E eventGraph,
-			IRuleDelegate delegate, double spatialResolution) {
-		super(framedGraph, eventGraph, delegate);
+	public SpatiallyModulatedTrajectoryRule(G baseGraph, E eventGraph,
+			F framedGraph, IRuleDelegate delegate, double spatialResolution) {
+		super(baseGraph, eventGraph, framedGraph, delegate);
 
 		this.spatialResolution = spatialResolution;
 	}
@@ -98,6 +99,9 @@ public class SpatiallyModulatedTrajectoryRule<F extends FramedGraph<?>, E extend
 
 			datum.add(pos);
 		}
+
+		// commit changes
+		baseGraph.commit();
 
 		referenceLocation = location;
 	}

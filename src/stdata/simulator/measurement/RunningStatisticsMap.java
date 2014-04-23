@@ -97,11 +97,10 @@ public class RunningStatisticsMap<T extends RunningStatistics> {
 	 * 
 	 * @return
 	 */
-	public T[] getRunningStatistics() {
-		Collection<T> values = map.values();
-		return values.toArray((T[]) new Object[values.size()]);
+	public Collection<T> getRunningStatistics() {
+		return map.values();
 	}
-	
+
 	public Set<Entry<String, T>> getEntries() {
 		return map.entrySet();
 	}
@@ -116,4 +115,15 @@ public class RunningStatisticsMap<T extends RunningStatistics> {
 		return map.get(key);
 	}
 
+	public static RunningStatistics[] getRunningStatisticsArray(
+			RunningStatisticsMap<RunningStatistics> statistcs) {
+		Collection<RunningStatistics> coll = statistcs.getRunningStatistics();
+		return coll.toArray(new RunningStatistics[coll.size()]);
+	}
+	
+	public static ReducibleRunningStatistics[] getReducibleRunningStatisticsArray(
+			RunningStatisticsMap<ReducibleRunningStatistics> statistcs) {
+		Collection<ReducibleRunningStatistics> coll = statistcs.getRunningStatistics();
+		return coll.toArray(new ReducibleRunningStatistics[coll.size()]);
+	}
 }

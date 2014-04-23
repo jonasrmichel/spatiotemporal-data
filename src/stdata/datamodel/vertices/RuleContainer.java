@@ -3,12 +3,12 @@ package stdata.datamodel.vertices;
 import stdata.rules.IRuleDelegate;
 import stdata.rules.Rule;
 
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.Adjacency;
+import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
-import com.tinkerpop.frames.modules.javahandler.JavaHandler;
-import com.tinkerpop.frames.modules.javahandler.JavaHandlerContext;
 
 public interface RuleContainer extends VertexFrame, IRuleDelegate {
 

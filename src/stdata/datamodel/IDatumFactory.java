@@ -3,13 +3,14 @@ package stdata.datamodel;
 import java.util.List;
 
 import stdata.datamodel.vertices.Datum;
-import stdata.datamodel.vertices.MeasuredDatum;
-import stdata.datamodel.vertices.MeasuredDatum.TriggerType;
 import stdata.rules.Rule;
 
 import com.thinkaurelius.titan.core.attribute.Geoshape;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
+import com.tinkerpop.frames.FramedGraph;
 
-public interface IDatumFactory<D extends Datum> {
+public interface IDatumFactory<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>> {
 
 	/**
 	 * Creates a new datum with the provided parameters.
@@ -25,11 +26,14 @@ public interface IDatumFactory<D extends Datum> {
 	 * @param context
 	 *            any initial explicit contextual relations this datum will
 	 *            have.
+	 * @param measurable
+	 *            true if this datum should contain measured metadata.
 	 * @param rule
 	 *            a rule that explicitly governs this datum.
 	 * @return the newly created datum.
 	 */
-	public D addDatum(Geoshape phenomenonLocation, Geoshape hostLocation,
-			long timestamp, String domain, List<D> context, Rule rule);
+	public Datum addDatum(Geoshape phenomenonLocation, Geoshape hostLocation,
+			long timestamp, String domain, List<Datum> context,
+			boolean measurable, Rule<G, E, F> rule);
 
 }

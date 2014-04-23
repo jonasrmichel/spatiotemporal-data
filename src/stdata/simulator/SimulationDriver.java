@@ -1,11 +1,14 @@
 package stdata.simulator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.commons.io.FileUtils;
 
 import stdata.datamodel.vertices.MeasuredDatum.TriggerType;
 import stdata.simulator.measurement.Logger;
@@ -85,26 +88,26 @@ public class SimulationDriver implements IHostDelegate {
 	}
 
 	/**
-	 * Loads the provided location manager with a mobility trace file.
+	 * Returns a location manager loaded with a mobility trace file.
 	 * 
-	 * @param locationManager
 	 * @param numObjects
 	 * @param mobility
 	 * @param startTime
 	 * @param stopTime
+	 * @return a fully loaded location manager.
 	 */
-	private void loadMobilityTraces(LocationManager locationManager,
-			int numObjects, String mobility, int startTime, int stopTime) {
+	private LocationManager loadMobilityTraces(int numObjects, String mobility,
+			int startTime, int stopTime) {
 		if (SimulationManager.verbose)
 			Util.report(
 					SimulationDriver.class,
 					"loading mobility trace file: " + " ["
 							+ Integer.toString(numObjects) + " objects]" + " ["
 							+ mobility + " mobility]" + " ["
-							+ Integer.toString(startTime) + ","
-							+ Integer.toString(stopTime) + " start,stop time]");
+							+ Integer.toString(startTime) + " start,"
+							+ Integer.toString(stopTime) + " stop]");
 
-		locationManager = new LocationManager(traceDir + File.separator
+		return new LocationManager(traceDir + File.separator
 				+ Integer.toString(numObjects) + "-" + mobility + ".txt",
 				startTime, stopTime);
 	}
@@ -124,12 +127,19 @@ public class SimulationDriver implements IHostDelegate {
 		// (assuming they've already been properly shutdown)
 		hosts.clear();
 
+		// clear out simulation-specific graph and index subdirectories
+		String simulationGraphDir = graphDir + File.separator + simulationId;
+		String simulationIndexDir = indexDir + File.separator + simulationId;
+
+		clearDirectory(simulationGraphDir);
+		clearDirectory(simulationIndexDir);
+
 		// load the required number of host moving objects
 		int numHosts = hostLocationManager.getNumTraces();
 		for (int i = 0; i < numHosts; i++)
 			hosts.put(i, new Host(i, SimulationManager.HOST_OBJECT_TYPE,
-					hostLocationManager, database, this, graphDir, indexDir,
-					logDir, simulationId,
+					hostLocationManager, database, this, simulationGraphDir,
+					simulationIndexDir, logDir, simulationId,
 					SimulationManager.phenomenaSensingRange,
 					SimulationManager.phenomenaSensingInterval,
 					temporalResolution, spatialResolution));
@@ -152,6 +162,33 @@ public class SimulationDriver implements IHostDelegate {
 					phenomenonLocationManager, database));
 	}
 
+	private void clearDirectory(String dir) {
+		try {
+			File folder = new File(dir);
+
+			// delete any existing directory at this path
+			if (folder.exists()) {
+				if (!folder.isDirectory()) {
+					System.err.println("Error: " + dir + " is not a directory");
+					System.exit(1);
+				}
+
+				FileUtils.deleteDirectory(folder);
+			}
+
+			// create a new empty directory at this path
+			if (!folder.mkdir()) {
+				System.err.println("Error: could not create directory "
+						+ folder.getAbsolutePath());
+				System.exit(1);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+
 	public void runSimulations() {
 		// each simulation has a unique identifier
 		String simulationId;
@@ -162,22 +199,23 @@ public class SimulationDriver implements IHostDelegate {
 
 		for (String pMobility : mobilityPhenomena) {
 			// load the phenomenon mobility traces
-			loadMobilityTraces(phenomenonLocationManager,
+			phenomenonLocationManager = loadMobilityTraces(
 					SimulationManager.NUM_PHENOMENA, pMobility, startTime,
 					stopTime);
 
 			for (String hMobility : mobilityHosts) {
 				// load the host mobility traces
-				loadMobilityTraces(hostLocationManager,
+				hostLocationManager = loadMobilityTraces(
 						SimulationManager.NUM_HOSTS, hMobility, startTime,
 						stopTime);
 
 				for (int stResolution = 0; stResolution < numSTResolutions; stResolution++) {
 					// create the simulation's unique identifier
-					simulationId = "stdata" + "_hm-" + hMobility + "_pm-"
-							+ pMobility + "_str-"
-							+ Integer.toString(stResolution);
-					
+					// hm_<host mobility>_pm_<phenemonon
+					// mobility>_stres_<space-time resolution>
+					simulationId = "hm_" + hMobility + "_pm_" + pMobility
+							+ "_stres_" + Integer.toString(stResolution);
+
 					// clear any existing logging info for this simulation
 					Logger.clearLogs(logDir, simulationId);
 

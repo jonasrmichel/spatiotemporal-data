@@ -2,6 +2,7 @@ package stdata.datamodel;
 
 import java.util.List;
 
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import stdata.datamodel.vertices.Datum;
@@ -44,18 +45,43 @@ public class DatumFactory<G extends Graph, D extends Datum> implements
 		// configure the datum
 		datum.add(pos);
 		datum.setLocation(phenomenonLocation);
-		if(context != null)
-		datum.setContextData((Iterable<Datum>) context);
+
+		if (context != null)
+			datum.setContextData((Iterable<Datum>) context);
 
 		// register the datum's rule
-		ruleRegistry.registerRule(rule, datum);
+		if (rule != null)
+			ruleRegistry.registerRule(rule, datum);
 
 		return datum;
 	}
 
 	@Override
-	public D addDatum(JSONObject json, Rule rule) {
-		// TODO Auto-generated method stub
-		return null;
+	public D addDatum(JSONObject json, Geoshape location, long timestamp,
+			String domain, List<D> context, Rule rule) {
+		D datum = null;
+		try {
+			// create the datum
+			datum = graph.addVertex(null, datumClass);
+
+			// unmarshal the datum
+			datum.unmarshal(json, spaceTimePositionFactory);
+			
+			// append a new space time position to the datum's trajectory
+			SpaceTimePosition pos = spaceTimePositionFactory.addSpaceTimePosition(
+					location, timestamp, domain);
+			datum.add(pos);
+			
+			if (context != null)
+				datum.setContextData((Iterable<Datum>) context);
+			
+			if (rule != null)
+				ruleRegistry.registerRule(rule, datum);
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return datum;
 	}
 }

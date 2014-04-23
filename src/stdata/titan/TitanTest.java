@@ -91,6 +91,13 @@ public class TitanTest {
 		for (Vertex v : framedGraph.getVertices())
 			System.out.println("\t" + v + ", " + v.getPropertyKeys());
 
+		System.out.println("Datum vertices:");
+		for (Vertex v : titanGraph.query().has("class", Datum.class.getName())
+				.vertices()) {
+			Datum d = framedGraph.getVertex(v, Datum.class);
+			System.out.println("\t" + d + ", " + d.toString());
+		}
+
 		TitanGraphQuery q = titanGraph.query().has("location", Geo.WITHIN,
 				Geoshape.circle(-40.1, 90.1, 100));
 		System.out.println("Geo.WITHIN vertices:");

@@ -54,13 +54,21 @@ public interface HostContext extends VertexFrame {
 		@Override
 		@JavaHandler
 		public void triggerLocationUpdate() {
-			setLocationTrigger(!getLocationTrigger());
+			try {
+				setLocationTrigger(!getLocationTrigger());
+			} catch (Exception e) {
+				setLocationTrigger(true);
+			}
 		}
 
 		@Override
 		@JavaHandler
 		public void triggerTimestampUpdate() {
-			setTimestampTrigger(!getTimestampTrigger());
+			try {
+				setTimestampTrigger(!getTimestampTrigger());
+			} catch (Exception e) {
+				setTimestampTrigger(true);
+			}
 		}
 	}
 }

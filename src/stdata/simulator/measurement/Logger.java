@@ -58,7 +58,7 @@ public class Logger {
 	private static void clearLogSubDir(String subDir, final String simulation) {
 		File folder = new File(subDir);
 
-		if (!folder.isDirectory()) {
+		if (folder.exists() && !folder.isDirectory()) {
 			System.err.println("Error: " + subDir + " is not a directory");
 			System.exit(1);
 		}
@@ -71,6 +71,9 @@ public class Logger {
 			}
 
 		});
+		
+		if (files == null)
+			return;
 
 		for (File file : files) {
 			if (!file.exists()) {
@@ -99,6 +102,15 @@ public class Logger {
 					+ LOGFILE_EXTENSION);
 			File temp = new File(logDir + File.separator + name
 					+ LOGFILE_EXTENSION + ".tmp");
+			
+			if (!logfile.exists())
+				return; // nothing to do
+			
+			if (!logfile.isFile()) {
+				System.err.println("Error: overall logfile " + name + " is not a file");
+				System.exit(1);
+			}
+				
 
 			BufferedReader reader = new BufferedReader(new FileReader(logfile));
 			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));

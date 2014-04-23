@@ -22,7 +22,7 @@ public abstract class MovingObject {
 
 	/** An interface for a spatial (moving object) database. */
 	protected IMovingObjectDatabase objectDB;
-	
+
 	public MovingObject(int identifier, String type,
 			ILocationManager locationManager, IMovingObjectDatabase objectDB) {
 		this.identifier = identifier;
@@ -58,9 +58,9 @@ public abstract class MovingObject {
 		// update the moving object's location
 		prevLocation = location;
 		location = locationManager.getLocation(identifier, time);
-		
+
 		// if necessary, update the the moving objects database
-		if (!prevLocation.equals(location))
+		if (prevLocation == null || !prevLocation.equals(location))
 			objectDB.updatePosition(identifier, type, time, location);
 	}
 

@@ -152,9 +152,12 @@ public abstract class SpatiotemporalDatabase<G extends Graph, D extends Datum> {
 	 * @return
 	 */
 	public <F extends VertexFrame> Iterable<F> getFramedVertices(Class<F> kind) {
-		return (Iterable<F>) baseGraph
+		Iterable<Vertex> vertices = baseGraph
 				.query()
 				.has(SpatiotemporalFrameInitializer.FRAMED_CLASS_KEY,
 						kind.getName()).vertices();
+		Iterable<F> framedVertices = framedGraph.frameVertices(vertices, kind);
+
+		return framedVertices;
 	}
 }

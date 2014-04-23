@@ -1,6 +1,7 @@
 package stdata.ibrdtn;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -42,7 +43,7 @@ public class IBRDTNHost {
 	ILocationProvider locationProvider;
 
 	/** The host's spatiotemporal graph database. */
-	SpatiotemporalDatabase<TitanGraph, MeasuredDatum> spatiotemporalDB;
+	SpatiotemporalDatabase<TitanGraph, Datum> spatiotemporalDB;
 	
 	/** The spatial resolution (meters) of spatially-modulated trajectories. */
 	double trajectorySpatialResolution = 10;
@@ -74,8 +75,8 @@ public class IBRDTNHost {
 		System.out.println(indexDir);
 		
 		// initialize the spatiotemporal graph database instance
-		spatiotemporalDB = new TitanSpatiotemporalDatabase<MeasuredDatum>(eid,
-				graphDir, indexDir, MeasuredDatum.class);
+		spatiotemporalDB = new TitanSpatiotemporalDatabase<Datum>(eid,
+				graphDir, indexDir, Datum.class);
 
 		// create a special vertex in the spatiotemporal database to store the
 		// host's position notion of time
@@ -153,44 +154,70 @@ public class IBRDTNHost {
 		hostContext.getTimestamp();
 	}
 	
-	private void createDatum(Geoshape phenomenonLocation){
+	private Datum createDatum(Geoshape phenomenonLocation){
 		SpatiallyModulatedTrajectoryRule<FramedGraph<TitanGraph>> spatiallyModulatedRule = 
 				new SpatiallyModulatedTrajectoryRule<FramedGraph<TitanGraph>>(
 				spatiotemporalDB.framedGraph, trajectorySpatialResolution);
-		MeasuredDatum spatiallyModulatedDatum;
-		spatiallyModulatedDatum = spatiotemporalDB.datumFactory.addDatum(
+		Datum spatiallyModulatedDatum = spatiotemporalDB.datumFactory.addDatum(
 				phenomenonLocation, phenomenonLocation, System.currentTimeMillis(),
 				Integer.toString(identifier), null, spatiallyModulatedRule);
-		// configure the MeasuredDatum properties
-		spatiallyModulatedDatum.setPhenomenonIdentifier(identifier);
-		spatiallyModulatedDatum.setTriggerType(TriggerType.SPATIAL);
+		return spatiallyModulatedDatum;
 		
 		//If I understand correctly, at this point, this datum, which I also have a handle
 		//to is actually in the database, too.
+	}
+	
+	private void hackSendBundle(String dest, Datum d){
+		/**
+		 * Christine's hack just to be able to test something: going to just send the bundle from here
+		 * since I can't seem to correctly put it in and pull it back out of the database.
+		 */
+		JSONObject jo = null; 
+		try{
+			jo = d.marshall();
+		}
+		catch(JSONException je){
+			je.printStackTrace();
+		}
+		if(jo != null){
+			try{
+				byte[] sendData = jo.toString().getBytes("utf-8");
+				sendBundle(dest, sendData);
+			}
+			catch(UnsupportedEncodingException uee){
+				uee.printStackTrace();
+			}
+		}
+	}
+	
+	private void extractAndSendBundles(String dest){
+		Iterable<Datum> frames = spatiotemporalDB.getFramedVertices(Datum.class);
+		for(Datum d : frames){
+			JSONObject jo = null; 
+			try{
+				jo = d.marshall();
+			}
+			catch(JSONException je){
+				je.printStackTrace();
+			}
+			if(jo != null){
+				try{
+					byte[] sendData = jo.toString().getBytes("utf-8");
+					sendBundle(dest, sendData);
+				}
+				catch(UnsupportedEncodingException uee){
+					uee.printStackTrace();
+				}
+			}
+		}
 	}
 
     /**
      * Application-level method to prep a bundle and send down to the send method,
      * which will actually chuck it through the DTN daemon.
      */
-	private void sendBundle(String dest){
-		//first thing's first. Let's grab a bundle to send.
-		Iterable<MeasuredDatum> frames = spatiotemporalDB.getFramedVertices(MeasuredDatum.class);
-		for(Object datum : frames){
-			System.out.println(datum);
-			System.out.println(datum.getClass());
-			/*JSONObject jo;
-			try{
-				jo = datum.marshall();
-			}
-			catch(JSONException je){
-				logger.log(Level.WARNING, "Couldn't serialize object.");
-			}*/
-			System.out.println("Yay! I've got my bytes!");
-		}
-		if(!frames.iterator().hasNext()){
-			System.out.println("Whoops! We did something wrong!");
-		}
+	private void sendBundle(String dest, byte[] data){
+		System.out.println("Sending Bundle");
 		
 		EID destination = new SingletonEndpoint(dest);
 		Bundle bundle = new Bundle(destination, Constants.LIFETIME);
@@ -241,8 +268,13 @@ public class IBRDTNHost {
     	Geoshape defaultLocation = Geoshape.point(30.2500, 97.7500);
     	ILocationProvider locationProvider = new DumbLocationProviderImpl(defaultLocation);
     	IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "/Users/christinejulien/hackathon/spatiotemporal-data/graphDir/", "/Users/christinejulien/hackathon/spatiotemporal-data/indexDir/", locationProvider);
-    	host.createDatum(defaultLocation);
-    	host.sendBundle(args[0]);
+    	//this first method creates a datum and thinks its putting it in the database
+    	Datum d = host.createDatum(defaultLocation);
+    	//this second method just sends the datum returned from above using the datum's marshall method
+    	//I'm doing it this way because I can't seem to recover stuff from the database
+    	host.hackSendBundle(args[0], d);
+    	//Eventually, I think this should work
+    	host.extractAndSendBundles(args[0]);
     }
 
 }

@@ -18,6 +18,7 @@ import stdata.titan.TitanSpatiotemporalDatabase;
 
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.attribute.Geoshape;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
 public class Host extends MovingObject {
@@ -94,7 +95,8 @@ public class Host extends MovingObject {
 	 * @param trigger
 	 * @return
 	 */
-	public RunningStatisticsMap<RunningStatistics> getStatistics(TriggerType trigger) {
+	public RunningStatisticsMap<RunningStatistics> getStatistics(
+			TriggerType trigger) {
 		RunningStatisticsMap<RunningStatistics> statistics = null;
 		if (trigger.equals(TriggerType.SPATIAL))
 			statistics = spatiallyModulatedStatistics;
@@ -149,8 +151,8 @@ public class Host extends MovingObject {
 		// create a new datum for each sensed phenomenon
 		Geoshape phenomenonLocation;
 		MeasuredDatum spatiallyModulatedDatum, temporallyModulatedDatum;
-		SpatiallyModulatedTrajectoryRule<FramedGraph<TitanGraph>> spatiallyModulatedRule;
-		TemporallyModulatedTrajectoryRule<FramedGraph<TitanGraph>> temporallyModulatedRule;
+		SpatiallyModulatedTrajectoryRule<FramedGraph<TitanGraph>, EventGraph<TitanGraph>> spatiallyModulatedRule;
+		TemporallyModulatedTrajectoryRule<FramedGraph<TitanGraph>, EventGraph<TitanGraph>> temporallyModulatedRule;
 		for (Integer phenomenon : nearbyPhenomena) {
 			// get the phenomenon's location
 			phenomenonLocation = delegate.getPhenomenonLocation(phenomenon,
@@ -160,8 +162,9 @@ public class Host extends MovingObject {
 			// (spatially and temporally triggered)
 
 			// create a new spatially modulated rule
-			spatiallyModulatedRule = new SpatiallyModulatedTrajectoryRule<FramedGraph<TitanGraph>>(
-					spatiotemporalDB.framedGraph, trajectorySpatialResolution);
+			spatiallyModulatedRule = new SpatiallyModulatedTrajectoryRule<FramedGraph<TitanGraph>, EventGraph<TitanGraph>>(
+					spatiotemporalDB.framedGraph, spatiotemporalDB.eventGraph,
+					trajectorySpatialResolution);
 			// create a datum with the spatially modulated rule
 			spatiallyModulatedDatum = spatiotemporalDB.datumFactory.addDatum(
 					phenomenonLocation, location, (long) time,
@@ -171,8 +174,9 @@ public class Host extends MovingObject {
 			spatiallyModulatedDatum.setTriggerType(TriggerType.SPATIAL);
 
 			// create a new temporally modulated rule
-			temporallyModulatedRule = new TemporallyModulatedTrajectoryRule<FramedGraph<TitanGraph>>(
-					spatiotemporalDB.framedGraph, trajectoryTemporalResolution);
+			temporallyModulatedRule = new TemporallyModulatedTrajectoryRule<FramedGraph<TitanGraph>, EventGraph<TitanGraph>>(
+					spatiotemporalDB.framedGraph, spatiotemporalDB.eventGraph,
+					trajectoryTemporalResolution);
 			// create a datum with the temporally modulated rule
 			temporallyModulatedDatum = spatiotemporalDB.datumFactory
 					.addDatum(phenomenonLocation, location, (long) time,

@@ -9,26 +9,27 @@ import stdata.datamodel.vertices.SpaceTimePosition;
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-public class SpatiallyModulatedTrajectoryRule<G extends FramedGraph<?>> extends
-		HostContextChagedRule<G> {
+public class SpatiallyModulatedTrajectoryRule<F extends FramedGraph<?>, E extends EventGraph<?>>
+		extends HostContextChagedRule<F, E> {
 	/** The spatial trajectory resolution (meters). */
 	double spatialResolution;
 
 	/** The reference location. */
 	Geoshape referenceLocation = null;
-	
-	public SpatiallyModulatedTrajectoryRule(G graph,
+
+	public SpatiallyModulatedTrajectoryRule(F framedGraph, E eventGraph,
 			double spatialResolution) {
-		super(graph);
+		super(framedGraph, eventGraph);
 
 		this.spatialResolution = spatialResolution;
 	}
 
-	public SpatiallyModulatedTrajectoryRule(G graph, IRuleDelegate delegate,
-			double spatialResolution) {
-		super(graph, delegate);
+	public SpatiallyModulatedTrajectoryRule(F framedGraph, E eventGraph,
+			IRuleDelegate delegate, double spatialResolution) {
+		super(framedGraph, eventGraph, delegate);
 
 		this.spatialResolution = spatialResolution;
 	}
@@ -80,8 +81,8 @@ public class SpatiallyModulatedTrajectoryRule<G extends FramedGraph<?>> extends
 	@Override
 	public void hostLocationChanged(HostContext hostContext) {
 		Geoshape location = hostContext.getLocation();
-		long timestamp  = hostContext.getTimestamp();
-		
+		long timestamp = hostContext.getTimestamp();
+
 		// note: Geoshape.Point.getLocation() is in kilometers.
 		if (referenceLocation != null
 				&& (location.getPoint().distance(referenceLocation.getPoint()) * 1000) < spatialResolution)
@@ -90,13 +91,14 @@ public class SpatiallyModulatedTrajectoryRule<G extends FramedGraph<?>> extends
 		// trigger trajectory updates
 		SpaceTimePosition pos;
 		for (Datum datum : delegate.getGoverns()) {
-			pos = (SpaceTimePosition) graph.addVertex(null, SpaceTimePosition.class);
+			pos = (SpaceTimePosition) framedGraph.addVertex(null,
+					SpaceTimePosition.class);
 			pos.setLocation(location);
 			pos.setTimestamp(timestamp);
-			
+
 			datum.add(pos);
 		}
-		
+
 		referenceLocation = location;
 	}
 

@@ -112,7 +112,7 @@ public class MovingObjectDatabase implements IMovingObjectDatabase {
 
 			// table schema
 			String sqlCreateTable = "CREATE TABLE " + simTable + " "
-					+ "(id INTEGER NOT NULL, "
+					+ "(id SERIAL NOT NULL, "
 					+ "identifier INTEGER NOT NULL, " + "type VARCHAR(50), "
 					+ "timestamp INTEGER NOT NULL, " + "PRIMARY KEY " + "(id)"
 					+ ")";

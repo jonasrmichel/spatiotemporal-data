@@ -17,18 +17,18 @@ public class SimulationManager {
 
 	/** Simulation options. */
 	public static final int NUM_HOSTS = 100;
-	public static final int NUM_PHENOMENA = 1500;
+	public static final int NUM_PHENOMENA = 100;
 	public static final String HOST_OBJECT_TYPE = "host";
 	public static final String PHENOMENON_OBJECT_TYPE = "phenomenon";
 
 	/** Verbose mode. */
-	public static boolean verbose = false;
+	public static boolean verbose = true;
 	/** Debug mode. */
 	public static boolean debug = false;
 	/** Simulation start time (offset in mobility trace files). */
 	public static int startTime = 0;
 	/** Simulation stop time. */
-	public static int stopTime = 60 * 60 * 1; // 1 hours
+	public static int stopTime = 60 * 60 * 1; // 1 hour
 
 	/** Mobility trace file directory (used by LocationManager). */
 	public static String traceDir = "../traces";
@@ -50,9 +50,12 @@ public class SimulationManager {
 	public static String[] mobilityPhenomena = { "slow", "medium", "fast" };
 
 	/** Trajectory temporal resolution (seconds). */
-	public static int[] trajectoryTemporalResolution = { 10 };
+	public static int[] trajectoryTemporalResolution = { 30 }; // 30, 60, 5*60, 10*60
 	/** Trajectory spatial resolution (meters). */
-	public static double[] trajectorySpatialResolution = { 10 };
+	public static double[] trajectorySpatialResolution = { 5 }; // 5,
+																			// 10,
+																			// 25,
+																			// 50
 
 	public static void main(String[] args) {
 		try {
@@ -149,8 +152,7 @@ public class SimulationManager {
 				"graph database home directory");
 		options.addOption("I", "index-dir", true,
 				"graph database index (lucene) home directory");
-		options.addOption("l", "log-dir", true,
-				"result logfile directory");
+		options.addOption("l", "log-dir", true, "result logfile directory");
 
 		options.addOption("r", "sensing-range", true,
 				"phenomena sensing range (meters)");
@@ -162,15 +164,15 @@ public class SimulationManager {
 				.withLongOpt("mobility-hosts")
 				.hasArgs()
 				.withDescription(
-						"degrees of host mobility to iterate over (0 slow, 1 medium, 2 fast)")
-				.create("host mobility degrees"));
+						"degrees of host mobility to iterate over (slow, medium, fast)")
+				.create());
 		options.addOption(OptionBuilder
 				.withArgName("P")
 				.withLongOpt("mobility-phenomena")
 				.hasArgs()
 				.withDescription(
-						"degrees of phenomena mobility to iterate over (0 slow, 1 medium, 2 fast)")
-				.create("phenomena mobility degrees"));
+						"degrees of phenomena mobility to iterate over (slow, medium, fast)")
+				.create());
 
 		options.addOption(OptionBuilder
 				.withArgName("T")
@@ -178,19 +180,22 @@ public class SimulationManager {
 				.hasArgs()
 				.withDescription(
 						"trajectory temporal resolutions to iterate over (seconds)")
-				.create("temporal resolutions"));
+				.create());
 		options.addOption(OptionBuilder
 				.withArgName("S")
 				.withLongOpt("spatial-resolution")
 				.hasArgs()
 				.withDescription(
 						"trajectory spatial resolutions to iterate over (meters)")
-				.create("spatial resolutions"));
+				.create());
 
 		return options;
 	}
 
 	private static void simulate() {
-		// TODO Auto-generated method stub
+		new SimulationDriver(startTime, stopTime, traceDir, graphDir, indexDir,
+				logDir, phenomenaSensingRange, phenomenaSensingInterval,
+				mobilityHosts, mobilityPhenomena, trajectoryTemporalResolution,
+				trajectorySpatialResolution).runSimulations();
 	}
 }

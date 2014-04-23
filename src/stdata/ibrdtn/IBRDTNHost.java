@@ -174,7 +174,7 @@ public class IBRDTNHost {
 		 */
 		JSONObject jo = null; 
 		try{
-			jo = d.marshall();
+			jo = d.marshal();
 		}
 		catch(JSONException je){
 			je.printStackTrace();
@@ -195,7 +195,7 @@ public class IBRDTNHost {
 		for(Datum d : frames){
 			JSONObject jo = null; 
 			try{
-				jo = d.marshall();
+				jo = d.marshal();
 			}
 			catch(JSONException je){
 				je.printStackTrace();

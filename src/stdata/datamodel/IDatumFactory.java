@@ -38,7 +38,9 @@ public interface IDatumFactory<D extends Datum> {
 	 * 
 	 * @param json
 	 *            a marshalled datum.
+	 * @return
 	 */
-	public D addDatum(JSONObject json, Rule rule);
+	public D addDatum(JSONObject json, Geoshape hostLocation, long timestamp,
+			String domain, List<D> context, Rule rule);
 
 }

@@ -77,25 +77,25 @@ public interface Datum extends VertexFrame {
 	public void add(SpaceTimePosition position);
 
 	/**
-	 * Marshalls (serializes) the datum into JSON form.
+	 * Marshals (serializes) the datum into JSON form.
 	 * 
-	 * @returns the JSON marshalled datum.
+	 * @returns the JSON marshaled datum.
 	 * @throws JSONException
 	 */
 	@JavaHandler
-	public JSONObject marshall() throws JSONException;
+	public JSONObject marshal() throws JSONException;
 
 	/**
-	 * Unmarshalls (deserializes) a JSON object into this datum.
+	 * Unmarshals (deserializes) a JSON object into this datum.
 	 * 
 	 * @param json
-	 *            a marshalled datum.
+	 *            a marshaled datum.
 	 * @param spaceTimePositionFactory
 	 *            the space-time position factory interface.
 	 * @throws JSONException
 	 */
 	@JavaHandler
-	public void unmarshall(JSONObject json,
+	public void unmarshal(JSONObject json,
 			ISpaceTimePositionFactory spaceTimePositionFactory)
 			throws JSONException;
 
@@ -119,18 +119,26 @@ public interface Datum extends VertexFrame {
 
 		@JavaHandler
 		@Override
-		public JSONObject marshall() throws JSONException {
-			// marshall the datum
-			JSONObject json = GraphSONUtility.jsonFromElement(asVertex(),
-					asVertex().getPropertyKeys(), GraphSONMode.NORMAL);
+		public JSONObject marshal() throws JSONException {
+			JSONObject json = new JSONObject();
 
-			// marshall the datum's trajectory
+			// marshal the datum's properties
+			for (String key : asVertex().getPropertyKeys()) {
+				if (key.equals("location"))
+					continue; // location is a special case handled below
+
+				json.put(key, asVertex().getProperty(key));
+			}
+
+			// marshal the location property
+			json.put("latitude", getLocation().getPoint().getLatitude());
+			json.put("longitude", getLocation().getPoint().getLongitude());
+
+			// marshal the datum's trajectory
 			SpaceTimePosition pos = getTrajectoryHead();
 			while (pos != null) {
-				// TODO marshall each space-time position
-				json.accumulate("trajectory", GraphSONUtility.jsonFromElement(
-						pos.asVertex(), pos.asVertex().getPropertyKeys(),
-						GraphSONMode.NORMAL));
+				// marshal each space-time position
+				json.accumulate("trajectory", pos.marshal());
 				pos = pos.getPrevious();
 			}
 
@@ -139,32 +147,37 @@ public interface Datum extends VertexFrame {
 
 		@JavaHandler
 		@Override
-		public void unmarshall(JSONObject json,
+		public void unmarshal(JSONObject json,
 				ISpaceTimePositionFactory spaceTimePositionFactory)
 				throws JSONException {
-			// unmarshall the datum's properties
+			// unmarshal the datum's properties
 			Iterator<String> keys = json.keys();
 			String key;
 			while (keys.hasNext()) {
 				key = keys.next();
-				if (key.equals("trajectory") || key.equals("_id")
+				if (key.equals("trajectory") || key.equals("latitude")
+						|| key.equals("longitude") || key.equals("_id")
 						|| key.equals("_type"))
 					continue;
+
 				asVertex().setProperty(key, json.get(key));
 			}
 
-			// unmarshall the datum's trajectory
+			// unmarshal the datum's location
+			setLocation(Geoshape.point(json.getDouble("latitude"),
+					json.getDouble("longitude")));
+
+			// unmarshal the datum's trajectory, adding them to the datum in
+			// reverse order
 			JSONArray trajectory = json.getJSONArray("trajectory");
-			JSONObject posJson, pointJson;
+			JSONObject posJson;
 			SpaceTimePosition pos;
 			for (int i = trajectory.length(); i > 0; i--) {
-//				spaceTimePositionFactory.addSpaceTimePosition(Geoshape.point(latitude, longitude),
-//						posJson.getLong(SpaceTimePosition.TIMESTAMP_KEY),
-//						posJson.getString(SpaceTimePosition.DOMAIN_KEY));
-				// TODO
+				posJson = trajectory.getJSONObject(i);
+				pos = spaceTimePositionFactory.addSpaceTimePosition(posJson);
+				add(pos);
 			}
 		}
-
 	}
 
 }

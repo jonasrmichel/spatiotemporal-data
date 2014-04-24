@@ -101,7 +101,7 @@ public class SpatiallyModulatedTrajectoryRule<G extends TransactionalGraph, E ex
 		}
 
 		// commit changes
-		baseGraph.commit();
+//		baseGraph.commit();
 
 		referenceLocation = location;
 	}

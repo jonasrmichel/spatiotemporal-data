@@ -107,7 +107,7 @@ public class TemporallyModulatedTrajectoryRule<G extends TransactionalGraph, E e
 		}
 		
 		// commit changes
-		baseGraph.commit();
+//		baseGraph.commit();
 
 		referenceTime = timestamp;
 

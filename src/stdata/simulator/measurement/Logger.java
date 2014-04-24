@@ -67,11 +67,12 @@ public class Logger {
 
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.matches("^" + simulation + "(\\w*)" + LOGFILE_EXTENSION);
+				return name.matches("^" + simulation + "(\\w*)"
+						+ LOGFILE_EXTENSION);
 			}
 
 		});
-		
+
 		if (files == null)
 			return;
 
@@ -96,31 +97,34 @@ public class Logger {
 	 */
 	private static void clearOverallLog(String logDir, String simulation,
 			TriggerType trigger) {
+		BufferedReader reader = null;
+		BufferedWriter writer = null;
 		try {
 			String name = "overall_" + trigger.toString().toLowerCase();
 			File logfile = new File(logDir + File.separator + name
 					+ LOGFILE_EXTENSION);
 			File temp = new File(logDir + File.separator + name
 					+ LOGFILE_EXTENSION + ".tmp");
-			
+
 			if (!logfile.exists())
 				return; // nothing to do
-			
+
 			if (!logfile.isFile()) {
-				System.err.println("Error: overall logfile " + name + " is not a file");
+				System.err.println("Error: overall logfile " + name
+						+ " is not a file");
 				System.exit(1);
 			}
-				
 
-			BufferedReader reader = new BufferedReader(new FileReader(logfile));
-			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
+			reader = new BufferedReader(new FileReader(logfile));
+			writer = new BufferedWriter(new FileWriter(temp));
 
 			String line;
 			while ((line = reader.readLine()) != null) {
-				if (line.trim().startsWith(simulation))
+				if (line.startsWith(simulation))
 					continue; // skip!!!
-				
+
 				writer.write(line);
+				writer.flush();
 			}
 
 			// TODO if verbose mode, report!
@@ -128,6 +132,19 @@ public class Logger {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (writer != null)
+					writer.close();
+				
+				if (reader != null)
+					reader.close();
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 	}
 
@@ -185,9 +202,8 @@ public class Logger {
 		sb.append(LOGFILE_DELIMITER
 				+ Double.toString(age > 0 ? dist_p_0 / age : 0d)); // dist_p_0_per_age
 
-		appendLogFileLine(logDir + File.separator
-				+ TRAJECTORY_LOGFILE_SUBDIR, name, TRAJECTORY_LOGFILE_HEADER,
-				sb.toString());
+		appendLogFileLine(logDir + File.separator + TRAJECTORY_LOGFILE_SUBDIR,
+				name, TRAJECTORY_LOGFILE_HEADER, sb.toString());
 	}
 
 	/**
@@ -227,8 +243,8 @@ public class Logger {
 			sb.append(s.toDelimitedString(LOGFILE_DELIMITER, true, false));
 		}
 
-		appendLogFileLine(logDir + File.separator + HOST_LOGFILE_SUBDIR,
-				name, HOST_LOGFILE_HEADER, sb.toString());
+		appendLogFileLine(logDir + File.separator + HOST_LOGFILE_SUBDIR, name,
+				HOST_LOGFILE_HEADER, sb.toString());
 	}
 
 	/**
@@ -266,9 +282,8 @@ public class Logger {
 			sb.append(s.toDelimitedString(LOGFILE_DELIMITER, true, false));
 		}
 
-		appendLogFileLine(logDir + File.separator
-				+ SIMULATION_LOGFILE_SUBDIR, name, SIMULATION_LOGFILE_HEADER,
-				sb.toString());
+		appendLogFileLine(logDir + File.separator + SIMULATION_LOGFILE_SUBDIR,
+				name, SIMULATION_LOGFILE_HEADER, sb.toString());
 	}
 
 	/**
@@ -280,7 +295,8 @@ public class Logger {
 	 * 
 	 * Name: overall_<TriggerType>.csv
 	 */
-	public static final String OVERALL_LOGFILE_HEADER = "db_size_min,db_size_max,db_size_avg,db_size_var,db_size_stdev"
+	public static final String OVERALL_LOGFILE_HEADER = "simulation"
+			+ ",db_size_min,db_size_max,db_size_avg,db_size_var,db_size_stdev"
 			+ ",size_min,size_max,size_avg,size_var,size_stdev"
 			+ ",length_min,length_max,length_avg,length_var,length_stdev"
 			+ ",age_min,age_max,age_avg,age_var,age_stdev"
@@ -294,17 +310,15 @@ public class Logger {
 			+ ",dist_p_0_per_age_min,dist_p_0_per_age_max,dist_p_0_per_age_avg,dist_p_0_per_age_var,dist_p_0_per_age_stdev";
 
 	public static void appendOverallMeasurement(String logDir,
-			TriggerType trigger, RunningStatistics... statistics) {
+			String simulation, TriggerType trigger,
+			RunningStatistics... statistics) {
 		String name = "overall_" + trigger.toString().toLowerCase();
 
 		StringBuilder sb = new StringBuilder();
+		sb.append(simulation);
 
-		int statCount = 0;
 		for (RunningStatistics s : statistics) {
-			if (statCount++ != 0)
-				sb.append(s.toDelimitedString(LOGFILE_DELIMITER, false, false));
-			else
-				sb.append(s.toDelimitedString(LOGFILE_DELIMITER, true, false));
+			sb.append(s.toDelimitedString(LOGFILE_DELIMITER, true, false));
 		}
 
 		appendLogFileLine(logDir, name, OVERALL_LOGFILE_HEADER, sb.toString());
@@ -312,8 +326,8 @@ public class Logger {
 
 	private static void appendLogFileLine(String dir, String name,
 			String header, String line) {
+		PrintWriter out = null;
 		try {
-			PrintWriter out = null;
 			File logdir = new File(dir);
 			File logfile = new File(dir + File.separator + name
 					+ LOGFILE_EXTENSION);
@@ -335,10 +349,13 @@ public class Logger {
 						logfile, true)));
 
 			out.println(line);
-			out.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();
+
+		} finally {
+			if (out != null)
+				out.close();
 		}
 	}
 }

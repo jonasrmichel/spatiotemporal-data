@@ -47,7 +47,7 @@ public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>,
 		rules.put(ruleContainer.asVertex().getId(), rule);
 		
 		// commit changes
-		baseGraph.commit();
+//		baseGraph.commit();
 
 		return ruleContainer;
 	}

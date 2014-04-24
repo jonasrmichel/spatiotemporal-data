@@ -101,7 +101,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph> {
 		F v = framedGraph.addVertex(id, kind);
 
 		// committ changes
-		baseGraph.commit();
+//		baseGraph.commit();
 
 		return v;
 	}
@@ -117,7 +117,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph> {
 		Vertex v = baseGraph.addVertex(id);
 
 		// commit changes
-		baseGraph.commit();
+//		baseGraph.commit();
 
 		return v;
 	}
@@ -140,7 +140,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph> {
 		Edge e = baseGraph.addEdge(id, outVertex, inVertex, label);
 
 		// commit changes
-		baseGraph.commit();
+//		baseGraph.commit();
 
 		return e;
 	}

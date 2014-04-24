@@ -16,8 +16,6 @@ import org.apache.commons.cli.ParseException;
 public class SimulationManager {
 
 	/** Simulation options. */
-	public static final int NUM_HOSTS = 100;
-	public static final int NUM_PHENOMENA = 1500;
 	public static final String HOST_OBJECT_TYPE = "host";
 	public static final String PHENOMENON_OBJECT_TYPE = "phenomenon";
 
@@ -28,7 +26,7 @@ public class SimulationManager {
 	/** Simulation start time (offset in mobility trace files). */
 	public static int startTime = 0;
 	/** Simulation stop time. */
-	public static int stopTime = 60 * 60 * 1; // 1 hour
+	public static int stopTime = 1;
 
 	/** Mobility trace file directory (used by LocationManager). */
 	public static String traceDir = "../traces";
@@ -42,16 +40,21 @@ public class SimulationManager {
 	/** Phenomena sensing interval (seconds). */
 	public static int phenomenaSensingInterval = 60 * 5; // 5 minutes
 
+	/** Number of mobile hosts. */
+	public static int numHosts = 100;
+
+	/** Number of mobile phenomena. */
+	public static int numPhenomena = 100;
+
 	/** Degree of host mobility. */
-	public static String[] mobilityHosts = { "slow", "medium", "fast" };
+	public static String[] mobilityHosts = { "slow" }; // "slow", "medium", "fast"
 	/** Degree of phenomena mobility. */
-	public static String[] mobilityPhenomena = { "slow", "medium", "fast" };
+	public static String[] mobilityPhenomena = { "slow" }; // "slow", "medium", "fast"
 
 	/** Trajectory temporal resolution (seconds). */
-	public static int[] trajectoryTemporalResolution = { 30, 60, 5 * 60,
-			10 * 60 };
+	public static int[] trajectoryTemporalResolution = { 30 }; // 30, 60, 5 * 60, 10 * 60
 	/** Trajectory spatial resolution (meters). */
-	public static double[] trajectorySpatialResolution = { 5, 10, 25, 50 };
+	public static double[] trajectorySpatialResolution = { 5 }; // 5, 10, 25, 50
 
 	public static void main(String[] args) {
 		try {
@@ -96,6 +99,13 @@ public class SimulationManager {
 			if (line.hasOption("sensing-interval"))
 				phenomenaSensingInterval = Integer.parseInt(line
 						.getOptionValue("sensing-interval"));
+
+			if (line.hasOption("num-hosts"))
+				numHosts = Integer.parseInt(line.getOptionValue("num-hosts"));
+
+			if (line.hasOption("num-phenomena"))
+				numPhenomena = Integer.parseInt(line
+						.getOptionValue("num-phenomena"));
 
 			if (line.hasOption("mobility-hosts"))
 				mobilityHosts = line.getOptionValues("mobility-hosts");
@@ -150,6 +160,10 @@ public class SimulationManager {
 		options.addOption("i", "sensing-interval", true,
 				"phenomena sensing interval (seconds)");
 
+		options.addOption("n", "num-hosts", true, "number of mobile hosts");
+		options.addOption("p", "num-phenomena", true,
+				"number of mobile phenomena");
+
 		options.addOption(OptionBuilder
 				.withArgName("H")
 				.withLongOpt("mobility-hosts")
@@ -185,8 +199,9 @@ public class SimulationManager {
 
 	private static void simulate() {
 		new SimulationDriver(startTime, stopTime, traceDir, graphDir, logDir,
-				phenomenaSensingRange, phenomenaSensingInterval, mobilityHosts,
-				mobilityPhenomena, trajectoryTemporalResolution,
-				trajectorySpatialResolution).runSimulations();
+				phenomenaSensingRange, phenomenaSensingInterval, numHosts,
+				numPhenomena, mobilityHosts, mobilityPhenomena,
+				trajectoryTemporalResolution, trajectorySpatialResolution)
+				.runSimulations();
 	}
 }

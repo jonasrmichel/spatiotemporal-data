@@ -315,6 +315,9 @@ public class Host extends MovingObject {
 			// update the running per-time host-level aggregate measurements
 			pushHostLevelMeasurements(datum, time);
 		}
+		
+		// commit all database changes that occurred in this step
+		spatiotemporalDB.baseGraph.commit();
 
 		// log the running per-time host-level aggregate measurements
 		Logger.appendHostMeasurement(

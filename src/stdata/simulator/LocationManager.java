@@ -129,7 +129,7 @@ public class LocationManager implements ILocationManager {
 				// split the line into its columns
 				cols = line.split("\t");
 				// retrieve the fields of interest
-				time = Integer.parseInt(cols[0]);
+				time = Integer.parseInt(cols[0]) - 1; // trace time begins at 1
 				identifier = Integer.parseInt(cols[1]);
 				posx = Integer.parseInt(cols[2]);
 				posy = Integer.parseInt(cols[3]);
@@ -146,7 +146,8 @@ public class LocationManager implements ILocationManager {
 
 				if (SimulationManager.debug)
 					Util.report(LocationManager.class, "parsed: "
-							+ "identifier=" + Integer.toString(identifier)
+							+ "time=" + Integer.toString(time)
+							+ " identifier=" + Integer.toString(identifier)
 							+ " posx=" + Integer.toString(posx) + " posy="
 							+ Integer.toString(posy));
 

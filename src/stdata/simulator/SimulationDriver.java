@@ -32,6 +32,8 @@ public class SimulationDriver implements IHostDelegate {
 	double phenomenaSensingRange;
 	int phenomenaSensingInterval;
 
+	int numHosts, numPhenomena;
+
 	String[] mobilityHosts, mobilityPhenomena;
 
 	int[] trajectoryTemporalResolution;
@@ -50,8 +52,9 @@ public class SimulationDriver implements IHostDelegate {
 
 	public SimulationDriver(int startTime, int stopTime, String traceDir,
 			String graphDir, String logDir, double phenomenaSensingRange,
-			int phenomenaSensingInterval, String[] mobilityHosts,
-			String[] mobilityPhenomena, int[] trajectoryTemporalResolution,
+			int phenomenaSensingInterval, int numHosts, int numPhenomena,
+			String[] mobilityHosts, String[] mobilityPhenomena,
+			int[] trajectoryTemporalResolution,
 			double[] trajectorySpatialResolution) {
 		this.startTime = startTime;
 		this.stopTime = stopTime;
@@ -59,6 +62,9 @@ public class SimulationDriver implements IHostDelegate {
 		this.traceDir = traceDir;
 		this.graphDir = graphDir;
 		this.logDir = logDir;
+
+		this.numHosts = numHosts;
+		this.numPhenomena = numPhenomena;
 
 		this.phenomenaSensingRange = phenomenaSensingRange;
 		this.phenomenaSensingInterval = phenomenaSensingInterval;
@@ -69,9 +75,8 @@ public class SimulationDriver implements IHostDelegate {
 		this.trajectoryTemporalResolution = trajectoryTemporalResolution;
 		this.trajectorySpatialResolution = trajectorySpatialResolution;
 
-		hosts = new HashMap<Integer, Host>(SimulationManager.NUM_HOSTS);
-		phenomena = new HashMap<Integer, Phenomenon>(
-				SimulationManager.NUM_PHENOMENA);
+		hosts = new HashMap<Integer, Host>(numHosts);
+		phenomena = new HashMap<Integer, Phenomenon>(numPhenomena);
 
 		// ensure that
 		// |trajectoryTemporalResolution| == |trajectorySpatialResolution|
@@ -198,15 +203,13 @@ public class SimulationDriver implements IHostDelegate {
 
 		for (String pMobility : mobilityPhenomena) {
 			// load the phenomenon mobility traces
-			phenomenonLocationManager = loadMobilityTraces(
-					SimulationManager.NUM_PHENOMENA, pMobility, startTime,
-					stopTime);
+			phenomenonLocationManager = loadMobilityTraces(numPhenomena,
+					pMobility, startTime, stopTime);
 
 			for (String hMobility : mobilityHosts) {
 				// load the host mobility traces
-				hostLocationManager = loadMobilityTraces(
-						SimulationManager.NUM_HOSTS, hMobility, startTime,
-						stopTime);
+				hostLocationManager = loadMobilityTraces(numHosts, hMobility,
+						startTime, stopTime);
 
 				for (int stResolution = 0; stResolution < numSTResolutions; stResolution++) {
 					// create the simulation's unique identifier
@@ -312,14 +315,20 @@ public class SimulationDriver implements IHostDelegate {
 					// simulation
 					Logger.appendOverallMeasurement(
 							logDir,
+							simulationId,
 							TriggerType.SPATIAL,
 							RunningStatisticsMap
 									.getReducibleRunningStatisticsArray(spatiallyModulatedStatistics));
 					Logger.appendOverallMeasurement(
 							logDir,
+							simulationId,
 							TriggerType.TEMPORAL,
 							RunningStatisticsMap
 									.getReducibleRunningStatisticsArray(temporallyModulatedStatistics));
+
+					if (SimulationManager.verbose)
+						Util.report(SimulationDriver.class,
+								"shutting down moving objects");
 
 					// shutdown the simulation objects
 					for (MovingObject movingObject : movingObjects)
@@ -327,9 +336,17 @@ public class SimulationDriver implements IHostDelegate {
 
 					database.shutdown();
 
+					if (SimulationManager.verbose)
+						Util.report(SimulationDriver.class,
+								"finished simulation " + "[" + simulationId
+										+ "]");
+
 				} // end of spatiotemporal resolution
 			} // end of host mobility
 		} // end of phenomenon mobility
+
+		if (SimulationManager.verbose)
+			Util.report(SimulationDriver.class, "finished all simulations");
 	}
 
 	/**

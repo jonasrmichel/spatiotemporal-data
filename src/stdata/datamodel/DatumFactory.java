@@ -50,7 +50,7 @@ public class DatumFactory<G extends TransactionalGraph, E extends EventGraph<G>,
 			datum.setContextData((Iterable<Datum>) context);
 
 		// commit changes
-		baseGraph.commit();
+//		baseGraph.commit();
 
 		// register the datum's rule
 		ruleRegistry.registerRule(rule, datum);

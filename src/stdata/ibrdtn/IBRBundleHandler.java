@@ -65,13 +65,13 @@ public class IBRBundleHandler extends AbstractAPIHandler{
 
 	@Override
 	public void startBlock(Block block) {
-		//logger.log(Level.FINE, "Receiving: {0}", block.toString());
+		logger.log(Level.FINE, "Receiving: {0}", block.toString());
 		bundle.appendBlock(block);
 	}
 
 	@Override
 	public void endBlock() {
-		//logger.log(Level.FINE, "Ending block");
+		logger.log(Level.FINE, "Ending block");
 	}
 
 	@Override
@@ -140,6 +140,8 @@ public class IBRBundleHandler extends AbstractAPIHandler{
 					sb.append(String.format("%02X ", b));
 				}
 				System.out.println("YAY! I received the bundle!");
+				//System.out.println(sb.toString());
+				System.out.println(new String(bytes));
 				logger.log(Level.INFO, "Payload received: \n\t{0} [{1}]",
 						new Object[]{sb.toString(), new String(bytes)});
 			} catch (IOException ex) {

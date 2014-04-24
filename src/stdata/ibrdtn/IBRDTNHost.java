@@ -3,6 +3,7 @@ package stdata.ibrdtn;
 import ibrdtn.api.APIException;
 import ibrdtn.api.ExtendedClient;
 import ibrdtn.api.object.Bundle;
+import ibrdtn.api.object.Block;
 import ibrdtn.api.object.EID;
 import ibrdtn.api.object.PayloadBlock;
 import ibrdtn.api.object.SingletonEndpoint;
@@ -10,11 +11,15 @@ import ibrdtn.example.api.Constants;
 import ibrdtn.example.api.PayloadType;
 
 import java.io.IOException;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.LinkedList;
+
+import org.apache.commons.io.FileUtils;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -241,7 +246,7 @@ public class IBRDTNHost {
 		bundle.setFlag(Bundle.Flags.DTNSEC_REQUEST_ENCRYPT, false);
 		bundle.setFlag(Bundle.Flags.DTNSEC_REQUEST_SIGN, false);
 
-		//bundle.appendBlock(teb);
+		bundle.appendBlock(teb.getExtensionBlock());
 		bundle.appendBlock(new PayloadBlock(data));
 		send(bundle);
 	}
@@ -254,7 +259,14 @@ public class IBRDTNHost {
 
 		final Bundle finalBundle = bundle;
 		final ExtendedClient finalClient = this.exClient;
-
+		
+		LinkedList<Block> blocks = finalBundle.getBlocks();
+		for(Block b : blocks){
+			System.out.println("My bundle has a block of type: " + b.getType());
+			System.out.println("That block's data is: " + b.getData());
+		}
+		System.out.println("Sending the following bunde: " + finalBundle.toString());
+		
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -268,6 +280,33 @@ public class IBRDTNHost {
 		});
 	}
 	
+	static void clearGraphDirectory(String dir) {
+		try {
+			File folder = new File(dir);
+
+			// delete any existing directory at this path
+			if (folder.exists()) {
+				if (!folder.isDirectory()) {
+					System.err.println("Error: " + dir + " is not a directory");
+					System.exit(1);
+				}
+
+				FileUtils.deleteDirectory(folder);
+			}
+
+			// create a new empty directory at this path
+			if (!folder.mkdir()) {
+				System.err.println("Error: could not create directory "
+						+ folder.getAbsolutePath());
+				System.exit(1);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+	
     public static void main(String[] args){
     	if(args.length != 1){
     		System.out.println("You must provide a destination!");
@@ -275,12 +314,13 @@ public class IBRDTNHost {
     	}
     	Geoshape defaultLocation = Geoshape.point(30.2500, 97.7500);
     	ILocationProvider locationProvider = new DumbLocationProviderImpl(defaultLocation);
+    	IBRDTNHost.clearGraphDirectory("/Users/christinejulien/hackathon/spatiotemporal-data/graphDir/");
     	IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "/Users/christinejulien/hackathon/spatiotemporal-data/graphDir/", "/Users/christinejulien/hackathon/spatiotemporal-data/indexDir/", locationProvider);
     	//this first method creates a datum and thinks its putting it in the database
     	Datum d = host.createDatum(defaultLocation);
     	//this second method just sends the datum returned from above using the datum's marshall method
     	//I'm doing it this way because I can't seem to recover stuff from the database
-    	host.hackSendBundle(args[0], d);
+    	//host.hackSendBundle(args[0], d);
     	//Eventually, I think this should work
     	TrackingExtensionBlock teb = host.createExtensionBlock(30);
     	host.extractAndSendBundles(args[0], teb);

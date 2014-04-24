@@ -10,7 +10,7 @@ import ibrdtn.api.object.SDNVOutputStream;
 import ibrdtn.api.object.Block.Data;
 import ibrdtn.api.object.Block.InvalidDataException;
 
-public class TrackingExtensionBlock extends ExtensionBlock{
+public class TrackingExtensionBlock{
     public static final int type = 193;
     private static final int DEFAULT_INTERVAL = 30;
     private SDNV flags = new SDNV(0);
@@ -20,19 +20,19 @@ public class TrackingExtensionBlock extends ExtensionBlock{
     private SDNV count = new SDNV(0);
     //private List<SDNV> entries;
     
+    //So we "have a" extension block
+    //private ExtensionBlock myExtensionBlock = new ExtensionBlock(type);
+    
     // Datum.getTrajectoryHead() and then this is just a linked list (previous until null)
     
     public TrackingExtensionBlock(){
-    	super(type);
     }
     
     public TrackingExtensionBlock(long interval){
-    	super(type);
     	this.interval = new SDNV(interval);
     }
     
-    public TrackingExtensionBlock(Block.Data data) throws InvalidDataException{
-    	super(type);
+    public TrackingExtensionBlock(Block.Data data){
     	SDNVOutputStream stream = new SDNVOutputStream();
         try {
             data.writeTo(stream);
@@ -41,13 +41,17 @@ public class TrackingExtensionBlock extends ExtensionBlock{
             interval = stream.nextSDNV();
             count = stream.nextSDNV();
         }
-        catch(IOException e){
-        	throw new InvalidDataException(e.getMessage());
+        catch(IOException ioe){
+        	ioe.printStackTrace();
         }
     }
+    
+    public ExtensionBlock getExtensionBlock(){
+        ExtensionBlock myExtensionBlock = new ExtensionBlock(type, getData());
+    	return myExtensionBlock;
+    }
 
-    @Override
-    public Data getData() {
+    private Data getData() {
         byte[] data = new byte[flags.length + interval.length + count.length];
         byte[] flagsbytes = flags.getBytes();
         byte[] intervalbytes = interval.getBytes();

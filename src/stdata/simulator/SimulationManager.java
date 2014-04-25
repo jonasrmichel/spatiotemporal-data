@@ -26,7 +26,7 @@ public class SimulationManager {
 	/** Simulation start time (offset in mobility trace files). */
 	public static int startTime = 0;
 	/** Simulation stop time. */
-	public static int stopTime = 1;
+	public static int stopTime = 60 * 60 * 1; // 1 hour
 
 	/** Mobility trace file directory (used by LocationManager). */
 	public static String traceDir = "../traces";
@@ -47,14 +47,14 @@ public class SimulationManager {
 	public static int numPhenomena = 100;
 
 	/** Degree of host mobility. */
-	public static String[] mobilityHosts = { "slow" }; // "slow", "medium", "fast"
+	public static String[] mobilityHosts = { "slow", "medium", "fast" }; // "slow", "medium", "fast"
 	/** Degree of phenomena mobility. */
-	public static String[] mobilityPhenomena = { "slow" }; // "slow", "medium", "fast"
+	public static String[] mobilityPhenomena = { "slow", "medium", "fast" }; // "slow", "medium", "fast"
 
 	/** Trajectory temporal resolution (seconds). */
-	public static int[] trajectoryTemporalResolution = { 30 }; // 30, 60, 5 * 60, 10 * 60
+	public static int[] trajectoryTemporalResolution = { 30, 60, 5 * 60, 10 * 60 }; // 30, 60, 5 * 60, 10 * 60
 	/** Trajectory spatial resolution (meters). */
-	public static double[] trajectorySpatialResolution = { 5 }; // 5, 10, 25, 50
+	public static double[] trajectorySpatialResolution = { 5, 10, 25, 50 }; // 5, 10, 25, 50
 
 	public static void main(String[] args) {
 		try {
@@ -77,11 +77,11 @@ public class SimulationManager {
 			if (line.hasOption("debug"))
 				debug = true;
 
-			if (line.hasOption("start"))
-				startTime = Integer.parseInt(line.getOptionValue("start"));
+			if (line.hasOption("start-time"))
+				startTime = Integer.parseInt(line.getOptionValue("start-time"));
 
-			if (line.hasOption("stop"))
-				startTime = Integer.parseInt(line.getOptionValue("stop"));
+			if (line.hasOption("stop-time"))
+				stopTime = Integer.parseInt(line.getOptionValue("stop-time"));
 
 			if (line.hasOption("trace-dir"))
 				traceDir = line.getOptionValue("trace-dir");
@@ -147,8 +147,8 @@ public class SimulationManager {
 		options.addOption("h", "help", false, "print this message");
 		options.addOption("v", "verbose", false, "be extra verbose");
 		options.addOption("d", "debug", false, "print debugging information");
-		options.addOption("b", "start", true, "simulation start time");
-		options.addOption("e", "stop", true, "simulation stop time");
+		options.addOption("b", "start-time", true, "simulation start time");
+		options.addOption("e", "stop-time", true, "simulation stop time");
 
 		options.addOption("t", "trace-dir", true, "mobility trace directory");
 		options.addOption("g", "graph-dir", true,

@@ -132,6 +132,7 @@ public class Logger {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			
 		} finally {
 			try {
 				if (writer != null)

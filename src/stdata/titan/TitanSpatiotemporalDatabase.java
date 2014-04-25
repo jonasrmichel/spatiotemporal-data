@@ -54,7 +54,7 @@ public class TitanSpatiotemporalDatabase extends
 
 		// create the base graph
 		baseGraph = TitanFactory.open(config);
-
+		
 		// configure indexing
 		try {
 			// vertex frame class index

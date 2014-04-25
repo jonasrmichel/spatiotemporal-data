@@ -1,6 +1,5 @@
 package stdata.simulator.movingobjects;
 
-import java.util.Collection;
 import java.util.List;
 
 import stdata.datamodel.SpatiotemporalDatabase;
@@ -272,6 +271,9 @@ public class Host extends MovingObject {
 		if (time % phenomenaSensingInterval == 0)
 			senseNearbyPhenomena(time);
 
+		// commit all database changes that occurred due to sensing
+		spatiotemporalDB.baseGraph.commit();
+
 		// update the host's context vertex
 		hostContext.setTimestamp(new Long(time));
 		hostContext.setLocation(location);
@@ -315,8 +317,8 @@ public class Host extends MovingObject {
 			// update the running per-time host-level aggregate measurements
 			pushHostLevelMeasurements(datum, time);
 		}
-		
-		// commit all database changes that occurred in this step
+
+		// commit all database changes that occurred due to trajectory updates
 		spatiotemporalDB.baseGraph.commit();
 
 		// log the running per-time host-level aggregate measurements

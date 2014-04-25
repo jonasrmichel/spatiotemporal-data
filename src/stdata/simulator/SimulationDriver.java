@@ -2,6 +2,7 @@ package stdata.simulator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,10 +35,12 @@ public class SimulationDriver implements IHostDelegate {
 
 	int numHosts, numPhenomena;
 
-	String[] mobilityHosts, mobilityPhenomena;
+	String[] mobilityHosts, mobilityHostsSkip, mobilityPhenomena,
+			mobilityPhenomenaSkip;
 
 	int[] trajectoryTemporalResolution;
 	double[] trajectorySpatialResolution;
+	int[] trajectoryResolutionIndexSkip;
 	int numSTResolutions;
 
 	/** Map of moving objects' identifiers to moving objects. */
@@ -53,9 +56,11 @@ public class SimulationDriver implements IHostDelegate {
 	public SimulationDriver(int startTime, int stopTime, String traceDir,
 			String graphDir, String logDir, double phenomenaSensingRange,
 			int phenomenaSensingInterval, int numHosts, int numPhenomena,
-			String[] mobilityHosts, String[] mobilityPhenomena,
+			String[] mobilityHosts, String[] mobilityHostsSkip,
+			String[] mobilityPhenomena, String[] mobilityPhenomenaSkip,
 			int[] trajectoryTemporalResolution,
-			double[] trajectorySpatialResolution) {
+			double[] trajectorySpatialResolution,
+			int[] trajectoryResolutionIndexSkip) {
 		this.startTime = startTime;
 		this.stopTime = stopTime;
 
@@ -70,10 +75,13 @@ public class SimulationDriver implements IHostDelegate {
 		this.phenomenaSensingInterval = phenomenaSensingInterval;
 
 		this.mobilityHosts = mobilityHosts;
+		this.mobilityHostsSkip = mobilityHostsSkip;
 		this.mobilityPhenomena = mobilityPhenomena;
+		this.mobilityPhenomenaSkip = mobilityPhenomenaSkip;
 
 		this.trajectoryTemporalResolution = trajectoryTemporalResolution;
 		this.trajectorySpatialResolution = trajectorySpatialResolution;
+		this.trajectoryResolutionIndexSkip = trajectoryResolutionIndexSkip;
 
 		hosts = new HashMap<Integer, Host>(numHosts);
 		phenomena = new HashMap<Integer, Phenomenon>(numPhenomena);
@@ -217,6 +225,23 @@ public class SimulationDriver implements IHostDelegate {
 					// mobility>_stres_<space-time resolution>
 					simulationId = "hm_" + hMobility + "_pm_" + pMobility
 							+ "_stres_" + Integer.toString(stResolution);
+
+					// check if this parameter combination needs to be skipped
+					if ((mobilityPhenomenaSkip != null && Arrays.asList(
+							mobilityPhenomenaSkip).contains(pMobility))
+							&& (mobilityHostsSkip != null && Arrays.asList(
+									mobilityHostsSkip).contains(hMobility))
+							&& (trajectoryResolutionIndexSkip != null && Util
+									.arrayContainsInt(
+											trajectoryResolutionIndexSkip,
+											stResolution))) {
+						// skip this simulation
+						if (SimulationManager.verbose)
+							Util.report(SimulationDriver.class,
+									"skipping over simulation " + "["
+											+ simulationId + "]");
+						continue;
+					}
 
 					// set the kickoff time (wall time)
 					kickoffTime = System.currentTimeMillis();

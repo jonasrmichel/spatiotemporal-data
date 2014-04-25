@@ -44,17 +44,33 @@ public class SimulationManager {
 	public static int numHosts = 100;
 
 	/** Number of mobile phenomena. */
-	public static int numPhenomena = 100;
+	public static int numPhenomena = 750;
 
-	/** Degree of host mobility. */
-	public static String[] mobilityHosts = { "slow", "medium", "fast" }; // "slow", "medium", "fast"
-	/** Degree of phenomena mobility. */
-	public static String[] mobilityPhenomena = { "slow", "medium", "fast" }; // "slow", "medium", "fast"
+	/**
+	 * Degree of phenomena mobility. { "slow", "medium", "fast" }
+	 */
+	public static String[] mobilityPhenomena = { "slow", "medium", "fast" };
+	public static String[] mobilityPhenomenaSkip = null;
+	/**
+	 * Degree of host mobility. { "slow", "medium", "fast" }
+	 */
+	public static String[] mobilityHosts = { "slow", "medium", "fast" };
+	public static String[] mobilityHostsSkip = null;
 
-	/** Trajectory temporal resolution (seconds). */
-	public static int[] trajectoryTemporalResolution = { 30, 60, 5 * 60, 10 * 60 }; // 30, 60, 5 * 60, 10 * 60
-	/** Trajectory spatial resolution (meters). */
-	public static double[] trajectorySpatialResolution = { 5, 10, 25, 50 }; // 5, 10, 25, 50
+	/**
+	 * Trajectory temporal resolution (seconds).
+	 * 
+	 * { low, medium, high, very high }
+	 */
+	public static int[] trajectoryTemporalResolution = { 10 * 60, 5 * 60, 60, 5 };
+	/**
+	 * Trajectory spatial resolution (meters).
+	 * 
+	 * { low, medium, high, very high }
+	 */
+	public static double[] trajectorySpatialResolution = { 50, 25, 10, 5 };
+
+	public static int[] trajectoryResolutionIndexSkip = null;
 
 	public static void main(String[] args) {
 		try {
@@ -107,11 +123,18 @@ public class SimulationManager {
 				numPhenomena = Integer.parseInt(line
 						.getOptionValue("num-phenomena"));
 
+			if (line.hasOption("mobility-phenomena"))
+				mobilityPhenomena = line.getOptionValues("mobility-phenomena");
+
+			if (line.hasOption("mobility-phenomena-skip"))
+				mobilityPhenomenaSkip = line
+						.getOptionValues("mobility-phenomena-skip");
+
 			if (line.hasOption("mobility-hosts"))
 				mobilityHosts = line.getOptionValues("mobility-hosts");
 
-			if (line.hasOption("mobility-phenomena"))
-				mobilityPhenomena = line.getOptionValues("mobility-phenomena");
+			if (line.hasOption("mobility-hosts-skip"))
+				mobilityHostsSkip = line.getOptionValues("mobility-hosts-skip");
 
 			if (line.hasOption("temporal-resolution")) {
 				String[] trajectoryTemporalResolution = line
@@ -129,6 +152,15 @@ public class SimulationManager {
 				for (int i = 0; i < trajectorySpatialResolution.length; i++)
 					SimulationManager.trajectorySpatialResolution[i] = Double
 							.parseDouble(trajectorySpatialResolution[i]);
+			}
+
+			if (line.hasOption("resolution-skip")) {
+				String[] trajectoryResolutionIndexSkip = line
+						.getOptionValues("resolution-skip");
+				SimulationManager.trajectoryResolutionIndexSkip = new int[trajectoryResolutionIndexSkip.length];
+				for (int i = 0; i < trajectoryResolutionIndexSkip.length; i++)
+					SimulationManager.trajectoryResolutionIndexSkip[i] = Integer
+							.parseInt(trajectoryResolutionIndexSkip[i]);
 			}
 
 			// begin simulations
@@ -165,6 +197,20 @@ public class SimulationManager {
 				"number of mobile phenomena");
 
 		options.addOption(OptionBuilder
+				.withArgName("P")
+				.withLongOpt("mobility-phenomena")
+				.hasArgs()
+				.withDescription(
+						"degrees of phenomena mobility to iterate over (slow, medium, fast)")
+				.create());
+		options.addOption(OptionBuilder
+				.withArgName("x")
+				.withLongOpt("mobility-phenomena-skip")
+				.hasArgs()
+				.withDescription(
+						"degrees of phenomena mobility to SKIP over (slow, medium, fast)")
+				.create());
+		options.addOption(OptionBuilder
 				.withArgName("H")
 				.withLongOpt("mobility-hosts")
 				.hasArgs()
@@ -172,11 +218,11 @@ public class SimulationManager {
 						"degrees of host mobility to iterate over (slow, medium, fast)")
 				.create());
 		options.addOption(OptionBuilder
-				.withArgName("P")
-				.withLongOpt("mobility-phenomena")
+				.withArgName("y")
+				.withLongOpt("mobility-hosts-skip")
 				.hasArgs()
 				.withDescription(
-						"degrees of phenomena mobility to iterate over (slow, medium, fast)")
+						"degrees of host mobility to SKIP over (slow, medium, fast)")
 				.create());
 
 		options.addOption(OptionBuilder
@@ -193,6 +239,10 @@ public class SimulationManager {
 				.withDescription(
 						"trajectory spatial resolutions to iterate over (meters)")
 				.create());
+		options.addOption(OptionBuilder.withArgName("z")
+				.withLongOpt("resolution-skip").hasArgs()
+				.withDescription("trajectory resolution indices to SKIP over")
+				.create());
 
 		return options;
 	}
@@ -200,8 +250,9 @@ public class SimulationManager {
 	private static void simulate() {
 		new SimulationDriver(startTime, stopTime, traceDir, graphDir, logDir,
 				phenomenaSensingRange, phenomenaSensingInterval, numHosts,
-				numPhenomena, mobilityHosts, mobilityPhenomena,
-				trajectoryTemporalResolution, trajectorySpatialResolution)
-				.runSimulations();
+				numPhenomena, mobilityHosts, mobilityHostsSkip,
+				mobilityPhenomena, mobilityPhenomenaSkip,
+				trajectoryTemporalResolution, trajectorySpatialResolution,
+				trajectoryResolutionIndexSkip).runSimulations();
 	}
 }

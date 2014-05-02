@@ -62,7 +62,7 @@ public class SimulationManager {
 	 * 
 	 * { low, medium, high, very high }
 	 */
-	public static int[] trajectoryTemporalResolution = { 10 * 60, 5 * 60, 60, 5 };
+	public static int[] trajectoryTemporalResolution = { 10 * 60, 5 * 60, 60, 10 };
 	/**
 	 * Trajectory spatial resolution (meters).
 	 * 

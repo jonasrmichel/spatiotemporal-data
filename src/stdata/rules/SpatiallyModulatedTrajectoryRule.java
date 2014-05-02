@@ -90,14 +90,16 @@ public class SpatiallyModulatedTrajectoryRule<G extends TransactionalGraph, E ex
 			return;
 
 		// trigger trajectory updates
-		SpaceTimePosition pos;
+//		SpaceTimePosition pos;
 		for (Datum datum : delegate.getGoverns()) {
-			pos = (SpaceTimePosition) framedGraph.addVertex(null,
-					SpaceTimePosition.class);
-			pos.setLocation(location);
-			pos.setTimestamp(timestamp);
-
-			datum.add(pos);
+//			pos = (SpaceTimePosition) framedGraph.addVertex(null,
+//					SpaceTimePosition.class);
+//			pos.setLocation(location);
+//			pos.setTimestamp(timestamp);
+//
+//			datum.add(pos);
+			
+			datum.addMeasured(location, timestamp);
 		}
 
 		// commit changes

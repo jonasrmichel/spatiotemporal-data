@@ -13,14 +13,15 @@ public class ReducibleRunningStatistics extends RunningStatistics {
 	 */
 	public void reduce(RunningStatistics statistics) {
 		double delta = getAverage() - statistics.getAverage();
-		double weight = (n * statistics.n) / (n + statistics.n);
+		double weight = (n > 0 || statistics.n > 0) ? (n * statistics.n)
+				/ (n + statistics.n) : 0;
 
 		newS += statistics.newS + delta * delta * weight;
 		sum += statistics.sum;
 		minimum = Math.min(minimum, statistics.minimum);
 		maximum = Math.max(maximum, statistics.maximum);
 		n += statistics.n;
-		newM = sum / n;
+		newM = n > 0 ? sum / n : 0;
 	}
 
 }

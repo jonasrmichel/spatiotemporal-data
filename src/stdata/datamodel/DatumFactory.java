@@ -36,21 +36,27 @@ public class DatumFactory<G extends TransactionalGraph, E extends EventGraph<G>,
 		datum.setIsMeasurable(measurable);
 
 		// initialize the datum's spatiotemporal trajectory
-		SpaceTimePosition pos = framedGraph.addVertex(null,
-				SpaceTimePosition.class);
-		pos.setLocation(hostLocation);
-		pos.setTimestamp(timestamp);
-		pos.setDomain(domain);
+		if (!measurable) {
+			SpaceTimePosition pos = framedGraph.addVertex(null,
+					SpaceTimePosition.class);
+			pos.setLocation(hostLocation);
+			pos.setTimestamp(timestamp);
+			pos.setDomain(domain);
+			
+			datum.add(pos);
+			
+		} else {
+			datum.addMeasured(hostLocation, timestamp);
+			
+		}
 
-		// configure the datum
-		datum.add(pos);
 		datum.setLocation(phenomenonLocation);
 
 		if (context != null)
 			datum.setContextData((Iterable<Datum>) context);
 
 		// commit changes
-//		baseGraph.commit();
+		// baseGraph.commit();
 
 		// register the datum's rule
 		ruleRegistry.registerRule(rule, datum);

@@ -223,8 +223,16 @@ public class SimulationDriver implements IHostDelegate {
 					// create the simulation's unique identifier
 					// hm_<host mobility>_pm_<phenemonon
 					// mobility>_stres_<space-time resolution>
-					simulationId = "hm_" + hMobility + "_pm_" + pMobility
-							+ "_stres_" + Integer.toString(stResolution);
+					simulationId = "hm_"
+							+ hMobility
+							+ "_pm_"
+							+ pMobility
+							+ "_stres_"
+							+ Integer
+									.toString((int) trajectorySpatialResolution[stResolution])
+							+ "_"
+							+ Integer
+									.toString(trajectoryTemporalResolution[stResolution]);
 
 					// check if this parameter combination needs to be skipped
 					if ((mobilityPhenomenaSkip != null && Arrays.asList(

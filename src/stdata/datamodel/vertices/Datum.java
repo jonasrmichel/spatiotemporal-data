@@ -113,6 +113,16 @@ public interface Datum extends VertexFrame {
 	public void setCreationLocation(Geoshape location);
 
 	/**
+	 * Previous location property is the geospatial position where the datum was
+	 * was most recently.
+	 */
+	@Property("previous-location")
+	public Geoshape getPreviousLocation();
+
+	@Property("previous-location")
+	public void setPreviousLocation(Geoshape location);
+
+	/**
 	 * Size property measures the datum trajectory's size (# space-time
 	 * positions).
 	 */
@@ -139,13 +149,22 @@ public interface Datum extends VertexFrame {
 	public void setLength(double length);
 
 	/**
-	 * Automatically the measured datum's length property.
+	 * Automatically updates the measured datum's length property.
 	 * 
 	 * @param pos1
 	 * @param pos2
 	 */
 	@JavaHandler
 	public void updateLength(SpaceTimePosition pos1, SpaceTimePosition pos2);
+
+	/**
+	 * Automatically updates the measured datum's length property.
+	 * 
+	 * @param pos1
+	 * @param pos2
+	 */
+	@JavaHandler
+	public void updateLength(Geoshape pos1, Geoshape pos2);
 
 	/** Age property measures the datum's age. */
 	@Property("age")
@@ -217,6 +236,18 @@ public interface Datum extends VertexFrame {
 	@JavaHandler
 	public void addMeasured(SpaceTimePosition position);
 
+	/**
+	 * This is a "faux" addMeasured() method -- it does not add a space-time
+	 * position to the datum's trajectory, but instead updates the statistics
+	 * that would be affected if a space-time position with the provided
+	 * parameters was added.
+	 * 
+	 * @param location
+	 * @param timestamp
+	 */
+	@JavaHandler
+	public void addMeasured(Geoshape location, long timestamp);
+
 	abstract class Impl implements JavaHandlerContext<Vertex>, Datum {
 
 		@Override
@@ -276,6 +307,39 @@ public interface Datum extends VertexFrame {
 
 		@Override
 		@JavaHandler
+		public void addMeasured(Geoshape location, long timestamp) {
+			try {
+				if (getSize() > 0) {
+					updateSize();
+					updateLength(location, getPreviousLocation());
+
+				} else {
+					setCreationTime(timestamp);
+					setCreationLocation(location);
+					setSize(0);
+					setLength(0);
+					setAge(0);
+					setDistanceHostCreation(0);
+					setDistancePhenomenonCreation(0);
+
+				}
+			} catch (Exception e) {
+				setCreationTime(timestamp);
+				setCreationLocation(location);
+				setSize(0);
+				setLength(0);
+				setAge(0);
+				setDistanceHostCreation(0);
+				setDistancePhenomenonCreation(0);
+
+			} finally {
+				setPreviousLocation(location);
+				
+			}
+		}
+
+		@Override
+		@JavaHandler
 		public void updateSize() {
 			setSize(getSize() + 1);
 		}
@@ -286,7 +350,15 @@ public interface Datum extends VertexFrame {
 			// Geoshape.Point.distance() is in kilometers, convert to meters
 			setLength(getLength()
 					+ pos1.getLocation().getPoint()
-							.distance(pos1.getLocation().getPoint()) * 1000);
+							.distance(pos2.getLocation().getPoint()) * 1000);
+		}
+
+		@Override
+		@JavaHandler
+		public void updateLength(Geoshape pos1, Geoshape pos2) {
+			// Geoshape.Point.distance() is in kilometers, convert to meters
+			setLength(getLength() + pos1.getPoint().distance(pos2.getPoint())
+					* 1000);
 		}
 
 		@Override

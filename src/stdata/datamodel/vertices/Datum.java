@@ -309,24 +309,13 @@ public interface Datum extends VertexFrame {
 		@JavaHandler
 		public void addMeasured(Geoshape location, long timestamp) {
 			try {
-				if (getSize() > 0) {
-					updateSize();
-					updateLength(location, getPreviousLocation());
+				updateSize();
+				updateLength(location, getPreviousLocation());
 
-				} else {
-					setCreationTime(timestamp);
-					setCreationLocation(location);
-					setSize(0);
-					setLength(0);
-					setAge(0);
-					setDistanceHostCreation(0);
-					setDistancePhenomenonCreation(0);
-
-				}
 			} catch (Exception e) {
 				setCreationTime(timestamp);
 				setCreationLocation(location);
-				setSize(0);
+				setSize(1);
 				setLength(0);
 				setAge(0);
 				setDistanceHostCreation(0);
@@ -334,7 +323,7 @@ public interface Datum extends VertexFrame {
 
 			} finally {
 				setPreviousLocation(location);
-				
+
 			}
 		}
 

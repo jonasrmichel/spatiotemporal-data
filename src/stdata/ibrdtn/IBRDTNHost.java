@@ -1,5 +1,7 @@
 package stdata.ibrdtn;
 
+import ibrdtn.api.object.SDNV;
+
 import ibrdtn.api.APIException;
 import ibrdtn.api.ExtendedClient;
 import ibrdtn.api.object.Bundle;
@@ -20,7 +22,6 @@ import java.util.logging.Logger;
 import java.util.LinkedList;
 
 import org.apache.commons.io.FileUtils;
-
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -247,6 +248,7 @@ public class IBRDTNHost {
 		bundle.setFlag(Bundle.Flags.DTNSEC_REQUEST_SIGN, false);
 
 		bundle.appendBlock(teb.getExtensionBlock());
+		System.out.println(teb.getExtensionBlock().getData().toString());
 		bundle.appendBlock(new PayloadBlock(data));
 		send(bundle);
 	}
@@ -279,6 +281,7 @@ public class IBRDTNHost {
 			}
 		});
 	}
+	
 	
 	static void clearGraphDirectory(String dir) {
 		try {
@@ -324,6 +327,15 @@ public class IBRDTNHost {
     	//Eventually, I think this should work
     	TrackingExtensionBlock teb = host.createExtensionBlock(30);
     	host.extractAndSendBundles(args[0], teb);
+    	
+    	/*IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "/Users/christinejulien/hackathon/spatiotemporal-data/graphDir/", "/Users/christinejulien/hackathon/spatiotemporal-data/indexDir/", null);
+    	TrackingExtensionBlock teb = host.createExtensionBlock(265);
+    	SDNV test = new SDNV(43);
+    	byte[] bytetest = new byte[1];
+    	bytetest[0] = (byte)43;
+    	SDNV test2 = new SDNV(bytetest);
+    	System.out.println("test2 length: " + test2.length);
+    	System.out.println("test2 value: " + test2.getValue());*/
     }
 
 

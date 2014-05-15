@@ -35,7 +35,9 @@ public class GeoRoutingExtensionBlock {
     	toAdd.setLatitude(new SDNV(latitude));
     	toAdd.setLongitude(new SDNV(longitude));
     	toAdd.setMarginOfError(new SDNV(marginOfError));
-    	entries.add(toAdd);    
+    	entries.add(toAdd);
+    	//this is bad... what's the better way to keep count updated?
+    	count = new SDNV(entries.size());
     }
     
     public void addEntry(String eid){
@@ -43,6 +45,8 @@ public class GeoRoutingExtensionBlock {
     			new GeoRoutingExtensionBlockEntry(new SDNV(11));
     	toAdd.setEID(eid);
     	entries.add(toAdd);
+    	//this is bad... what's the better way to keep count updated?
+    	count = new SDNV(entries.size());
     }
     
     public void addEntry(String eid, long latitude, long longitude){
@@ -56,6 +60,9 @@ public class GeoRoutingExtensionBlock {
     	toAdd.setLongitude(new SDNV(longitude));
     	toAdd.setEID(eid);
     	toAdd.setMarginOfError(new SDNV(marginOfError));
+    	entries.add(toAdd);
+    	//this is bad... what's the better way to keep count updated?
+    	count = new SDNV(entries.size());
     }
     
     public ExtensionBlock getExtensionBlock(){

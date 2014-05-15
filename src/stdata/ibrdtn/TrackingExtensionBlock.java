@@ -72,21 +72,16 @@ public class TrackingExtensionBlock{
     }
     
      void setData(Block.Data data){
-    	 System.out.println("-----CALLING SETDATA-----");
     	SDNVOutputStream stream = new SDNVOutputStream();
         try {
             data.writeTo(stream);
             stream.flush();
             //every stream should have to have the first three values
             flags = stream.nextSDNV();
-            System.out.println("flags: " + flags.getValue());
-            System.out.println("flags length: " + flags.length);
             interval = stream.nextSDNV();
             count = stream.nextSDNV();
             for(int i = 0; i<count.getValue(); i++){
             	SDNV type = stream.nextSDNV();
-            	System.out.println("type: " + type.getValue());
-            	System.out.println("type's length " + type.length);
             	// oh, hey, look, terrible style! This should be refactored out of type code.
             	TrackingExtensionBlockEntry nextEntry = null;
             	if(type.equals(TrackingExtensionBlockEntry.HOPTYPE)){

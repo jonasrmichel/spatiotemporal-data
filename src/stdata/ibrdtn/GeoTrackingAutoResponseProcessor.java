@@ -29,7 +29,7 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
         this.envelope = envelope;
         this.client = client;
         this.executor = executor;
-        geoRoutingStrategy = new SmartGeoBasedRoutingStrategy();
+        geoRoutingStrategy = new HopBasedRoutingStrategy();
     }
     
     @Override
@@ -71,7 +71,7 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
 		bundle.appendBlock(teb.getExtensionBlock());
 		bundle.appendBlock(greb.getExtensionBlock());
 		System.out.println(greb.getExtensionBlock().getData().toString());
-		bundle.appendBlock(envelope.getPayloadBlock());
+		bundle.appendBlock(new PayloadBlock(new String("Got your bundle!").getBytes()));
 		send(bundle);
 	}
     
@@ -93,7 +93,7 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
 			public void run() {
 
 				try {
-					//finalClient.send(finalBundle);
+					finalClient.send(finalBundle);
 				} catch (Exception e) {
 					logger.log(Level.SEVERE, "Unable to send bundle", e);
 				}

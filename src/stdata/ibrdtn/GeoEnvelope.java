@@ -8,7 +8,6 @@ public class GeoEnvelope {
 	
 	private TrackingExtensionBlock extensionBlock;
 	private GeoRoutingExtensionBlock geoRoutingBlock;
-	private PayloadBlock payloadBlock;
 	private SingletonEndpoint source;
 	private EID destination;
 
@@ -18,20 +17,12 @@ public class GeoEnvelope {
 		this.extensionBlock = extensionBlock;
 	}
 	
-	public void setPayloadBlock(PayloadBlock payloadBlock){
-		this.payloadBlock = payloadBlock;
-	}
-	
 	public void setGeoRoutingExtensionBlock(GeoRoutingExtensionBlock geoRoutingBlock){
 		this.geoRoutingBlock = geoRoutingBlock;
 	}
 	
 	public TrackingExtensionBlock getExtensionBlock(){
 		return extensionBlock;
-	}
-	
-	public PayloadBlock getPayloadBlock(){
-		return payloadBlock;
 	}
 	
 	public GeoRoutingExtensionBlock getGeoRoutingExtensionBlock(){

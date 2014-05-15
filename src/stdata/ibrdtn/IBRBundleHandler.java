@@ -18,6 +18,7 @@ import java.io.PipedOutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.List;
 
 
 //public class IBRBundleHandler extends AbstractAPIHandler{
@@ -170,9 +171,22 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 		 */
 		markDelivered();
 		System.out.println("Received the following bundle: " + bundle.toString());
+	
+		List<Block> blocks = bundle.getBlocks();
+		boolean hasTracking = false;
+		boolean hasGeo = false;
+		for(Block b : blocks){
+			if(b.getType() == TrackingExtensionBlock.type){
+				hasTracking = true;
+			}
+			else if (b.getType() == GeoRoutingExtensionBlock.type){
+				hasGeo = true;
+			}
+		}
 
 		//if I received a tracking extension block but NOT a geoRouting extension block, send a response
-		if(envelope.getExtensionBlock() != null && envelope.getGeoRoutingExtensionBlock() == null){
+		//if(envelope.getExtensionBlock() != null && envelope.getGeoRoutingExtensionBlock() == null){
+		if(hasTracking && !hasGeo){
 			envelope.setSource(bundle.getSource());
 			envelope.setDestination(bundle.getDestination());
 			executor.execute(new GeoTrackingAutoResponseProcessor(envelope, client, executor));
@@ -182,7 +196,6 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 	@Override
 	public void startBlock(Block block) {
 		System.out.println("Block type: " + block.getType());
-		System.out.println("Block data: " + block.getData());
 		//logger.log(Level.FINE, "Receiving: {0}", block.toString());
 		//bundle.appendBlock(block);
 		if(block.getType() == PayloadBlock.type){
@@ -277,33 +290,19 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 				StringBuilder sb = new StringBuilder();
 				for (byte b : bytes) {
 					sb.append(String.format("%02X ", b));
-					System.out.print(b + " ");
 				}
-				System.out.println();
-				System.out.println("YAY! I received the block!");
-				System.out.println(sb.toString());
 				if(workingPayloadBlock != null){
 					workingPayloadBlock.setData(data);
-					envelope.setPayloadBlock(workingPayloadBlock);
 				}
 				else if(workingExtensionBlock != null){
 					System.out.println("bytes received: " + sb.toString());
-					System.out.print("data received: ");
-					for(byte b : bytes){
-						System.out.print(b + ", ");
-					}
-					System.out.println();
 					workingExtensionBlock.setData(bytes);
 					envelope.setExtensionBlock(workingExtensionBlock);
 				}
 				else if(workingGeoExtensionBlock != null){
 					System.out.println("bytes received: " + sb.toString());
-					System.out.print("data received: ");
-					for(byte b : bytes){
-						System.out.print(b + ", ");
-					}
-					System.out.println();
-					workingGeoExtensionBlock.setData(bytes);				
+					workingGeoExtensionBlock.setData(bytes);
+					envelope.setGeoRoutingExtensionBlock(workingGeoExtensionBlock);
 				}
 				logger.log(Level.INFO, "Block Data received: \n\t{0} [{1}]",
 						new Object[]{sb.toString(), new String(bytes)});

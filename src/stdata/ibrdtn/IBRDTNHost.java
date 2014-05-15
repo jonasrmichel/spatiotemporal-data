@@ -176,28 +176,6 @@ public class IBRDTNHost {
 		// to is actually in the database, too.
 	}
 
-	private void hackSendBundle(String dest, Datum d) {
-		/**
-		 * Christine's hack just to be able to test something: going to just
-		 * send the bundle from here since I can't seem to correctly put it in
-		 * and pull it back out of the database.
-		 */
-		JSONObject jo = null;
-		try {
-			jo = d.marshal();
-		} catch (JSONException je) {
-			je.printStackTrace();
-		}
-		if (jo != null) {
-			try {
-				byte[] sendData = jo.toString().getBytes("utf-8");
-				sendBundle(dest, sendData, new TrackingExtensionBlock());
-			}
-			catch(UnsupportedEncodingException uee){
-				uee.printStackTrace();
-			}
-		}
-	}
 	
 	private TrackingExtensionBlock createExtensionBlock(long interval){
 		TrackingExtensionBlock toReturn = new TrackingExtensionBlock(interval);

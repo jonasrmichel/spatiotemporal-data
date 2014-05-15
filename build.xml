@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="pervasive-data">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="/Applications/eclipse/"/>
+    <property name="IBRDTNAPI.location" value="../../Documents/workspace/IBRDTNAPI"/>
+    <property name="IBRDTNExample.location" value="../../Documents/workspace/IBRDTNExample"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
+    <path id="Maven Dependencies.libraryclasspath">
+        <pathelement location="../../.m2/repository/com/thinkaurelius/titan/titan-core/0.4.2/titan-core-0.4.2.jar"/>
+        <pathelement location="../../.m2/repository/com/tinkerpop/blueprints/blueprints-core/2.4.0/blueprints-core-2.4.0.jar"/>
+        <pathelement location="../../.m2/repository/org/codehaus/jettison/jettison/1.3.3/jettison-1.3.3.jar"/>
+        <pathelement location="../../.m2/repository/stax/stax-api/1.0.1/stax-api-1.0.1.jar"/>
+        <pathelement location="../../.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-json-org/2.1.2/jackson-datatype-json-org-2.1.2.jar"/>
+        <pathelement location="../../.m2/repository/com/fasterxml/jackson/core/jackson-core/2.1.2/jackson-core-2.1.2.jar"/>
+        <pathelement location="../../.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.1.2/jackson-databind-2.1.2.jar"/>
+        <pathelement location="../../.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.1.1/jackson-annotations-2.1.1.jar"/>
+        <pathelement location="../../.m2/repository/org/json/json/20090211/json-20090211.jar"/>
+        <pathelement location="../../.m2/repository/colt/colt/1.2.0/colt-1.2.0.jar"/>
+        <pathelement location="../../.m2/repository/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar"/>
+        <pathelement location="../../.m2/repository/com/tinkerpop/frames/2.4.0/frames-2.4.0.jar"/>
+        <pathelement location="../../.m2/repository/com/tinkerpop/gremlin/gremlin-groovy/2.4.0/gremlin-groovy-2.4.0.jar"/>
+        <pathelement location="../../.m2/repository/com/tinkerpop/gremlin/gremlin-java/2.4.0/gremlin-java-2.4.0.jar"/>
+        <pathelement location="../../.m2/repository/org/apache/ivy/ivy/2.3.0/ivy-2.3.0.jar"/>
+        <pathelement location="../../.m2/repository/com/tinkerpop/pipes/2.4.0/pipes-2.4.0.jar"/>
+        <pathelement location="../../.m2/repository/org/codehaus/groovy/groovy/1.8.9/groovy-1.8.9.jar"/>
+        <pathelement location="../../.m2/repository/antlr/antlr/2.7.7/antlr-2.7.7.jar"/>
+        <pathelement location="../../.m2/repository/asm/asm/3.2/asm-3.2.jar"/>
+        <pathelement location="../../.m2/repository/asm/asm-commons/3.2/asm-commons-3.2.jar"/>
+        <pathelement location="../../.m2/repository/asm/asm-util/3.2/asm-util-3.2.jar"/>
+        <pathelement location="../../.m2/repository/asm/asm-analysis/3.2/asm-analysis-3.2.jar"/>
+        <pathelement location="../../.m2/repository/asm/asm-tree/3.2/asm-tree-3.2.jar"/>
+        <pathelement location="../../.m2/repository/org/apache/ant/ant/1.8.3/ant-1.8.3.jar"/>
+        <pathelement location="../../.m2/repository/org/apache/ant/ant-launcher/1.8.3/ant-launcher-1.8.3.jar"/>
+        <pathelement location="../../.m2/repository/org/fusesource/jansi/jansi/1.5/jansi-1.5.jar"/>
+        <pathelement location="../../.m2/repository/jline/jline/0.9.94/jline-0.9.94.jar"/>
+        <pathelement location="../../.m2/repository/org/javassist/javassist/3.18.0-GA/javassist-3.18.0-GA.jar"/>
+        <pathelement location="../../.m2/repository/com/codahale/metrics/metrics-core/3.0.0-BETA3/metrics-core-3.0.0-BETA3.jar"/>
+        <pathelement location="../../.m2/repository/com/codahale/metrics/metrics-ganglia/3.0.0-BETA3/metrics-ganglia-3.0.0-BETA3.jar"/>
+        <pathelement location="../../.m2/repository/info/ganglia/gmetric4j/gmetric4j/1.0.3/gmetric4j-1.0.3.jar"/>
+        <pathelement location="../../.m2/repository/org/acplt/oncrpc/1.0.7/oncrpc-1.0.7.jar"/>
+        <pathelement location="../../.m2/repository/com/codahale/metrics/metrics-graphite/3.0.0-BETA3/metrics-graphite-3.0.0-BETA3.jar"/>
+        <pathelement location="../../.m2/repository/com/spatial4j/spatial4j/0.3/spatial4j-0.3.jar"/>
+        <pathelement location="../../.m2/repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar"/>
+        <pathelement location="../../.m2/repository/commons-configuration/commons-configuration/1.6/commons-configuration-1.6.jar"/>
+        <pathelement location="../../.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4.jar"/>
+        <pathelement location="../../.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar"/>
+        <pathelement location="../../.m2/repository/commons-digester/commons-digester/1.8/commons-digester-1.8.jar"/>
+        <pathelement location="../../.m2/repository/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar"/>
+        <pathelement location="../../.m2/repository/commons-beanutils/commons-beanutils-core/1.8.0/commons-beanutils-core-1.8.0.jar"/>
+        <pathelement location="../../.m2/repository/commons-io/commons-io/2.1/commons-io-2.1.jar"/>
+        <pathelement location="../../.m2/repository/commons-codec/commons-codec/1.7/commons-codec-1.7.jar"/>
+        <pathelement location="../../.m2/repository/com/google/guava/guava/14.0.1/guava-14.0.1.jar"/>
+        <pathelement location="../../.m2/repository/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar"/>
+        <pathelement location="../../.m2/repository/com/carrotsearch/hppc/0.4.2/hppc-0.4.2.jar"/>
+        <pathelement location="../../.m2/repository/com/github/stephenc/high-scale-lib/high-scale-lib/1.1.4/high-scale-lib-1.1.4.jar"/>
+        <pathelement location="../../.m2/repository/com/esotericsoftware/kryo/kryo/2.21/kryo-2.21-shaded.jar"/>
+        <pathelement location="../../.m2/repository/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar"/>
+        <pathelement location="../../.m2/repository/com/thinkaurelius/titan/titan-berkeleyje/0.4.2/titan-berkeleyje-0.4.2.jar"/>
+        <pathelement location="../../.m2/repository/com/sleepycat/je/5.0.73/je-5.0.73.jar"/>
+        <pathelement location="../../.m2/repository/com/thinkaurelius/titan/titan-lucene/0.4.2/titan-lucene-0.4.2.jar"/>
+        <pathelement location="../../.m2/repository/org/apache/lucene/lucene-core/4.4.0/lucene-core-4.4.0.jar"/>
+        <pathelement location="../../.m2/repository/org/apache/lucene/lucene-analyzers-common/4.4.0/lucene-analyzers-common-4.4.0.jar"/>
+        <pathelement location="../../.m2/repository/org/apache/lucene/lucene-queryparser/4.4.0/lucene-queryparser-4.4.0.jar"/>
+        <pathelement location="../../.m2/repository/org/apache/lucene/lucene-queries/4.4.0/lucene-queries-4.4.0.jar"/>
+        <pathelement location="../../.m2/repository/org/apache/lucene/lucene-sandbox/4.4.0/lucene-sandbox-4.4.0.jar"/>
+        <pathelement location="../../.m2/repository/jakarta-regexp/jakarta-regexp/1.4/jakarta-regexp-1.4.jar"/>
+        <pathelement location="../../.m2/repository/org/apache/lucene/lucene-spatial/4.4.0/lucene-spatial-4.4.0.jar"/>
+    </path>
+    <path id="JUnit 4.libraryclasspath">
+        <pathelement location="${ECLIPSE_HOME}plugins/org.junit_4.11.0.v201303080030/junit.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.hamcrest.core_1.3.0.v201303031735.jar"/>
+    </path>
+    <path id="IBRDTNAPI.classpath">
+        <pathelement location="${IBRDTNAPI.location}/bin"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+    </path>
+    <path id="IBRDTNExample.classpath">
+        <pathelement location="${IBRDTNExample.location}/bin"/>
+        <path refid="IBRDTNAPI.classpath"/>
+    </path>
+    <path id="pervasive-data.classpath">
+        <pathelement location="target/classes"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+        <pathelement location="lib/commons-cli-1.2.jar"/>
+        <path refid="IBRDTNAPI.classpath"/>
+        <path refid="IBRDTNExample.classpath"/>
+    </path>
+    <path id="run.IBRDTNHost.classpath">
+        <path refid="pervasive-data.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="target/classes"/>
+        <copy includeemptydirs="false" todir="target/classes">
+            <fileset dir="src">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="target/classes"/>
+    </target>
+    <target depends="clean" name="cleanall">
+        <ant antfile="build.xml" dir="${IBRDTNAPI.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IBRDTNExample.location}" inheritAll="false" target="clean"/>
+    </target>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="build.xml" dir="${IBRDTNAPI.location}" inheritAll="false" target="build-project"/>
+        <ant antfile="build.xml" dir="${IBRDTNExample.location}" inheritAll="false" target="build-project"/>
+    </target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="target/classes" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="pervasive-data.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="IBRDTNHost">
+        <java classname="stdata.ibrdtn.IBRDTNHost" failonerror="true" fork="yes">
+            <arg line="respond dtn://eee2/ibr-1"/>
+            <classpath refid="run.IBRDTNHost.classpath"/>
+        </java>
+    </target>
+</project>

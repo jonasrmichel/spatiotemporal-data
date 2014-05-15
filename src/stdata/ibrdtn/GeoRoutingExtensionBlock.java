@@ -104,13 +104,17 @@ public class GeoRoutingExtensionBlock {
    	 		data.writeTo(stream);
    	 		stream.flush();
    	 		flags = stream.nextSDNV();
+   	 		System.out.println("flags: " + flags.getValue());
    	 		count = stream.nextSDNV();
+   	 		System.out.println("count: " + count.getValue());
    	 		for(int i = 0; i<count.getValue(); i++){
    	 			SDNV entryFlags = stream.nextSDNV();
+   	 			System.out.println("entryFlags: " + entryFlags.getValue());
    	 			byte flagsByte = entryFlags.getBytes()[0];
    	 			GeoRoutingExtensionBlockEntry nextEntry = 
    	 					new GeoRoutingExtensionBlockEntry(entryFlags);
    	 			nextEntry.setMarginOfError(stream.nextSDNV());
+   	 			System.out.println("margin of error: " + nextEntry.getMarginOfError().getValue());
    	 			if((flagsByte & (byte) 0x08) != 0){
    	 				//then there is eid data
               		 SDNV eidLength = stream.nextSDNV(); // note this is probably not really an SDNV
@@ -217,6 +221,11 @@ class GeoRoutingExtensionBlockEntry {
         System.arraycopy(flagsbytes, 0, toReturn, byteArrayCounter, flagsbytes.length);
         byteArrayCounter += flagsbytes.length;
 	    byte[] marginOfErrorBytes = marginOfError.getBytes();
+	    System.out.println("Margin of error: " + marginOfError.getValue());
+	    for(int i = 0; i<marginOfErrorBytes.length; i++){
+	    	System.out.print(marginOfErrorBytes[i] + " ");
+	    }
+	    System.out.println();
 	    System.arraycopy(marginOfErrorBytes, 0, toReturn, byteArrayCounter, marginOfErrorBytes.length);
 	    byteArrayCounter += marginOfErrorBytes.length;
         if(eid != null){

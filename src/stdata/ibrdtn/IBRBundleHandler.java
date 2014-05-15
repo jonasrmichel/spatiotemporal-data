@@ -171,7 +171,8 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 		markDelivered();
 		System.out.println("Received the following bundle: " + bundle.toString());
 
-		if(envelope.getExtensionBlock() != null){
+		//if I received a tracking extension block but NOT a geoRouting extension block, send a response
+		if(envelope.getExtensionBlock() != null && envelope.getGeoRoutingExtensionBlock() == null){
 			envelope.setSource(bundle.getSource());
 			envelope.setDestination(bundle.getDestination());
 			executor.execute(new GeoTrackingAutoResponseProcessor(envelope, client, executor));

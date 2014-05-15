@@ -309,7 +309,7 @@ public class IBRDTNHost {
     	}
     	
     	
-    	SDNV test = new SDNV(1048);
+    	/*SDNV test = new SDNV(1048);
     	System.out.println("value: " + test.getValue());
     	   StringBuilder sb = new StringBuilder();
     	   for(byte b: test.getBytes())
@@ -321,7 +321,7 @@ public class IBRDTNHost {
        	   StringBuilder sb2 = new StringBuilder();
        	   for(byte b: test2.getBytes())
        	      sb2.append(String.format("%02x", b&0xff));
-       	   System.out.println(sb2.toString());
+       	   System.out.println(sb2.toString());*/
     	   
     	/*IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "/Users/christinejulien/hackathon/spatiotemporal-data/graphDir/", "/Users/christinejulien/hackathon/spatiotemporal-data/indexDir/", null);
     	TrackingExtensionBlock teb = host.createExtensionBlock(265);

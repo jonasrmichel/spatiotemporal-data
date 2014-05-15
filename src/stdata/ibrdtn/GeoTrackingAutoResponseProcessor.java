@@ -21,11 +21,15 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
     private GeoEnvelope envelope;
     private final ExtendedClient client;
     private final ExecutorService executor;
+    // choices are current HopBasedRoutingStrategy or GeoBasedRoutingStrategy
+    // new choice: SmartGeoBasedRoutingStrategy -- only one geoentry per logical hop
+    private GeoRoutingStrategy geoRoutingStrategy;
 
     public GeoTrackingAutoResponseProcessor(GeoEnvelope envelope, ExtendedClient client, ExecutorService executor) {
         this.envelope = envelope;
         this.client = client;
         this.executor = executor;
+        geoRoutingStrategy = new SmartGeoBasedRoutingStrategy();
     }
     
     @Override
@@ -38,29 +42,16 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
     	System.out.println("Bundle came from: " + envelope.getSource().toString());
     	GeoRoutingExtensionBlock greb = 
     			createGeoBlockFromTrackingBlock(envelope.getExtensionBlock());
-    	sendReturnBundle(envelope.getSource().toString(), greb);
+		TrackingExtensionBlock teb = new TrackingExtensionBlock(30);
+    	sendReturnBundle(envelope.getSource().toString(), greb, teb);
     }
     
     private GeoRoutingExtensionBlock createGeoBlockFromTrackingBlock(TrackingExtensionBlock teb){
-    	GeoRoutingExtensionBlock toReturn = new GeoRoutingExtensionBlock();
-    	List<TrackingExtensionBlockEntry> trackingEntries = teb.getEntries();
-    	// this one retraces the network hops
-    	/*for(TrackingExtensionBlockEntry e : trackingEntries){
-    		if(e.type.equals(TrackingExtensionBlockEntry.HOPTYPE)){
-    			toReturn.addEntry(((HopDataBlockEntry)e).getEID());
-    		}
-    	}*/
-    	// this one retraces the locations
-    	for(TrackingExtensionBlockEntry e : trackingEntries){
-    		if(e.type.equals(TrackingExtensionBlockEntry.GEOTYPE)){
-    			toReturn.addEntry(((GeoDataBlockEntry)e).getLatitude().getValue(),
-    					          ((GeoDataBlockEntry)e).getLongitude().getValue());
-    		}
-    	}
-    	return toReturn;
+    	return geoRoutingStrategy.createBlock(teb.getEntries());
     }
     
-    private void sendReturnBundle(String dest, GeoRoutingExtensionBlock greb){
+    private void sendReturnBundle(String dest, GeoRoutingExtensionBlock greb, 
+    		                      TrackingExtensionBlock teb){
 		System.out.println("Sending Bundle");
 
 		EID destination = new SingletonEndpoint(dest);
@@ -77,6 +68,7 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
 		bundle.setFlag(Bundle.Flags.DTNSEC_REQUEST_ENCRYPT, false);
 		bundle.setFlag(Bundle.Flags.DTNSEC_REQUEST_SIGN, false);
 
+		bundle.appendBlock(teb.getExtensionBlock());
 		bundle.appendBlock(greb.getExtensionBlock());
 		System.out.println(greb.getExtensionBlock().getData().toString());
 		bundle.appendBlock(envelope.getPayloadBlock());

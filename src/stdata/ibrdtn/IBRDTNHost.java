@@ -311,22 +311,24 @@ public class IBRDTNHost {
 	}
 	
     public static void main(String[] args){
-    	if(args.length != 1){
-    		System.out.println("You must provide a destination!");
+    	if(args.length != 2){
+    		System.out.println("Usage: java -jar stdataibrdtn.jar [send/respond] [destination].");
     		System.exit(0);
     	}
     	Geoshape defaultLocation = Geoshape.point(30.2500, 97.7500);
     	ILocationProvider locationProvider = new DumbLocationProviderImpl(defaultLocation);
-    	IBRDTNHost.clearGraphDirectory("/Users/christinejulien/hackathon/spatiotemporal-data/graphDir/");
-    	IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "/Users/christinejulien/hackathon/spatiotemporal-data/graphDir/", "/Users/christinejulien/hackathon/spatiotemporal-data/indexDir/", locationProvider);
+    	IBRDTNHost.clearGraphDirectory("./graphDir/");
+    	IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "./graphDir/", "./indexDir/", locationProvider);
     	//this first method creates a datum and thinks its putting it in the database
     	Datum d = host.createDatum(defaultLocation);
     	//this second method just sends the datum returned from above using the datum's marshall method
     	//I'm doing it this way because I can't seem to recover stuff from the database
     	//host.hackSendBundle(args[0], d);
     	//Eventually, I think this should work
-    	TrackingExtensionBlock teb = host.createExtensionBlock(30);
-    	host.extractAndSendBundles(args[0], teb);
+    	if(args[0].equals("send")){
+    		TrackingExtensionBlock teb = host.createExtensionBlock(30);
+    		host.extractAndSendBundles(args[1], teb);
+    	}
     	
     	/*IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "/Users/christinejulien/hackathon/spatiotemporal-data/graphDir/", "/Users/christinejulien/hackathon/spatiotemporal-data/indexDir/", null);
     	TrackingExtensionBlock teb = host.createExtensionBlock(265);

@@ -20,7 +20,7 @@ public class GeoRoutingExtensionBlock {
     private SDNV count = new SDNV(0);
     private List<GeoRoutingExtensionBlockEntry> entries = 
     		new ArrayList<GeoRoutingExtensionBlockEntry>();
-    static long defaultMarginOfError = 100;
+    static long defaultMarginOfError = 1048; // 1/1000 * 1024 * 1024 -- approximately equal to 1meter
     
     public GeoRoutingExtensionBlock(){
     }

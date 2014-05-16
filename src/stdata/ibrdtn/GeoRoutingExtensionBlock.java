@@ -198,7 +198,9 @@ class GeoRoutingExtensionBlockEntry {
 			bytes += marginOfError.length;
 		}
 		if(eid != null){
-			bytes += eid.getBytes().length;
+			//the "magic number" 1 is because we have to add in a byte to record the length
+			//of the eid string too. It's what the BundleString implementation underneath expects
+			bytes += eid.getBytes().length + 1;
 		}
 		if(latitude != null){
 			bytes += latitude.length;
@@ -216,15 +218,14 @@ class GeoRoutingExtensionBlockEntry {
         System.arraycopy(flagsbytes, 0, toReturn, byteArrayCounter, flagsbytes.length);
         byteArrayCounter += flagsbytes.length;
 	    byte[] marginOfErrorBytes = marginOfError.getBytes();
-	    System.out.println("Margin of error: " + marginOfError.getValue());
-	    for(int i = 0; i<marginOfErrorBytes.length; i++){
-	    	System.out.print(marginOfErrorBytes[i] + " ");
-	    }
-	    System.out.println();
 	    System.arraycopy(marginOfErrorBytes, 0, toReturn, byteArrayCounter, marginOfErrorBytes.length);
 	    byteArrayCounter += marginOfErrorBytes.length;
         if(eid != null){
         	byte[] eidBytes = eid.getBytes();
+        	byte[] length = new byte[1];
+        	length[0] = (byte)eidBytes.length;
+        	System.arraycopy(length, 0, toReturn, byteArrayCounter, length.length);
+        	byteArrayCounter += length.length;
         	System.arraycopy(eidBytes, 0, toReturn, byteArrayCounter, eidBytes.length);
         	byteArrayCounter += eidBytes.length;
         }

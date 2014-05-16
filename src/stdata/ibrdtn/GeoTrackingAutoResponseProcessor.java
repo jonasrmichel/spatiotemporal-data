@@ -3,6 +3,7 @@ package stdata.ibrdtn;
 import ibrdtn.api.ExtendedClient;
 import ibrdtn.api.object.Block;
 import ibrdtn.api.object.Bundle;
+import ibrdtn.api.object.ByteArrayBlockData;
 import ibrdtn.api.object.EID;
 import ibrdtn.api.object.GroupEndpoint;
 import ibrdtn.api.object.PayloadBlock;
@@ -30,7 +31,7 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
         this.envelope = envelope;
         this.client = client;
         this.executor = executor;
-        geoRoutingStrategy = new HopBasedRoutingStrategy();
+        geoRoutingStrategy = new SmartGeoBasedRoutingStrategy();
     }
     
     @Override
@@ -39,8 +40,8 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
     }
 	
     private void processMessage() {
-    	System.out.println("Whew! Got the data to the right place.");
-    	System.out.println("Bundle came from: " + envelope.getSource().toString());
+    	//System.out.println("Whew! Got the data to the right place.");
+    	//System.out.println("Bundle came from: " + envelope.getSource().toString());
     	GeoRoutingExtensionBlock greb = 
     			createGeoBlockFromTrackingBlock(envelope.getExtensionBlock());
 		TrackingExtensionBlock teb = new TrackingExtensionBlock(30);
@@ -53,7 +54,7 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
     
     private void sendReturnBundle(EID destination, GeoRoutingExtensionBlock greb, 
     		                      TrackingExtensionBlock teb){
-		System.out.println("Sending Bundle");
+		System.out.println("\n--------SENDING RETURN BUNDLE--------");
 
 		Bundle bundle = new Bundle(destination, Constants.LIFETIME);
 		bundle.setPriority(Bundle.Priority.valueOf("NORMAL"));
@@ -70,24 +71,30 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
 
 		bundle.appendBlock(teb.getExtensionBlock());
 		bundle.appendBlock(greb.getExtensionBlock());
-		System.out.println(greb.getExtensionBlock().getData().toString());
 		bundle.appendBlock(new PayloadBlock(new String("Got your bundle!").getBytes()));
+		StringBuilder sb = new StringBuilder();
+		for (byte b : ((ByteArrayBlockData)teb.getData()).getBytes()) {
+			sb.append(String.format("%02X ", b));
+		}
+		System.out.println("Block " + TrackingExtensionBlock.type + " : " + sb);
+		System.out.println(bundle.toString());
 		send(bundle);
+		System.out.println("--------DONE SENDING BUNDLE--------\n");
 	}
     
     private void send(Bundle bundle) {
-		logger.log(Level.INFO, "Sending {0}", bundle);
+		//logger.log(Level.INFO, "Sending {0}", bundle);
 
 		final Bundle finalBundle = bundle;
 		final ExtendedClient finalClient = this.client;
 		
-		LinkedList<Block> blocks = finalBundle.getBlocks();
+		/*LinkedList<Block> blocks = finalBundle.getBlocks();
 		for(Block b : blocks){
 			System.out.println("My bundle has a block of type: " + b.getType());
 			System.out.println("That block's data is: " + b.getData());
 		}
 		System.out.println("Sending the following bunde: " + finalBundle.toString());
-		
+		*/
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {

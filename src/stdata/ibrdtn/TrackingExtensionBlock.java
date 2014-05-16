@@ -110,6 +110,7 @@ public class TrackingExtensionBlock{
             		// next up is the latitude then the longitude
             		((GeoDataBlockEntry)nextEntry).setLatitude(stream.nextSDNV());
             		((GeoDataBlockEntry)nextEntry).setLongitude(stream.nextSDNV());
+
             	}
             	if(nextEntry != null){
             		entries.add(nextEntry);

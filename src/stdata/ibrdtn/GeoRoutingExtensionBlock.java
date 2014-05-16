@@ -20,13 +20,14 @@ public class GeoRoutingExtensionBlock {
     private SDNV count = new SDNV(0);
     private List<GeoRoutingExtensionBlockEntry> entries = 
     		new ArrayList<GeoRoutingExtensionBlockEntry>();
-    static long defaultMarginOfError = 1048; // 1/1000 * 1024 * 1024 -- approximately equal to 1meter
+    private long marginOfError = 1048; // 1/1000 * 1024 * 1024 -- approximately equal to 1meter
     
-    public GeoRoutingExtensionBlock(){
+    public GeoRoutingExtensionBlock(int marginOfError){
+    	this.marginOfError = marginOfError;
     }
     
     public void addEntry(long latitude, long longitude){
-    	addEntry(latitude, longitude, defaultMarginOfError);
+    	addEntry(latitude, longitude, marginOfError);
     }
     
     public void addEntry(long latitude, long longitude, long marginOfError){
@@ -50,7 +51,7 @@ public class GeoRoutingExtensionBlock {
     }
     
     public void addEntry(String eid, long latitude, long longitude){
-    	addEntry(eid, latitude, longitude, defaultMarginOfError);
+    	addEntry(eid, latitude, longitude, marginOfError);
     }
     
     public void addEntry(String eid, long latitude, long longitude, long marginOfError){
@@ -140,6 +141,10 @@ public class GeoRoutingExtensionBlock {
    void setData(byte[] data){
    		setData(new ByteArrayBlockData(data));
    }
+   
+   long getMarginOfError(){
+	   return marginOfError;
+   }
 	
 }
 
@@ -147,12 +152,13 @@ class GeoRoutingExtensionBlockEntry {
 	
     // flags: required: 1; ordered: 2; geo_required: 4; eid_required: 8
 	private SDNV flags = new SDNV(15);
-	private SDNV marginOfError = new SDNV(GeoRoutingExtensionBlock.defaultMarginOfError);
+	private SDNV marginOfError;
 	private String eid;
 	private SDNV latitude;
 	private SDNV longitude;
 	
-	GeoRoutingExtensionBlockEntry(){
+	GeoRoutingExtensionBlockEntry(int marginOfError){
+		this.marginOfError = new SDNV(marginOfError);
 	}
 	
 	GeoRoutingExtensionBlockEntry(SDNV flags){

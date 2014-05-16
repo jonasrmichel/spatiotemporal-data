@@ -41,14 +41,16 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
     protected GeoEnvelope envelope;
     protected String groupID;
     protected byte[] bytes;
+    protected int marginOfError;
     
 
 	public IBRBundleHandler(ExtendedClient client, ExecutorService executor, 
-			                PayloadType messageType, String groupID) {
+			                PayloadType messageType, int marginOfError, String groupID) {
 		this.client = client;
 		this.executor = executor;
 		this.messageType = messageType;
 		this.groupID = groupID;
+		this.marginOfError = marginOfError;
 	}
 
 	//NEW STUFF
@@ -196,7 +198,7 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 			envelope.setSource(bundle.getSource());
 			envelope.setDestination(bundle.getDestination());
 			envelope.setGroupID(groupID);
-			executor.execute(new GeoTrackingAutoResponseProcessor(envelope, client, executor));
+			executor.execute(new GeoTrackingAutoResponseProcessor(envelope, client, executor, marginOfError));
 		}
 	}
 
@@ -212,7 +214,7 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 			this.workingExtensionBlock = new TrackingExtensionBlock();
 		}
 		else if(block.getType() == GeoRoutingExtensionBlock.type){
-			this.workingGeoExtensionBlock = new GeoRoutingExtensionBlock();
+			this.workingGeoExtensionBlock = new GeoRoutingExtensionBlock(marginOfError);
 		}
 	}
 

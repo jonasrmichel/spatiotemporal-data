@@ -70,7 +70,7 @@ public class IBRDTNHost {
 			.getName());
 
 	public IBRDTNHost(int identifier, String eid, String graphDir,
-			String indexDir, ILocationProvider locationProvider, String groupID) {
+			String indexDir, ILocationProvider locationProvider, int marginOfError, String groupID) {
 		this.identifier = identifier;
 		this.eid = eid;
 		this.graphDir = graphDir;
@@ -88,7 +88,7 @@ public class IBRDTNHost {
 		// init connection to IBR-DTN daemon
 		executor = Executors.newSingleThreadExecutor();
 		exClient = new ExtendedClient();
-		handler = new IBRBundleHandler(exClient, executor, payloadType, groupID);
+		handler = new IBRBundleHandler(exClient, executor, payloadType, marginOfError, groupID);
 		exClient.setHandler(handler);
 		exClient.setHost(Constants.HOST);
 		exClient.setPort(Constants.PORT);
@@ -300,21 +300,21 @@ public class IBRDTNHost {
 	}
 	
     public static void main(String[] args){
-    	if(args.length < 1 || args.length > 2){
-    		System.out.println("Usage: java -jar stdataibrdtn.jar groupID [destination].");
+    	if(args.length < 2 || args.length > 3){
+    		System.out.println("Usage: java -jar stdataibrdtn.jar marginOfError groupID [destination].");
     		System.exit(0);
     	}
     	Geoshape defaultLocation = Geoshape.point(30.2500, 97.7500);
     	ILocationProvider locationProvider = new DumbLocationProviderImpl(defaultLocation);
     	IBRDTNHost.clearGraphDirectory("./graphDir/");
-    	IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "./graphDir/", "./indexDir/", locationProvider, args[0]);
+    	IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "./graphDir/", "./indexDir/", locationProvider, Integer.parseInt(args[0]), args[1]);
     	//this first method creates a datum and thinks its putting it in the database
     	Datum d = host.createDatum(defaultLocation);
     	//this second method just sends the datum returned from above using the datum's marshall method
     	//I'm doing it this way because I can't seem to recover stuff from the database
     	//host.hackSendBundle(args[0], d);
     	//Eventually, I think this should work
-    	if(args.length == 2){
+    	if(args.length == 3){
     		try{
     			Thread.sleep(100);
     		}

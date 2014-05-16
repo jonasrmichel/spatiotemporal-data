@@ -26,12 +26,15 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
     // choices are current HopBasedRoutingStrategy or GeoBasedRoutingStrategy
     // new choice: SmartGeoBasedRoutingStrategy -- only one geoentry per logical hop
     private GeoRoutingStrategy geoRoutingStrategy;
+    private int marginOfError;
 
-    public GeoTrackingAutoResponseProcessor(GeoEnvelope envelope, ExtendedClient client, ExecutorService executor) {
+    public GeoTrackingAutoResponseProcessor(GeoEnvelope envelope, ExtendedClient client, ExecutorService executor,
+    		                                int marginOfError) {
         this.envelope = envelope;
         this.client = client;
         this.executor = executor;
         geoRoutingStrategy = new SmartGeoBasedRoutingStrategy();
+        this.marginOfError = marginOfError;
     }
     
     @Override
@@ -49,7 +52,7 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
     }
     
     private GeoRoutingExtensionBlock createGeoBlockFromTrackingBlock(TrackingExtensionBlock teb){
-    	return geoRoutingStrategy.createBlock(teb.getEntries());
+    	return geoRoutingStrategy.createBlock(teb.getEntries(), marginOfError);
     }
     
     private void sendReturnBundle(EID destination, GeoRoutingExtensionBlock greb, 

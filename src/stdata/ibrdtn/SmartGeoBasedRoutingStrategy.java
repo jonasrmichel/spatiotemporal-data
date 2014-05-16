@@ -4,8 +4,8 @@ import java.util.List;
 
 public class SmartGeoBasedRoutingStrategy implements GeoRoutingStrategy{
 	
-	public GeoRoutingExtensionBlock createBlock(List<TrackingExtensionBlockEntry> entries){
-    	GeoRoutingExtensionBlock toReturn = new GeoRoutingExtensionBlock();
+	public GeoRoutingExtensionBlock createBlock(List<TrackingExtensionBlockEntry> entries, int marginOfError){
+    	GeoRoutingExtensionBlock toReturn = new GeoRoutingExtensionBlock(marginOfError);
     	boolean findGeo = true;
     	for(TrackingExtensionBlockEntry e : entries){
     		if(findGeo && e.type.equals(TrackingExtensionBlockEntry.GEOTYPE)){

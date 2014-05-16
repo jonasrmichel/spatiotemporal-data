@@ -71,7 +71,7 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
                 try {
                     // Mark bundle as delivered...                    
                     finalClient.markDelivered(finalBundleID);
-                    logger.log(Level.FINE, "Delivered: {0}", finalBundleID);
+                    //logger.log(Level.FINE, "Delivered: {0}", finalBundleID);
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, "Unable to mark bundle as delivered.", e);
                 }
@@ -94,7 +94,8 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
                 try {
                     exClient.loadBundle(finalBundleId);
                     exClient.getBundle();
-                    logger.log(Level.INFO, "New bundle loaded");
+                    //logger.log(Level.INFO, "New bundle loaded");
+                    System.out.println("\n--------RECEIVING NEW BUNDLE--------");
                 } catch (APIException e) {
                     logger.log(Level.WARNING, "Failed to load next bundle");
                 }
@@ -131,7 +132,7 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
             @Override
             public void run() {
                 try {
-                    logger.log(Level.INFO, "Requesting payload");
+                    //logger.log(Level.INFO, "Requesting payload");
                     finalClient.getPayload();
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, "Unable to mark bundle as delivered.", e);
@@ -149,18 +150,19 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 
 	@Override
 	public void notify(StatusReport r) {
-		logger.log(Level.INFO, r.toString());
+		//logger.log(Level.INFO, r.toString());
 	}
 
 	@Override
 	public void notify(Custody c) {
-		logger.log(Level.INFO, c.toString());
+		//logger.log(Level.INFO, c.toString());
 	}
 
 	@Override
 	public void startBundle(Bundle bundle) {
-		System.out.println("Receiving the following bundle: " + bundle.toString());
-		logger.log(Level.FINE, "Receiving: {0}", bundle);
+		//System.out.println("Receiving the following bundle: " + bundle.toString());
+		//logger.log(Level.FINE, "Receiving: {0}", bundle);
+		System.out.print(bundle.toString() + " : ");
 		this.bundle = bundle;
 	}
 
@@ -174,7 +176,8 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 		 */
 		markDelivered();
 		System.out.println("Received the following bundle: " + bundle.toString());
-	
+		System.out.println("--------END BUNDLE--------\n");
+		
 		List<Block> blocks = bundle.getBlocks();
 		boolean hasTracking = false;
 		boolean hasGeo = false;
@@ -199,7 +202,7 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 
 	@Override
 	public void startBlock(Block block) {
-		System.out.println("Block type: " + block.getType());
+		System.out.print("Block " + block.getType() + " : ");
 		//logger.log(Level.FINE, "Receiving: {0}", block.toString());
 		//bundle.appendBlock(block);
 		if(block.getType() == PayloadBlock.type){
@@ -215,7 +218,7 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 
 	@Override
 	public void endBlock() {
-		logger.log(Level.FINE, "Ending block");
+		//logger.log(Level.FINE, "Ending block");
 		if(workingPayloadBlock != null){
 			bundle.appendBlock(workingPayloadBlock);
 			workingPayloadBlock = null;
@@ -274,7 +277,7 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 
 	@Override
 	public void progress(long pos, long total) {
-		logger.log(Level.INFO, "Payload: {0} of {1} bytes", new Object[]{pos, total});
+		//logger.log(Level.INFO, "Payload: {0} of {1} bytes", new Object[]{pos, total});
 	}
 
 	class ShimPipedStreamReader implements Runnable {
@@ -297,19 +300,20 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 				}
 				if(workingPayloadBlock != null){
 					workingPayloadBlock.setData(data);
+					System.out.println();
 				}
 				else if(workingExtensionBlock != null){
-					System.out.println("bytes received: " + sb.toString());
+					System.out.println(sb.toString());
 					workingExtensionBlock.setData(bytes);
 					envelope.setExtensionBlock(workingExtensionBlock);
 				}
 				else if(workingGeoExtensionBlock != null){
-					System.out.println("bytes received: " + sb.toString());
+					System.out.println(sb.toString());
 					workingGeoExtensionBlock.setData(bytes);
 					envelope.setGeoRoutingExtensionBlock(workingGeoExtensionBlock);
 				}
-				logger.log(Level.INFO, "Block Data received: \n\t{0} [{1}]",
-						new Object[]{sb.toString(), new String(bytes)});
+				//logger.log(Level.INFO, "Block Data received: \n\t{0} [{1}]",
+						//new Object[]{sb.toString(), new String(bytes)});
 			} catch (IOException ex) {
 				logger.log(Level.SEVERE, "Unable to decode payload");
 			}

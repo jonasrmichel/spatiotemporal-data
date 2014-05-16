@@ -1,11 +1,11 @@
 package stdata.ibrdtn;
 
 import ibrdtn.api.object.SDNV;
-
 import ibrdtn.api.APIException;
 import ibrdtn.api.ExtendedClient;
 import ibrdtn.api.object.Bundle;
 import ibrdtn.api.object.GroupEndpoint;
+import ibrdtn.api.object.ByteArrayBlockData;
 import ibrdtn.api.object.Block;
 import ibrdtn.api.object.EID;
 import ibrdtn.api.object.PayloadBlock;
@@ -77,9 +77,6 @@ public class IBRDTNHost {
 		this.indexDir = indexDir;
 		this.locationProvider = locationProvider;
 
-		System.out.println(graphDir);
-		System.out.println(indexDir);
-
 		// initialize the spatiotemporal graph database instance
 		spatiotemporalDB = new TitanSpatiotemporalDatabase<Datum>(eid,
 				graphDir, indexDir, Datum.class);
@@ -112,9 +109,7 @@ public class IBRDTNHost {
 	private void connect() {
 		try {
 			exClient.open();
-			logger.log(Level.FINE, "Successfully connected to DTN daemon");
 			exClient.setEndpoint(eid);
-			logger.log(Level.INFO, "Endpoint ''{0}'' registered.", eid);
 
 		} catch (APIException e) {
 			logger.log(Level.WARNING, "API error: {0}", e.getMessage());
@@ -218,7 +213,7 @@ public class IBRDTNHost {
      * which will actually chuck it through the DTN daemon.
      */
 	private void sendBundle(String dest, byte[] data, TrackingExtensionBlock teb){
-		System.out.println("Sending Bundle");
+		System.out.println("\n--------SENDING BUNDLE--------");
 
 		EID destination = new SingletonEndpoint(dest);
 		Bundle bundle = new Bundle(destination, Constants.LIFETIME);
@@ -235,27 +230,34 @@ public class IBRDTNHost {
 		bundle.setFlag(Bundle.Flags.DTNSEC_REQUEST_SIGN, false);
 
 		bundle.appendBlock(teb.getExtensionBlock());
-		System.out.println(teb.getExtensionBlock().getData().toString());
+		//System.out.println(teb.getExtensionBlock().getData().toString());
 		bundle.appendBlock(new PayloadBlock(data));
+		StringBuilder sb = new StringBuilder();
+		for (byte b : ((ByteArrayBlockData)teb.getData()).getBytes()) {
+			sb.append(String.format("%02X ", b));
+		}
+		System.out.println("Block " + TrackingExtensionBlock.type + " : " + sb);
+		System.out.println(bundle.toString());
 		send(bundle);
+		System.out.println("--------DONE SENDING BUNDLE--------\n");
 	}
 
 	/**
 	 * Low level functions to send the bundle through the DTN daemon
 	 */
 	private void send(Bundle bundle) {
-		logger.log(Level.INFO, "Sending {0}", bundle);
+		//logger.log(Level.INFO, "Sending {0}", bundle);
 
 		final Bundle finalBundle = bundle;
 		final ExtendedClient finalClient = this.exClient;
 		
 		LinkedList<Block> blocks = finalBundle.getBlocks();
-		for(Block b : blocks){
+		/*for(Block b : blocks){
 			System.out.println("My bundle has a block of type: " + b.getType());
 			System.out.println("That block's data is: " + b.getData());
 		}
 		System.out.println("Sending the following bunde: " + finalBundle.toString());
-		
+		*/
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -313,6 +315,12 @@ public class IBRDTNHost {
     	//host.hackSendBundle(args[0], d);
     	//Eventually, I think this should work
     	if(args.length == 2){
+    		try{
+    			Thread.sleep(100);
+    		}
+    		catch(InterruptedException e){
+    			e.printStackTrace();
+    		}
     		TrackingExtensionBlock teb = host.createExtensionBlock(30);
     		host.extractAndSendBundles(args[1], teb);
     	}

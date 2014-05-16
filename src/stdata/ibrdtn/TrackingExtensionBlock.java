@@ -54,7 +54,7 @@ public class TrackingExtensionBlock{
     	return entries;
     }
 
-    private Data getData() {
+    public Data getData() {
     	//right now, the getData method doesn't include the entries. This is because,
     	//for now, the only time getData is called is when we're sending a NEW tracking
     	//bundle. In that case, there shouldn't yet be any entries anyway.

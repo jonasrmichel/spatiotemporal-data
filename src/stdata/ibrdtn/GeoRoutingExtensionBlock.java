@@ -98,33 +98,25 @@ public class GeoRoutingExtensionBlock {
     }
     
     void setData(Block.Data data){
-   	 	System.out.println("-----CALLING GEOROUTING.SETDATA-----");
    	 	SDNVOutputStream stream = new SDNVOutputStream();
    	 	try {
    	 		data.writeTo(stream);
    	 		stream.flush();
    	 		flags = stream.nextSDNV();
-   	 		System.out.println("flags: " + flags.getValue());
    	 		count = stream.nextSDNV();
-   	 		System.out.println("count: " + count.getValue());
    	 		for(int i = 0; i<count.getValue(); i++){
    	 			SDNV entryFlags = stream.nextSDNV();
-   	 			System.out.println("entryFlags: " + entryFlags.getValue());
    	 			byte flagsByte = entryFlags.getBytes()[0];
    	 			GeoRoutingExtensionBlockEntry nextEntry = 
    	 					new GeoRoutingExtensionBlockEntry(entryFlags);
    	 			nextEntry.setMarginOfError(stream.nextSDNV());
-   	 			System.out.println("margin of error: " + nextEntry.getMarginOfError().getValue());
    	 			if((flagsByte & (byte) 0x08) != 0){
    	 				//then there is eid data
               		 SDNV eidLength = stream.nextSDNV(); // note this is probably not really an SDNV
-              		 System.out.println("eid Length: " + eidLength.getValue());
               		 byte[] eidBytes = new byte[(int)eidLength.getValue()];
               		 int counter = 0;
               		 while(counter < eidLength.getValue()){
-              			 System.out.println("counter: " + counter);
               			 SDNV next = stream.nextSDNV();
-              			 System.out.println("next: " + next.getValue());
               			 byte[] sdnvBytes = next.getBytes();
               			 for(int j = 0; j<sdnvBytes.length; j++){
               				 eidBytes[counter] = sdnvBytes[j];

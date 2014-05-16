@@ -10,6 +10,7 @@ public class GeoEnvelope {
 	private GeoRoutingExtensionBlock geoRoutingBlock;
 	private SingletonEndpoint source;
 	private EID destination;
+	private String groupID;
 
 	public GeoEnvelope(){}
 	
@@ -43,6 +44,14 @@ public class GeoEnvelope {
 	
 	public EID getDestination(){
 		return destination;
+	}
+	
+	public void setGroupID(String groupID){
+		this.groupID = groupID;
+	}
+	
+	public String getGroupID(){
+		return groupID;
 	}
 
 }

@@ -4,6 +4,7 @@ import ibrdtn.api.ExtendedClient;
 import ibrdtn.api.object.Block;
 import ibrdtn.api.object.Bundle;
 import ibrdtn.api.object.EID;
+import ibrdtn.api.object.GroupEndpoint;
 import ibrdtn.api.object.PayloadBlock;
 import ibrdtn.api.object.SingletonEndpoint;
 import ibrdtn.example.api.Constants;
@@ -43,18 +44,17 @@ public class GeoTrackingAutoResponseProcessor implements Runnable{
     	GeoRoutingExtensionBlock greb = 
     			createGeoBlockFromTrackingBlock(envelope.getExtensionBlock());
 		TrackingExtensionBlock teb = new TrackingExtensionBlock(30);
-    	sendReturnBundle(envelope.getSource().toString(), greb, teb);
+    	sendReturnBundle(new GroupEndpoint(envelope.getGroupID()), greb, teb);
     }
     
     private GeoRoutingExtensionBlock createGeoBlockFromTrackingBlock(TrackingExtensionBlock teb){
     	return geoRoutingStrategy.createBlock(teb.getEntries());
     }
     
-    private void sendReturnBundle(String dest, GeoRoutingExtensionBlock greb, 
+    private void sendReturnBundle(EID destination, GeoRoutingExtensionBlock greb, 
     		                      TrackingExtensionBlock teb){
 		System.out.println("Sending Bundle");
 
-		EID destination = new SingletonEndpoint(dest);
 		Bundle bundle = new Bundle(destination, Constants.LIFETIME);
 		bundle.setPriority(Bundle.Priority.valueOf("NORMAL"));
 		bundle.setFlag(Bundle.Flags.CUSTODY_REPORT, false);

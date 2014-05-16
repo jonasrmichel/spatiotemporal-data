@@ -39,13 +39,16 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
     protected PayloadType messageType;
     protected Thread t;
     protected GeoEnvelope envelope;
+    protected String groupID;
     protected byte[] bytes;
     
 
-	public IBRBundleHandler(ExtendedClient client, ExecutorService executor, PayloadType messageType) {
+	public IBRBundleHandler(ExtendedClient client, ExecutorService executor, 
+			                PayloadType messageType, String groupID) {
 		this.client = client;
 		this.executor = executor;
 		this.messageType = messageType;
+		this.groupID = groupID;
 	}
 
 	//NEW STUFF
@@ -189,6 +192,7 @@ public class IBRBundleHandler implements ibrdtn.api.sab.CallbackHandler  {
 		if(hasTracking && !hasGeo){
 			envelope.setSource(bundle.getSource());
 			envelope.setDestination(bundle.getDestination());
+			envelope.setGroupID(groupID);
 			executor.execute(new GeoTrackingAutoResponseProcessor(envelope, client, executor));
 		}
 	}

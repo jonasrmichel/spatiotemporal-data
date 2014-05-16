@@ -5,6 +5,7 @@ import ibrdtn.api.object.SDNV;
 import ibrdtn.api.APIException;
 import ibrdtn.api.ExtendedClient;
 import ibrdtn.api.object.Bundle;
+import ibrdtn.api.object.GroupEndpoint;
 import ibrdtn.api.object.Block;
 import ibrdtn.api.object.EID;
 import ibrdtn.api.object.PayloadBlock;
@@ -69,7 +70,7 @@ public class IBRDTNHost {
 			.getName());
 
 	public IBRDTNHost(int identifier, String eid, String graphDir,
-			String indexDir, ILocationProvider locationProvider) {
+			String indexDir, ILocationProvider locationProvider, String groupID) {
 		this.identifier = identifier;
 		this.eid = eid;
 		this.graphDir = graphDir;
@@ -90,10 +91,17 @@ public class IBRDTNHost {
 		// init connection to IBR-DTN daemon
 		executor = Executors.newSingleThreadExecutor();
 		exClient = new ExtendedClient();
-		handler = new IBRBundleHandler(exClient, executor, payloadType);
+		handler = new IBRBundleHandler(exClient, executor, payloadType, groupID);
 		exClient.setHandler(handler);
 		exClient.setHost(Constants.HOST);
 		exClient.setPort(Constants.PORT);
+		try{
+			exClient.addRegistration(new GroupEndpoint(groupID));
+		}
+		catch(APIException e){
+			System.err.println("Unable to join group: " + groupID);
+			e.printStackTrace();
+		}
 		connect();
 	}
 
@@ -289,48 +297,25 @@ public class IBRDTNHost {
 	}
 	
     public static void main(String[] args){
-    	if(args.length != 2){
-    		System.out.println("Usage: java -jar stdataibrdtn.jar [send/respond] [destination].");
+    	if(args.length < 1 || args.length > 2){
+    		System.out.println("Usage: java -jar stdataibrdtn.jar groupID [destination].");
     		System.exit(0);
     	}
     	Geoshape defaultLocation = Geoshape.point(30.2500, 97.7500);
     	ILocationProvider locationProvider = new DumbLocationProviderImpl(defaultLocation);
     	IBRDTNHost.clearGraphDirectory("./graphDir/");
-    	IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "./graphDir/", "./indexDir/", locationProvider);
+    	IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "./graphDir/", "./indexDir/", locationProvider, args[0]);
     	//this first method creates a datum and thinks its putting it in the database
     	Datum d = host.createDatum(defaultLocation);
     	//this second method just sends the datum returned from above using the datum's marshall method
     	//I'm doing it this way because I can't seem to recover stuff from the database
     	//host.hackSendBundle(args[0], d);
     	//Eventually, I think this should work
-    	if(args[0].equals("send")){
+    	if(args.length == 2){
     		TrackingExtensionBlock teb = host.createExtensionBlock(30);
     		host.extractAndSendBundles(args[1], teb);
     	}
     	
-    	
-    	/*SDNV test = new SDNV(1048);
-    	System.out.println("value: " + test.getValue());
-    	   StringBuilder sb = new StringBuilder();
-    	   for(byte b: test.getBytes())
-    	      sb.append(String.format("%02x", b&0xff));
-    	   System.out.println(sb.toString());
-    	   
-    	   SDNV test2 = new SDNV(7);
-       	System.out.println("value: " + test2.getValue());
-       	   StringBuilder sb2 = new StringBuilder();
-       	   for(byte b: test2.getBytes())
-       	      sb2.append(String.format("%02x", b&0xff));
-       	   System.out.println(sb2.toString());*/
-    	   
-    	/*IBRDTNHost host = new IBRDTNHost(1, "ibr-1", "/Users/christinejulien/hackathon/spatiotemporal-data/graphDir/", "/Users/christinejulien/hackathon/spatiotemporal-data/indexDir/", null);
-    	TrackingExtensionBlock teb = host.createExtensionBlock(265);
-    	SDNV test = new SDNV(43);
-    	byte[] bytetest = new byte[1];
-    	bytetest[0] = (byte)43;
-    	SDNV test2 = new SDNV(bytetest);
-    	System.out.println("test2 length: " + test2.length);
-    	System.out.println("test2 value: " + test2.getValue());*/
     }
 
 

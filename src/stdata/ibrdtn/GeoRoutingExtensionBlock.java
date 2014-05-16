@@ -118,10 +118,13 @@ public class GeoRoutingExtensionBlock {
    	 			if((flagsByte & (byte) 0x08) != 0){
    	 				//then there is eid data
               		 SDNV eidLength = stream.nextSDNV(); // note this is probably not really an SDNV
+              		 System.out.println("eid Length: " + eidLength.getValue());
               		 byte[] eidBytes = new byte[(int)eidLength.getValue()];
               		 int counter = 0;
               		 while(counter < eidLength.getValue()){
+              			 System.out.println("counter: " + counter);
               			 SDNV next = stream.nextSDNV();
+              			 System.out.println("next: " + next.getValue());
               			 byte[] sdnvBytes = next.getBytes();
               			 for(int j = 0; j<sdnvBytes.length; j++){
               				 eidBytes[counter] = sdnvBytes[j];

@@ -95,6 +95,8 @@ public class IBRDTNHost {
 		exClient.setHandler(handler);
 		exClient.setHost(Constants.HOST);
 		exClient.setPort(Constants.PORT);
+		
+		connect();
 		try{
 			exClient.addRegistration(new GroupEndpoint(groupID));
 		}
@@ -102,7 +104,6 @@ public class IBRDTNHost {
 			System.err.println("Unable to join group: " + groupID);
 			e.printStackTrace();
 		}
-		connect();
 	}
 
 	/**

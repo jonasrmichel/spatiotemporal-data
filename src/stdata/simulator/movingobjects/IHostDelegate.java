@@ -1,6 +1,6 @@
 package stdata.simulator.movingobjects;
 
-import com.thinkaurelius.titan.core.attribute.Geoshape;
+import stdata.geo.Geoshape;
 
 public interface IHostDelegate {
 

@@ -6,6 +6,7 @@ import stdata.datamodel.SpatiotemporalDatabase;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.Datum.TriggerType;
 import stdata.datamodel.vertices.HostContext;
+import stdata.geo.Geoshape;
 import stdata.rules.SpatiallyModulatedTrajectoryRule;
 import stdata.rules.TemporallyModulatedTrajectoryRule;
 import stdata.simulator.ILocationManager;
@@ -17,7 +18,6 @@ import stdata.simulator.measurement.RunningStatisticsMap;
 import stdata.titan.TitanSpatiotemporalDatabase;
 
 import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
@@ -162,7 +162,10 @@ public class Host extends MovingObject {
 			// create a new spatially modulated rule
 			spatiallyModulatedRule = new SpatiallyModulatedTrajectoryRule<TitanGraph, EventGraph<TitanGraph>, FramedGraph<EventGraph<TitanGraph>>>(
 					spatiotemporalDB.baseGraph, spatiotemporalDB.eventGraph,
-					spatiotemporalDB.framedGraph, trajectorySpatialResolution);
+					spatiotemporalDB.framedGraph,
+					spatiotemporalDB.edgeFrameFactories,
+					spatiotemporalDB.vertexFrameFactories,
+					trajectorySpatialResolution);
 			// create a datum with the spatially modulated rule
 			spatiallyModulatedDatum = spatiotemporalDB.datumFactory.addDatum(
 					phenomenonLocation, location, (long) time,
@@ -175,7 +178,10 @@ public class Host extends MovingObject {
 			// create a new temporally modulated rule
 			temporallyModulatedRule = new TemporallyModulatedTrajectoryRule<TitanGraph, EventGraph<TitanGraph>, FramedGraph<EventGraph<TitanGraph>>>(
 					spatiotemporalDB.baseGraph, spatiotemporalDB.eventGraph,
-					spatiotemporalDB.framedGraph, trajectoryTemporalResolution);
+					spatiotemporalDB.framedGraph,
+					spatiotemporalDB.edgeFrameFactories,
+					spatiotemporalDB.vertexFrameFactories,
+					trajectoryTemporalResolution);
 			// create a datum with the temporally modulated rule
 			temporallyModulatedDatum = spatiotemporalDB.datumFactory.addDatum(
 					phenomenonLocation, location, (long) time,
@@ -272,17 +278,17 @@ public class Host extends MovingObject {
 			senseNearbyPhenomena(time);
 
 		// commit all database changes that occurred due to sensing
-		spatiotemporalDB.baseGraph.commit();
+		spatiotemporalDB.commit();
 
 		// update the host's context vertex
 		hostContext.setTimestamp(new Long(time));
 		hostContext.setLocation(location);
 
 		// trigger trajectory updates per temporal resolution
-		hostContext.triggerTimestampUpdate();
+		hostContext.setTimestampTrigger(true);
 
 		// trigger trajectory updates per spatial resolution
-		hostContext.triggerLocationUpdate();
+		hostContext.setLocationTrigger(true);
 
 		// update each datum's measured properties
 		Iterable<Datum> datums = spatiotemporalDB
@@ -319,7 +325,7 @@ public class Host extends MovingObject {
 		}
 
 		// commit all database changes that occurred due to trajectory updates
-		spatiotemporalDB.baseGraph.commit();
+		spatiotemporalDB.commit();
 
 		// log the running per-time host-level aggregate measurements
 		Logger.appendHostMeasurement(

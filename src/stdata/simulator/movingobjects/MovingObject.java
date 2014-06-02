@@ -1,9 +1,8 @@
 package stdata.simulator.movingobjects;
 
+import stdata.geo.Geoshape;
 import stdata.simulator.ILocationManager;
 import stdata.simulator.IMovingObjectDatabase;
-
-import com.thinkaurelius.titan.core.attribute.Geoshape;
 
 public abstract class MovingObject {
 

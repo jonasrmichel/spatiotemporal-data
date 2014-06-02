@@ -2,7 +2,7 @@ package stdata.simulator;
 
 import java.util.List;
 
-import com.thinkaurelius.titan.core.attribute.Geoshape;
+import stdata.geo.Geoshape;
 
 public interface IMovingObjectDatabase {
 

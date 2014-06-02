@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 
 import stdata.datamodel.vertices.Datum.TriggerType;
+import stdata.geo.Geoshape;
 import stdata.simulator.measurement.Logger;
 import stdata.simulator.measurement.ReducibleRunningStatistics;
 import stdata.simulator.measurement.RunningStatistics;
@@ -20,8 +21,6 @@ import stdata.simulator.movingobjects.Host;
 import stdata.simulator.movingobjects.IHostDelegate;
 import stdata.simulator.movingobjects.MovingObject;
 import stdata.simulator.movingobjects.Phenomenon;
-
-import com.thinkaurelius.titan.core.attribute.Geoshape;
 
 public class SimulationDriver implements IHostDelegate {
 

@@ -10,8 +10,8 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>> implements
-		IRuleRegistry<G, E, F> {
+public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
+		implements IRuleRegistry<G, E, F> {
 	G baseGraph;
 	E eventGraph;
 	F framedGraph;
@@ -34,8 +34,8 @@ public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>,
 	@Override
 	public RuleContainer registerRule(Rule<G, E, F> rule, Datum datum) {
 		// create the rule's container vertex
-		RuleContainer ruleContainer = (RuleContainer) framedGraph.addVertex(null,
-				RuleContainer.class);
+		RuleContainer ruleContainer = (RuleContainer) framedGraph.addVertex(
+				null, RuleContainer.class);
 
 		// set the rule's delegate (the container)
 		rule.setDelegate(ruleContainer);
@@ -45,9 +45,9 @@ public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>,
 
 		// register the rule
 		rules.put(ruleContainer.asVertex().getId(), rule);
-		
+
 		// commit changes
-//		baseGraph.commit();
+		// baseGraph.commit();
 
 		return ruleContainer;
 	}

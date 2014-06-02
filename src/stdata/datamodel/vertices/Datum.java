@@ -1,18 +1,22 @@
 package stdata.datamodel.vertices;
 
+import stdata.datamodel.IDatumDelegate;
 import stdata.datamodel.edges.Context;
+import stdata.geo.Geoshape;
 
-import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Incidence;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
-import com.tinkerpop.frames.modules.javahandler.JavaHandler;
-import com.tinkerpop.frames.modules.javahandler.JavaHandlerContext;
 
 public interface Datum extends VertexFrame {
+	/** The delegate to make callbacks on. */
+	@Property("delegate")
+	public IDatumDelegate getDelegate();
+
+	@Property("delegate")
+	public void setDelegate(IDatumDelegate delegate);
 
 	/** Geospatial location of the sensed phenomenon this datum represents. */
 	@Property("location")
@@ -53,9 +57,6 @@ public interface Datum extends VertexFrame {
 
 	@Incidence(label = "context")
 	public void removeContext(Context context);
-
-	// TODO: encode get/can/is logic as GremlinGroovy annotations
-	// https://github.com/tinkerpop/frames/wiki/Gremlin-Groovy
 
 	/*
 	 * Special simulation-specific properties and methods. We can't just extend
@@ -133,12 +134,6 @@ public interface Datum extends VertexFrame {
 	public void setSize(int size);
 
 	/**
-	 * Automatically updates the measured datum's size property.
-	 */
-	@JavaHandler
-	public void updateSize();
-
-	/**
 	 * Length property measures the datum trajectory's length in meters (the sum
 	 * of the distance between each space-time position).
 	 */
@@ -148,39 +143,12 @@ public interface Datum extends VertexFrame {
 	@Property("trajectory-length")
 	public void setLength(double length);
 
-	/**
-	 * Automatically updates the measured datum's length property.
-	 * 
-	 * @param pos1
-	 * @param pos2
-	 */
-	@JavaHandler
-	public void updateLength(SpaceTimePosition pos1, SpaceTimePosition pos2);
-
-	/**
-	 * Automatically updates the measured datum's length property.
-	 * 
-	 * @param pos1
-	 * @param pos2
-	 */
-	@JavaHandler
-	public void updateLength(Geoshape pos1, Geoshape pos2);
-
 	/** Age property measures the datum's age. */
 	@Property("age")
 	public long getAge();
 
 	@Property("age")
 	public void setAge(long age);
-
-	/**
-	 * Automatically updates the measured datum's age property.
-	 * 
-	 * @param timestamp
-	 *            represents the current time.
-	 */
-	@JavaHandler
-	public void updateAge(long timestamp);
 
 	/**
 	 * Distance-host-creation property is the current distance of the host
@@ -193,13 +161,6 @@ public interface Datum extends VertexFrame {
 	public void setDistanceHostCreation(double distance);
 
 	/**
-	 * Automatically updates the measured datum's distance-host-creation
-	 * property (meters).
-	 */
-	@JavaHandler
-	public void updateDistanceHostCreation(Geoshape hostLocation);
-
-	/**
 	 * Distance-phenomenon-creation property is the current distance of the
 	 * phenomenon this datum represents from the datum's initial creation
 	 * location (meters).
@@ -209,168 +170,5 @@ public interface Datum extends VertexFrame {
 
 	@Property("distance-phenomenon-creation")
 	public void setDistancePhenomenonCreation(double distance);
-
-	/**
-	 * Automatically updates the measured datum's distance-phenomenon-creation
-	 * property (meters).
-	 */
-	@JavaHandler
-	public void updateDistancePhenomenonCreation(Geoshape phenomenonLocation);
-
-	/**
-	 * Adds a new space-time position to the datum's trajectory (i.e., at the
-	 * head of the trajectory).
-	 * 
-	 * @param position
-	 *            will become the head of the datum's trajectory.
-	 */
-	@JavaHandler
-	public void add(SpaceTimePosition position);
-
-	/**
-	 * Adds a new space-time position to the datum's trajectory and captures
-	 * some extra measurable metadata.
-	 * 
-	 * @param position
-	 */
-	@JavaHandler
-	public void addMeasured(SpaceTimePosition position);
-
-	/**
-	 * This is a "faux" addMeasured() method -- it does not add a space-time
-	 * position to the datum's trajectory, but instead updates the statistics
-	 * that would be affected if a space-time position with the provided
-	 * parameters was added.
-	 * 
-	 * @param location
-	 * @param timestamp
-	 */
-	@JavaHandler
-	public void addMeasured(Geoshape location, long timestamp);
-
-	abstract class Impl implements JavaHandlerContext<Vertex>, Datum {
-
-		@Override
-		@JavaHandler
-		public void add(SpaceTimePosition position) {
-			if (getIsMeasurable()) {
-				addMeasured(position);
-				return;
-			}
-
-			// configure the new space-time position
-			position.setDatum(this);
-
-			// place the new space-time position into the datum's trajectory
-			SpaceTimePosition trajectoryHead = getTrajectoryHead();
-			position.setPrevious(trajectoryHead);
-			if (trajectoryHead != null)
-				trajectoryHead.setNext(position);
-
-			// update the datum's trajectory head
-			setTrajectoryHead(position);
-
-		}
-
-		@Override
-		@JavaHandler
-		public void addMeasured(SpaceTimePosition position) {
-			// configure the new space-time position
-			position.setDatum(this);
-
-			// place the new space-time position into the datum's trajectory
-			SpaceTimePosition trajectoryHead = getTrajectoryHead();
-			position.setPrevious(trajectoryHead);
-			if (trajectoryHead != null) {
-				trajectoryHead.setNext(position);
-
-				// update measurements
-				updateSize();
-				updateLength(position, trajectoryHead);
-				// age, distance-host-creation, and distance-phenomenon-creation
-				// are updated by the host carrying the datum each time step
-
-			} else { // the trajectory is empty
-				// initialize measurements
-				setCreationTime(position.getTimestamp());
-				setCreationLocation(position.getLocation());
-				setSize(0);
-				setLength(0);
-				setAge(0);
-				setDistanceHostCreation(0);
-				setDistancePhenomenonCreation(0);
-			}
-
-			// update the datum's trajectory head
-			setTrajectoryHead(position);
-		}
-
-		@Override
-		@JavaHandler
-		public void addMeasured(Geoshape location, long timestamp) {
-			try {
-				updateSize();
-				updateLength(location, getPreviousLocation());
-
-			} catch (Exception e) {
-				setCreationTime(timestamp);
-				setCreationLocation(location);
-				setSize(1);
-				setLength(0);
-				setAge(0);
-				setDistanceHostCreation(0);
-				setDistancePhenomenonCreation(0);
-
-			} finally {
-				setPreviousLocation(location);
-
-			}
-		}
-
-		@Override
-		@JavaHandler
-		public void updateSize() {
-			setSize(getSize() + 1);
-		}
-
-		@Override
-		@JavaHandler
-		public void updateLength(SpaceTimePosition pos1, SpaceTimePosition pos2) {
-			// Geoshape.Point.distance() is in kilometers, convert to meters
-			setLength(getLength()
-					+ pos1.getLocation().getPoint()
-							.distance(pos2.getLocation().getPoint()) * 1000);
-		}
-
-		@Override
-		@JavaHandler
-		public void updateLength(Geoshape pos1, Geoshape pos2) {
-			// Geoshape.Point.distance() is in kilometers, convert to meters
-			setLength(getLength() + pos1.getPoint().distance(pos2.getPoint())
-					* 1000);
-		}
-
-		@Override
-		@JavaHandler
-		public void updateAge(long timestamp) {
-			setAge(timestamp - getCreationTime());
-		}
-
-		@Override
-		@JavaHandler
-		public void updateDistanceHostCreation(Geoshape hostLocation) {
-			// Geoshape.Point.distance() is in kilometers, convert to meters
-			setDistanceHostCreation(hostLocation.getPoint().distance(
-					getCreationLocation().getPoint()) * 1000);
-		}
-
-		@Override
-		@JavaHandler
-		public void updateDistancePhenomenonCreation(Geoshape phenomenonLocation) {
-			// Geoshape.Point.distance() is in kilometers, convert to meters
-			setDistancePhenomenonCreation(phenomenonLocation.getPoint()
-					.distance(getLocation().getPoint()) * 1000);
-		}
-	}
 
 }

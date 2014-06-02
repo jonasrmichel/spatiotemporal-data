@@ -3,9 +3,9 @@ package stdata.datamodel;
 import java.util.List;
 
 import stdata.datamodel.vertices.Datum;
+import stdata.geo.Geoshape;
 import stdata.rules.Rule;
 
-import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
@@ -32,7 +32,7 @@ public interface IDatumFactory<G extends TransactionalGraph, E extends EventGrap
 	 *            a rule that explicitly governs this datum.
 	 * @return the newly created datum.
 	 */
-	public Datum addDatum(Geoshape phenomenonLocation, Geoshape hostLocation,
+	public Datum addDatum(Geoshape phenomenonLoc, Geoshape hostLoc,
 			long timestamp, String domain, List<Datum> context,
 			boolean measurable, Rule<G, E, F> rule);
 

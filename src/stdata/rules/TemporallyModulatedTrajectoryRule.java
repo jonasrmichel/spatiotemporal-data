@@ -2,11 +2,14 @@ package stdata.rules;
 
 import java.util.Map;
 
+import stdata.datamodel.ISpaceTimePositionFactory;
+import stdata.datamodel.edges.EdgeFrameFactory;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.HostContext;
 import stdata.datamodel.vertices.SpaceTimePosition;
+import stdata.datamodel.vertices.VertexFrameFactory;
+import stdata.geo.Geoshape;
 
-import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
@@ -23,59 +26,63 @@ public class TemporallyModulatedTrajectoryRule<G extends TransactionalGraph, E e
 	long referenceTime = -1L;
 
 	public TemporallyModulatedTrajectoryRule(G baseGraph, E eventGraph,
-			F framedGraph, long temporalResolution) {
-		super(baseGraph, eventGraph, framedGraph);
+			F framedGraph, Map<String, EdgeFrameFactory> edgeFrameFactories,
+			Map<String, VertexFrameFactory> vertexFrameFactories,
+			long temporalResolution) {
+		super(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
+				vertexFrameFactories);
 
 		this.temporalResolution = temporalResolution;
 	}
 
 	public TemporallyModulatedTrajectoryRule(G baseGraph, E eventGraph,
-			F framedGraph, IRuleDelegate delegate, long temporalResolution) {
-		super(baseGraph, eventGraph, framedGraph, delegate);
+			F framedGraph, Map<String, EdgeFrameFactory> edgeFrameFactories,
+			Map<String, VertexFrameFactory> vertexFrameFactories,
+			IRuleDelegate delegate, long temporalResolution) {
+		super(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
+				vertexFrameFactories, delegate);
 
 		this.temporalResolution = temporalResolution;
 	}
 
 	@Override
-	public void vertexAdded(Vertex vertex) {
+	public void edgeAdded(Edge arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void vertexPropertyRemoved(Vertex vertex, String key,
-			Object removedValue) {
+	public void edgePropertyChanged(Edge arg0, String arg1, Object arg2) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void vertexRemoved(Vertex vertex, Map<String, Object> props) {
+	public void edgePropertyRemoved(Edge arg0, String arg1, Object arg2) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void edgeAdded(Edge edge) {
+	public void edgeRemoved(Edge arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void edgePropertyChanged(Edge edge, String key, Object oldValue,
-			Object setValue) {
+	public void vertexAdded(Vertex arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void edgePropertyRemoved(Edge edge, String key, Object removedValue) {
+	public void vertexPropertyRemoved(Vertex arg0, String arg1, Object arg2) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void edgeRemoved(Edge edge, Map<String, Object> props) {
+	public void vertexRemoved(Vertex arg0) {
 		// TODO Auto-generated method stub
 
 	}
@@ -96,20 +103,24 @@ public class TemporallyModulatedTrajectoryRule<G extends TransactionalGraph, E e
 			return;
 
 		// trigger trajectory updates
-//		SpaceTimePosition pos;
+		SpaceTimePosition pos;
 		for (Datum datum : delegate.getGoverns()) {
-//			pos = (SpaceTimePosition) framedGraph.addVertex(null,
-//					SpaceTimePosition.class);
-//			pos.setLocation(location);
-//			pos.setTimestamp(timestamp);
-//
-//			datum.add(pos);
-			
-			datum.addMeasured(location, timestamp);
+			if (datum.getIsMeasurable()) {
+				datum.getDelegate().appendMeasured(datum, location, timestamp);
+
+			} else {
+				pos = (SpaceTimePosition) vertexFrameFactories.get(
+						ISpaceTimePositionFactory.class.getName())
+						.addFramedVertex(null, SpaceTimePosition.class);
+				pos.setLocation(location);
+				pos.setTimestamp(timestamp);
+
+				datum.getDelegate().append(datum, pos);
+			}
 		}
-		
+
 		// commit changes
-//		baseGraph.commit();
+		// baseGraph.commit();
 
 		referenceTime = timestamp;
 

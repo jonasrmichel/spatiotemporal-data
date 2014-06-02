@@ -6,11 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.thinkaurelius.titan.core.attribute.Geoshape;
+import stdata.geo.Geoshape;
 
 public class LocationManager implements ILocationManager {
 	/** Holds the global list of mobility traces. */

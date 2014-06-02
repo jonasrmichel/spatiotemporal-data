@@ -1,14 +1,15 @@
 package stdata.datamodel.vertices;
 
-import com.thinkaurelius.titan.core.attribute.Geoshape;
-import com.tinkerpop.blueprints.Vertex;
+import stdata.geo.Geoshape;
+
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
-import com.tinkerpop.frames.modules.javahandler.JavaHandler;
-import com.tinkerpop.frames.modules.javahandler.JavaHandlerContext;
 
 public interface HostContext extends VertexFrame {
+	/** Location-based event trigger property key. */
 	public static final String LOCATION_TRIGGER_KEY = "location-trigger";
+
+	/** Timestamp-based event trigger property key. */
 	public static final String TIMESTAMP_TRIGGER_KEY = "timestamp-trigger";
 
 	/** Location property. */
@@ -24,12 +25,6 @@ public interface HostContext extends VertexFrame {
 	@Property(LOCATION_TRIGGER_KEY)
 	public boolean getLocationTrigger();
 
-	/**
-	 * Toggles the location trigger property to trigger spatial event listeners.
-	 */
-	@JavaHandler
-	public void triggerLocationUpdate();
-
 	/** Timestamp property. */
 	@Property("timestamp")
 	public long getTimestamp();
@@ -43,32 +38,4 @@ public interface HostContext extends VertexFrame {
 	@Property(TIMESTAMP_TRIGGER_KEY)
 	public boolean getTimestampTrigger();
 
-	/**
-	 * Toggles the timestamp trigger property to trigger temporal event
-	 * listeners.
-	 */
-	@JavaHandler
-	public void triggerTimestampUpdate();
-
-	abstract class Impl implements JavaHandlerContext<Vertex>, HostContext {
-		@Override
-		@JavaHandler
-		public void triggerLocationUpdate() {
-			try {
-				setLocationTrigger(!getLocationTrigger());
-			} catch (Exception e) {
-				setLocationTrigger(true);
-			}
-		}
-
-		@Override
-		@JavaHandler
-		public void triggerTimestampUpdate() {
-			try {
-				setTimestampTrigger(!getTimestampTrigger());
-			} catch (Exception e) {
-				setTimestampTrigger(true);
-			}
-		}
-	}
 }

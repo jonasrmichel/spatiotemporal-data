@@ -2,23 +2,22 @@ package stdata.datamodel.edges;
 
 import stdata.datamodel.vertices.Datum;
 
+import com.tinkerpop.frames.Domain;
 import com.tinkerpop.frames.EdgeFrame;
-import com.tinkerpop.frames.InVertex;
-import com.tinkerpop.frames.OutVertex;
 import com.tinkerpop.frames.Property;
+import com.tinkerpop.frames.Range;
 
 public interface Context extends EdgeFrame {
-
 	@Property("relation")
 	public String getRelation();
 
 	@Property("relation")
 	public void setRelation(String relation);
 
-	@InVertex
+	@Domain
 	public Datum getDatumTo();
 
-	@OutVertex
+	@Range
 	public Datum getDatumFrom();
 
 }

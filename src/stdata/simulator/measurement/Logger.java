@@ -10,8 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import stdata.datamodel.vertices.Datum.TriggerType;
-
-import com.thinkaurelius.titan.core.attribute.Geoshape;
+import stdata.geo.Geoshape;
 
 public class Logger {
 	/** Logfile settings. */

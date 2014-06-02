@@ -1,12 +1,14 @@
 package stdata.datamodel.vertices;
 
-import com.thinkaurelius.titan.core.attribute.Geoshape;
+import stdata.geo.Geoshape;
+
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
 
 public interface SpaceTimePosition extends VertexFrame {
+	/** Location property key. */
 	public static final String LOCATION_KEY = "location";
 	
 	/** Location property. */

@@ -1,7 +1,5 @@
 package stdata.titan;
 
-import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration.INDEX_BACKEND_KEY;
-import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration.INDEX_NAMESPACE;
 import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration.STORAGE_BACKEND_KEY;
 import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration.STORAGE_DIRECTORY_KEY;
 import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration.STORAGE_NAMESPACE;
@@ -14,21 +12,15 @@ import org.apache.commons.configuration.Configuration;
 import stdata.datamodel.SpatiotemporalFrameInitializer;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.SpaceTimePosition;
+import stdata.geo.Geoshape;
 
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.TitanGraphQuery;
-import com.thinkaurelius.titan.core.attribute.Geo;
-import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
 import com.tinkerpop.frames.FramedGraph;
-import com.tinkerpop.frames.FramedGraphConfiguration;
-import com.tinkerpop.frames.FramedGraphFactory;
-import com.tinkerpop.frames.modules.AbstractModule;
-import com.tinkerpop.frames.modules.javahandler.JavaHandlerModule;
 
 public class TitanTest {
 	public static final String INDEX = "test-index";

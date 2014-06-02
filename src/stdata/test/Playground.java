@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
 import stdata.datamodel.SpatiotemporalFrameInitializer;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.SpaceTimePosition;
+import stdata.geo.Geoshape;
 
-import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
@@ -17,10 +17,6 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
-import com.tinkerpop.frames.FramedGraphConfiguration;
-import com.tinkerpop.frames.FramedGraphFactory;
-import com.tinkerpop.frames.modules.AbstractModule;
-import com.tinkerpop.frames.modules.javahandler.JavaHandlerModule;
 
 public class Playground {
 
@@ -35,22 +31,13 @@ public class Playground {
 		// indexing
 		Index<Vertex> index = ((IndexableGraph) graph).createIndex(
 				"test-index", Vertex.class);
-
+		
 		// wrap the base graph for event listening
 		EventGraph<Graph> eventGraph = new EventGraph<Graph>(graph);
 		// eventGraph.addListener(new SpatiotemporalGraphChangedListener());
 
-		// make sure to reuse the factory when creating new framed graphs
-		// FramedGraphFactory factory = new FramedGraphFactory();
-		FramedGraphFactory factory = new FramedGraphFactory(
-				new JavaHandlerModule(), new AbstractModule() {
-					public void doConfigure(FramedGraphConfiguration config) {
-						config.addFrameInitializer(new SpatiotemporalFrameInitializer());
-					}
-				});
-
 		// wrap the event graph for framing
-		FramedGraph<EventGraph<Graph>> framedGraph = factory.create(eventGraph);
+		FramedGraph<EventGraph<Graph>> framedGraph = new FramedGraph<EventGraph<Graph>>(eventGraph);
 
 		// set write partition
 		// partitionGraph.setWritePartition("data");

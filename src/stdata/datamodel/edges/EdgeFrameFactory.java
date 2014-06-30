@@ -1,5 +1,7 @@
 package stdata.datamodel.edges;
 
+import stdata.datamodel.SpatiotemporalDatabase;
+
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.EdgeFrame;
@@ -9,9 +11,6 @@ public class EdgeFrameFactory<G extends TransactionalGraph, E extends EventGraph
 	protected G baseGraph;
 	protected F framedGraph;
 
-	/** The framed class type property key. */
-	public static final String FRAMED_CLASS_KEY = "class";
-
 	public EdgeFrameFactory(G baseGraph, F framedGraph) {
 		this.baseGraph = baseGraph;
 		this.framedGraph = framedGraph;
@@ -19,7 +18,8 @@ public class EdgeFrameFactory<G extends TransactionalGraph, E extends EventGraph
 
 	public T addEdge(Object id, Class<T> kind) {
 		T edge = framedGraph.addVertex(id, kind);
-		edge.asEdge().setProperty(FRAMED_CLASS_KEY, kind.getName());
+		edge.asEdge().setProperty(SpatiotemporalDatabase.FRAMED_CLASS_KEY,
+				kind.getName());
 
 		return edge;
 	}

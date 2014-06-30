@@ -3,7 +3,6 @@ package stdata.test;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import stdata.datamodel.SpatiotemporalFrameInitializer;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.geo.Geoshape;
@@ -13,10 +12,12 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.IndexableGraph;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
+import com.tinkerpop.gremlin.java.GremlinPipeline;
 
 public class Playground {
 
@@ -31,6 +32,9 @@ public class Playground {
 		// indexing
 		Index<Vertex> index = ((IndexableGraph) graph).createIndex(
 				"test-index", Vertex.class);
+		
+		KeyIndexableGraph kig;
+		GremlinPipeline gp;
 		
 		// wrap the base graph for event listening
 		EventGraph<Graph> eventGraph = new EventGraph<Graph>(graph);

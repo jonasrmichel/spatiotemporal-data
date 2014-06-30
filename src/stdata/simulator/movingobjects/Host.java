@@ -2,10 +2,10 @@ package stdata.simulator.movingobjects;
 
 import java.util.List;
 
+import stdata.datamodel.ISpatiotemporalDatabaseDelegate;
 import stdata.datamodel.SpatiotemporalDatabase;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.Datum.TriggerType;
-import stdata.datamodel.vertices.HostContext;
 import stdata.geo.Geoshape;
 import stdata.rules.SpatiallyModulatedTrajectoryRule;
 import stdata.rules.TemporallyModulatedTrajectoryRule;
@@ -21,7 +21,8 @@ import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-public class Host extends MovingObject {
+public class Host extends MovingObject implements
+		ISpatiotemporalDatabaseDelegate {
 	/** File paths. */
 	String graphDir, logDir;
 
@@ -41,12 +42,6 @@ public class Host extends MovingObject {
 
 	/** The host's spatiotemporal graph database. */
 	SpatiotemporalDatabase<TitanGraph> spatiotemporalDB;
-
-	/**
-	 * The host's special context vertex that provides the graph database with
-	 * access to the host's location and current time.
-	 */
-	HostContext hostContext;
 
 	/** The host's simulation delegate. */
 	IHostDelegate delegate;
@@ -256,11 +251,7 @@ public class Host extends MovingObject {
 	@Override
 	protected void initialize() {
 		spatiotemporalDB = new TitanSpatiotemporalDatabase(
-				Integer.toString(identifier), graphDir);
-
-		// create a special vertex in the spatiotemporal database for the host's
-		// position and simulation time
-		hostContext = spatiotemporalDB.addFramedVertex(null, HostContext.class);
+				Integer.toString(identifier), graphDir, this);
 	}
 
 	@Override
@@ -273,6 +264,8 @@ public class Host extends MovingObject {
 
 	@Override
 	public void step(int time) {
+		this.time = time;
+
 		// if necessary, perform sensing
 		if (time % phenomenaSensingInterval == 0)
 			senseNearbyPhenomena(time);
@@ -280,15 +273,19 @@ public class Host extends MovingObject {
 		// commit all database changes that occurred due to sensing
 		spatiotemporalDB.commit();
 
-		// update the host's context vertex
-		hostContext.setTimestamp(new Long(time));
-		hostContext.setLocation(location);
+		// update the host's spatiotemporal context
+		spatiotemporalDB.setTemporalContext(time);
+		spatiotemporalDB.setSpatialContext(location);
 
-		// trigger trajectory updates per temporal resolution
-		hostContext.setTimestampTrigger(true);
+		// commit spatial and temporal context changes, triggering spatially-
+		// and temporally-modulated rules
+		spatiotemporalDB.commit();
 
-		// trigger trajectory updates per spatial resolution
-		hostContext.setLocationTrigger(true);
+		// // trigger trajectory updates per temporal resolution
+		// hostContext.setTimestampTrigger(true);
+		//
+		// // trigger trajectory updates per spatial resolution
+		// hostContext.setLocationTrigger(true);
 
 		// update each datum's measured properties
 		Iterable<Datum> datums = spatiotemporalDB
@@ -348,4 +345,15 @@ public class Host extends MovingObject {
 						.getRunningStatisticsArray(temporallyModulatedStatistics));
 	}
 
+	/* ISpatiotemporalDatabaseDelegate interface implementation. */
+
+	@Override
+	public Geoshape getLocation() {
+		return location;
+	}
+
+	@Override
+	public long getTimestamp() {
+		return time;
+	}
 }

@@ -15,6 +15,9 @@ public abstract class MovingObject {
 	/** The object's current geographic location. */
 	protected Geoshape location;
 	protected Geoshape prevLocation;
+	
+	/** The object's current notion of time. */
+	protected long time = 0L;
 
 	/** An interface for the mobile trace location manager. */
 	protected ILocationManager locationManager;

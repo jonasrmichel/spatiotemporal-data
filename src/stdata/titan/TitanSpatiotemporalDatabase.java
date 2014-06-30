@@ -8,6 +8,7 @@ import java.io.File;
 
 import org.apache.commons.configuration.BaseConfiguration;
 
+import stdata.datamodel.ISpatiotemporalDatabaseDelegate;
 import stdata.datamodel.SpatiotemporalDatabase;
 
 import com.thinkaurelius.titan.core.TitanFactory;
@@ -16,8 +17,9 @@ import com.thinkaurelius.titan.core.TitanGraph;
 public class TitanSpatiotemporalDatabase extends
 		SpatiotemporalDatabase<TitanGraph> {
 
-	public TitanSpatiotemporalDatabase(String instance, String graphDir) {
-		super(instance, graphDir);
+	public TitanSpatiotemporalDatabase(String instance, String graphDir,
+			ISpatiotemporalDatabaseDelegate delegate) {
+		super(instance, graphDir, delegate);
 		// TODO Auto-generated constructor stub
 	}
 

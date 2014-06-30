@@ -5,7 +5,7 @@ import java.util.Map;
 import stdata.datamodel.ISpaceTimePositionFactory;
 import stdata.datamodel.edges.EdgeFrameFactory;
 import stdata.datamodel.vertices.Datum;
-import stdata.datamodel.vertices.HostContext;
+import stdata.datamodel.vertices.SpatiotemporalContext;
 import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.datamodel.vertices.VertexFrameFactory;
 import stdata.geo.Geoshape;
@@ -17,7 +17,7 @@ import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
 public class SpatiallyModulatedTrajectoryRule<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
-		extends HostContextChangedRule<G, E, F> {
+		extends SpatiotemporalContextRule<G, E, F> {
 	/** The spatial trajectory resolution (meters). */
 	double spatialResolution;
 
@@ -87,7 +87,7 @@ public class SpatiallyModulatedTrajectoryRule<G extends TransactionalGraph, E ex
 	}
 
 	@Override
-	public void hostLocationChanged(HostContext hostContext) {
+	public void locationChanged(SpatiotemporalContext hostContext) {
 		Geoshape location = hostContext.getLocation();
 		long timestamp = hostContext.getTimestamp();
 
@@ -120,7 +120,7 @@ public class SpatiallyModulatedTrajectoryRule<G extends TransactionalGraph, E ex
 	}
 
 	@Override
-	public void hostTimeChanged(HostContext hostContext) {
+	public void timeChanged(SpatiotemporalContext hostContext) {
 		// TODO Auto-generated method stub
 
 	}

@@ -32,7 +32,7 @@ public interface Datum extends VertexFrame {
 	@Adjacency(label = "trajectory-head")
 	public void setTrajectoryHead(SpaceTimePosition position);
 
-	/** The entire datum trajectory. */
+	/** The unordered datum trajectory. */
 	@Adjacency(label = "trajectory", direction = Direction.BOTH)
 	public Iterable<SpaceTimePosition> getTrajectory();
 

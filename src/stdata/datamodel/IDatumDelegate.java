@@ -1,13 +1,37 @@
 package stdata.datamodel;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.geo.Geoshape;
 
 public interface IDatumDelegate {
 
-	/** The conversion factor to convert kilmeters to meters. */
+	/** The conversion factor to convert kilometers to meters. */
 	public static final int KM_TO_M = 10 ^ 3;
+
+	/**
+	 * Returns an iterator over the provided datum's spatiotemporal trajectory,
+	 * ordered in descending temporal order (most to least recent).
+	 * 
+	 * @param datum
+	 *            a datum.
+	 * @return an iterator over the datum's trajectory.
+	 */
+	public Iterator<SpaceTimePosition> getTrajectory(Datum datum);
+
+	/**
+	 * Returns a map of datums to their associated spatiotemporal trajectories.
+	 * 
+	 * @param data
+	 *            an iterator over a collection of datums.
+	 * @return a map of the provided datums to their associated spatiotemporal
+	 *         metadata.
+	 */
+	public Map<Datum, Iterator<SpaceTimePosition>> getTrajectories(
+			Iterator<Datum> data);
 
 	/**
 	 * Appends the provided space-time position to the provided datum's
@@ -114,4 +138,21 @@ public interface IDatumDelegate {
 	 */
 	public void updateDistancePhenomenonCreation(Datum datum,
 			Geoshape phenomenonLoc);
+	
+	/**
+	 * Deletes the provided datum and its associated spatiotemporal metadata.
+	 * 
+	 * @param datum
+	 *            the datum to delete.
+	 */
+	public void delete(Datum datum);
+
+	/**
+	 * Deletes each of the datums in the provided iterator and their associated
+	 * spatiotemporal metadata.
+	 * 
+	 * @param data
+	 *            an iterator over a collection of datums to delete.
+	 */
+	public void delete(Iterator<Datum> data);
 }

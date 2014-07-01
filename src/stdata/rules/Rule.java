@@ -2,6 +2,8 @@ package stdata.rules;
 
 import java.util.Map;
 
+import stdata.ContextProvider;
+import stdata.NetworkProvider;
 import stdata.datamodel.edges.EdgeFrameFactory;
 import stdata.datamodel.vertices.VertexFrameFactory;
 
@@ -25,30 +27,27 @@ public abstract class Rule<G extends TransactionalGraph, E extends EventGraph<G>
 	/** Holds a map of vertex frame factories keyed on their class names. */
 	protected Map<String, VertexFrameFactory> vertexFrameFactories;
 
-	/** The rule's delegate interface. */
+	/** A context provider . */
+	protected ContextProvider contextProvider;
+	
+	/** A network provider through which to send data. */
+	protected NetworkProvider networkProvider;
+
+	/** The rule's delegate interface (a rule container vertex). */
 	protected IRuleDelegate delegate = null;
 
-	public Rule(G baseGraph, E eventGraph, F framedGraph,
+	protected void initialize(G baseGraph, E eventGraph, F framedGraph,
 			Map<String, EdgeFrameFactory> edgeFrameFactories,
-			Map<String, VertexFrameFactory> vertexFrameFactories) {
+			Map<String, VertexFrameFactory> vertexFrameFactories,
+			ContextProvider contextProvider, NetworkProvider networkProvider,
+			IRuleDelegate delegate) {
 		this.baseGraph = baseGraph;
 		this.eventGraph = eventGraph;
 		this.framedGraph = framedGraph;
 		this.edgeFrameFactories = edgeFrameFactories;
 		this.vertexFrameFactories = vertexFrameFactories;
-	}
-
-	public Rule(G baseGraph, E eventGraph, F framedGraph,
-			Map<String, EdgeFrameFactory> edgeFrameFactories,
-			Map<String, VertexFrameFactory> vertexFrameFactories,
-			IRuleDelegate delegate) {
-		this(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
-				vertexFrameFactories);
-
-		this.delegate = delegate;
-	}
-
-	public void setDelegate(IRuleDelegate delegate) {
+		this.contextProvider = contextProvider;
+		this.networkProvider = networkProvider;
 		this.delegate = delegate;
 	}
 }

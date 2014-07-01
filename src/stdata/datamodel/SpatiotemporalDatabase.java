@@ -1,20 +1,29 @@
 package stdata.datamodel;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
+import stdata.ContextProvider;
+import stdata.NetworkProvider;
 import stdata.datamodel.edges.EdgeFrameFactory;
+import stdata.datamodel.vertices.Datum;
+import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.datamodel.vertices.SpatiotemporalContext;
 import stdata.datamodel.vertices.VertexFrameFactory;
 import stdata.geo.Geoshape;
 import stdata.rules.IRuleRegistry;
 import stdata.rules.RuleRegistry;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.VertexFrame;
@@ -23,14 +32,17 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	/** The framed class type property key. */
 	public static final String FRAMED_CLASS_KEY = "class";
 
-	/** The database's instance identifier. (Permits multiptle local instances.) */
+	/** The database's instance identifier. (Permits multiple local instances.) */
 	protected String instance;
 
 	/** The database's graph home directory. */
 	protected String graphDir;
 
-	/** The delegate on which to make callbacks. */
-	protected ISpatiotemporalDatabaseDelegate delegate;
+	/** The context provider interface. */
+	protected ContextProvider contextProvider;
+
+	/** The network provider interface. */
+	protected NetworkProvider networkProvider;
 
 	/** Base graph database. */
 	public G baseGraph;
@@ -51,10 +63,10 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	public IRuleRegistry<G, EventGraph<G>, FramedGraph<EventGraph<G>>> ruleRegistry;
 
 	/** The space-time position factory interface. */
-	public ISpaceTimePositionFactory stpFactory;
+	public SpaceTimePositionFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>> stpFactory;
 
 	/** The datum factory interface. */
-	public IDatumFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>> datumFactory;
+	public DatumFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>> datumFactory;
 
 	/**
 	 * A limited-scope factory to generate special vertices that represent the
@@ -69,10 +81,11 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	protected SpatiotemporalContext stContext;
 
 	public SpatiotemporalDatabase(String instance, String graphDir,
-			ISpatiotemporalDatabaseDelegate delegate) {
+			ContextProvider contextProvider, NetworkProvider networkProvider) {
 		this.instance = instance;
 		this.graphDir = graphDir;
-		this.delegate = delegate;
+		this.contextProvider = contextProvider;
+		this.networkProvider = networkProvider;
 
 		// initialize the base graph implementation, wrappers, and indices
 		initializeBaseGraph();
@@ -80,9 +93,13 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		initializeFramedGraph();
 		initializeFramedElementIndex();
 
+		edgeFrameFactories = new HashMap<String, EdgeFrameFactory>();
+		vertexFrameFactories = new HashMap<String, VertexFrameFactory>();
+
 		ruleRegistry = new RuleRegistry<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
-				baseGraph, eventGraph, framedGraph);
-		stpFactory = new SpaceTimePositionFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>, VertexFrame>(
+				baseGraph, eventGraph, framedGraph, edgeFrameFactories,
+				vertexFrameFactories, contextProvider, networkProvider);
+		stpFactory = new SpaceTimePositionFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
 				baseGraph, framedGraph);
 		datumFactory = new DatumFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
 				baseGraph, framedGraph, stpFactory, ruleRegistry);
@@ -133,7 +150,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 */
 	private void initializeSpatiotemporalContext() {
 		stContext = stContextFactory.addSpatiotemporalContext(
-				delegate.getLocation(), delegate.getTimestamp());
+				contextProvider.getLocation(), contextProvider.getTimestamp());
 	}
 
 	/**
@@ -175,45 +192,6 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	}
 
 	/**
-	 * Exposes the base graph's addVertex() method.
-	 * 
-	 * @param id
-	 *            the recommended object identifier.
-	 * @return the newly created vertex.
-	 */
-	public Vertex addVertex(Object id) {
-		Vertex v = baseGraph.addVertex(id);
-
-		// commit changes
-		// commit();
-
-		return v;
-	}
-
-	/**
-	 * Exposes the base graph's addEdge() method.
-	 * 
-	 * @param id
-	 *            the recommended object identifier.
-	 * @param outVertex
-	 *            the vertex on the tail of the edge.
-	 * @param inVertex
-	 *            the vertex on the head of the edge.
-	 * @param label
-	 *            the label associated with the edge.
-	 * @return the newly created edge.
-	 */
-	public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex,
-			String label) {
-		Edge e = baseGraph.addEdge(id, outVertex, inVertex, label);
-
-		// commit changes
-		// commit();
-
-		return e;
-	}
-
-	/**
 	 * Returns an iterator over all the framed vertices in the graph database
 	 * with the provided frame class.
 	 * 
@@ -227,5 +205,50 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		Iterable<F> framedVertices = framedGraph.frameVertices(vertices, kind);
 
 		return framedVertices;
+	}
+
+	/**
+	 * Copies the provided graph into the spatiotemporal graph database,
+	 * updating each datum type vertex's spatiotemporal metadata.
+	 * 
+	 * @param graph
+	 *            the graph to copy from
+	 */
+	public void add(Graph graph) {
+		// a cache for datum type vertices
+		HashSet<Datum> data = new HashSet<Datum>();
+
+		// add vertices
+		for (Vertex fromVertex : graph.getVertices()) {
+			Vertex toVertex = baseGraph.addVertex(fromVertex.getId());
+
+			// check if vertex is datum type
+			if (toVertex.getPropertyKeys().contains(FRAMED_CLASS_KEY)
+					&& toVertex.getProperty(FRAMED_CLASS_KEY).equals(
+							Datum.class.getName())) {
+				data.add(framedGraph.frame(toVertex, Datum.class));
+			}
+
+			ElementHelper.copyProperties(fromVertex, toVertex);
+		}
+
+		// add edges
+		for (Edge fromEdge : graph.getEdges()) {
+			Vertex outVertex = baseGraph.getVertex(fromEdge.getVertex(
+					Direction.OUT).getId());
+			Vertex inVertex = baseGraph.getVertex(fromEdge.getVertex(
+					Direction.IN).getId());
+			Edge toEdge = baseGraph.addEdge(fromEdge.getId(), outVertex,
+					inVertex, fromEdge.getLabel());
+			ElementHelper.copyProperties(fromEdge, toEdge);
+		}
+
+		// update datum's spatiotemporal metadata
+		SpaceTimePosition position = stpFactory.addSpaceTimePosition(
+				contextProvider.getLocation(), contextProvider.getTimestamp(),
+				contextProvider.getDomain());
+		for (Datum datum : data) {
+			datumFactory.append(datum, position);
+		}
 	}
 }

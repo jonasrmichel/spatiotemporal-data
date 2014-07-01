@@ -59,11 +59,11 @@ public class StorageConfig {
     }
 
 
-    public static Configuration addPermanentCache(Configuration conf) {
-        Configuration cacheconf = conf.subset(GraphDatabaseConfiguration.CACHE_NAMESPACE);
-        cacheconf.addProperty(GraphDatabaseConfiguration.DB_CACHE_KEY,true);
-        cacheconf.addProperty(GraphDatabaseConfiguration.DB_CACHE_TIME_KEY,0);
-        return conf;
-    }
+//    public static Configuration addPermanentCache(Configuration conf) {
+//        Configuration cacheconf = conf.subset(GraphDatabaseConfiguration.CACHE_NAMESPACE);
+//        cacheconf.addProperty(GraphDatabaseConfiguration.DB_CACHE_KEY,true);
+//        cacheconf.addProperty(GraphDatabaseConfiguration.DB_CACHE_TIME_KEY,0);
+//        return conf;
+//    }
 
 }

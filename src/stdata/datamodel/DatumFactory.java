@@ -1,6 +1,10 @@
 package stdata.datamodel;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.SpaceTimePosition;
@@ -9,6 +13,8 @@ import stdata.geo.Geoshape;
 import stdata.rules.IRuleRegistry;
 import stdata.rules.Rule;
 
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
@@ -66,6 +72,31 @@ public class DatumFactory<G extends TransactionalGraph, E extends EventGraph<G>,
 	}
 
 	/* IDatumDelegate interface implementation. */
+
+	@Override
+	public Iterator<SpaceTimePosition> getTrajectory(Datum datum) {
+		ArrayList<SpaceTimePosition> trajectory = new ArrayList<SpaceTimePosition>();
+		SpaceTimePosition position = datum.getTrajectoryHead();
+		while (position != null) {
+			trajectory.add(position);
+			position = position.getPrevious();
+		}
+
+		return trajectory.iterator();
+	}
+
+	@Override
+	public Map<Datum, Iterator<SpaceTimePosition>> getTrajectories(
+			Iterator<Datum> data) {
+		Map<Datum, Iterator<SpaceTimePosition>> trajectories = new HashMap<Datum, Iterator<SpaceTimePosition>>();
+		Datum datum;
+		while (data.hasNext()) {
+			datum = data.next();
+			trajectories.put(datum, getTrajectory(datum));
+		}
+
+		return trajectories;
+	}
 
 	@Override
 	public void append(Datum datum, SpaceTimePosition position) {
@@ -187,4 +218,32 @@ public class DatumFactory<G extends TransactionalGraph, E extends EventGraph<G>,
 		datum.setDistancePhenomenonCreation(distance);
 	}
 
+	@Override
+	public void delete(Datum datum) {
+		// delete the datum's spatiotemporal metadata
+		for (SpaceTimePosition position : datum.getTrajectory()) {
+			// delete all edges incident to this space-time position
+			for (Edge edge : position.asVertex().getEdges(Direction.BOTH))
+				baseGraph.removeEdge(edge);
+
+			// delete this space-time position
+			baseGraph.removeVertex(position.asVertex());
+		}
+
+		// delete all edges incident to the datum
+		for (Edge edge : datum.asVertex().getEdges(Direction.BOTH))
+			baseGraph.removeEdge(edge);
+
+		// delete the datum
+		baseGraph.removeVertex(datum.asVertex());
+	}
+
+	@Override
+	public void delete(Iterator<Datum> data) {
+		Datum datum;
+		while (data.hasNext()) {
+			datum = data.next();
+			delete(datum);
+		}
+	}
 }

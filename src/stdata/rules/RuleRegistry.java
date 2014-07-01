@@ -3,8 +3,12 @@ package stdata.rules;
 import java.util.HashMap;
 import java.util.Map;
 
+import stdata.ContextProvider;
+import stdata.NetworkProvider;
+import stdata.datamodel.edges.EdgeFrameFactory;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.RuleContainer;
+import stdata.datamodel.vertices.VertexFrameFactory;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
@@ -12,15 +16,32 @@ import com.tinkerpop.frames.FramedGraph;
 
 public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
 		implements IRuleRegistry<G, E, F> {
-	G baseGraph;
-	E eventGraph;
-	F framedGraph;
+	private G baseGraph;
+	private E eventGraph;
+	private F framedGraph;
+
+	private Map<String, EdgeFrameFactory> edgeFrameFactories;
+	private Map<String, VertexFrameFactory> vertexFrameFactories;
+
+	private ContextProvider contextProvider;
+	private NetworkProvider networkProvider;
+
 	Map<Object, Rule<G, E, F>> rules;
 
-	public RuleRegistry(G baseGraph, E eventGraph, F framedGraph) {
+	public RuleRegistry(G baseGraph, E eventGraph, F framedGraph,
+			Map<String, EdgeFrameFactory> edgeFrameFactories,
+			Map<String, VertexFrameFactory> vertexFrameFactories,
+			ContextProvider contextProvider, NetworkProvider networkProvider) {
 		this.baseGraph = baseGraph;
 		this.eventGraph = eventGraph;
 		this.framedGraph = framedGraph;
+
+		this.edgeFrameFactories = edgeFrameFactories;
+		this.vertexFrameFactories = vertexFrameFactories;
+
+		this.contextProvider = contextProvider;
+		this.networkProvider = networkProvider;
+
 		rules = new HashMap<Object, Rule<G, E, F>>();
 	}
 
@@ -37,17 +58,16 @@ public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>,
 		RuleContainer ruleContainer = (RuleContainer) framedGraph.addVertex(
 				null, RuleContainer.class);
 
-		// set the rule's delegate (the container)
-		rule.setDelegate(ruleContainer);
+		// intialize the rule
+		rule.initialize(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
+				vertexFrameFactories, contextProvider, networkProvider,
+				ruleContainer);
 
 		// configure the graph references to governed data
 		ruleContainer.addGoverns(datum);
 
 		// register the rule
 		rules.put(ruleContainer.asVertex().getId(), rule);
-
-		// commit changes
-		// baseGraph.commit();
 
 		return ruleContainer;
 	}

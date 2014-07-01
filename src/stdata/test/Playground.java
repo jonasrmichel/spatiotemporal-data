@@ -64,7 +64,7 @@ public class Playground {
 		position.setLocation(Geoshape.point(-40, 90));
 		position.setTimestamp(System.currentTimeMillis());
 
-		datum.add(position);
+//		datum.add(position);
 
 		// update the index
 		index.put("class", SpaceTimePosition.class.getName(),

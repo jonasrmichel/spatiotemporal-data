@@ -33,24 +33,24 @@ public class TitanTest {
 				StorageConfig.getHomeDir());
 
 		// add index
-		Configuration sub = config.subset(STORAGE_NAMESPACE)
-				.subset(INDEX_NAMESPACE).subset(INDEX);
-		sub.setProperty(INDEX_BACKEND_KEY,
-				"com.thinkaurelius.titan.diskstorage.lucene.LuceneIndex");
-		sub.setProperty(STORAGE_DIRECTORY_KEY,
-				StorageConfig.getHomeDir("lucene"));
+		// Configuration sub = config.subset(STORAGE_NAMESPACE)
+		// .subset(INDEX_NAMESPACE).subset(INDEX);
+		// sub.setProperty(INDEX_BACKEND_KEY,
+		// "com.thinkaurelius.titan.diskstorage.lucene.LuceneIndex");
+		// sub.setProperty(STORAGE_DIRECTORY_KEY,
+		// StorageConfig.getHomeDir("lucene"));
 
 		// create the graph
 		TitanGraph titanGraph = TitanFactory.open(config);
 
 		// configure indexing
-		try {
-			titanGraph.makeKey("location").dataType(Geoshape.class)
-					.indexed(INDEX, Vertex.class).make();
-		} catch (IllegalArgumentException e) {
-			// key already defined
-			System.out.println("(Key already defined.)");
-		}
+		// try {
+		// titanGraph.makeKey("location").dataType(Geoshape.class)
+		// .indexed(INDEX, Vertex.class).make();
+		// } catch (IllegalArgumentException e) {
+		// // key already defined
+		// System.out.println("(Key already defined.)");
+		// }
 
 		// wrap the titan graph for event listening
 		EventGraph<TitanGraph> eventGraph = new EventGraph<TitanGraph>(
@@ -58,7 +58,7 @@ public class TitanTest {
 		eventGraph.addListener(new GraphChangedListener() {
 
 			@Override
-			public void vertexRemoved(Vertex vertex, Map<String, Object> props) {
+			public void vertexRemoved(Vertex vertex) {
 				// TODO Auto-generated method stub
 
 			}
@@ -72,11 +72,9 @@ public class TitanTest {
 
 			@Override
 			public void vertexPropertyChanged(Vertex vertex, String key,
-					Object oldValue, Object setValue) {
+					Object setValue) {
 				System.out.println("vertexPropertyChanged(): "
 						+ vertex.toString() + " " + key + ": "
-						+ (oldValue != null ? oldValue.toString() : "null")
-						+ " --> "
 						+ (setValue != null ? setValue.toString() : "null"));
 
 			}
@@ -88,7 +86,7 @@ public class TitanTest {
 			}
 
 			@Override
-			public void edgeRemoved(Edge edge, Map<String, Object> props) {
+			public void edgeRemoved(Edge edge) {
 				// TODO Auto-generated method stub
 
 			}
@@ -102,7 +100,7 @@ public class TitanTest {
 
 			@Override
 			public void edgePropertyChanged(Edge edge, String key,
-					Object oldValue, Object setValue) {
+					Object setValue) {
 				// TODO Auto-generated method stub
 
 			}
@@ -112,17 +110,21 @@ public class TitanTest {
 				// TODO Auto-generated method stub
 
 			}
+
 		});
 
 		// wrap the titan graph for framing
-		FramedGraphFactory factory = new FramedGraphFactory(
-				new JavaHandlerModule(), new AbstractModule() {
-					public void doConfigure(FramedGraphConfiguration config) {
-						config.addFrameInitializer(new SpatiotemporalFrameInitializer());
-					}
-				});
-		FramedGraph<EventGraph<TitanGraph>> framedGraph = factory
-				.create(eventGraph);
+		// FramedGraphFactory factory = new FramedGraphFactory(
+		// new JavaHandlerModule(), new AbstractModule() {
+		// public void doConfigure(FramedGraphConfiguration config) {
+		// config.addFrameInitializer(new SpatiotemporalFrameInitializer());
+		// }
+		// });
+		// FramedGraph<EventGraph<TitanGraph>> framedGraph = factory
+		// .create(eventGraph);
+
+		FramedGraph<EventGraph<TitanGraph>> framedGraph = new FramedGraph<EventGraph<TitanGraph>>(
+				eventGraph);
 
 		// populate the framed graph
 		Datum datum = framedGraph.addVertex(null, Datum.class);
@@ -134,9 +136,9 @@ public class TitanTest {
 		position.setLocation(Geoshape.point(-40, 90));
 		position.setTimestamp(System.currentTimeMillis());
 
-		datum.add(position);
+		// datum.add(position);
 
-		titanGraph.commit();
+		// titanGraph.commit();
 
 		// read graph
 		System.out.println("titanGraph vertices:");
@@ -147,18 +149,18 @@ public class TitanTest {
 		for (Vertex v : framedGraph.getVertices())
 			System.out.println("\t" + v + ", " + v.getPropertyKeys());
 
-		System.out.println("Datum vertices:");
-		for (Vertex v : titanGraph.query().has("class", Datum.class.getName())
-				.vertices()) {
-			Datum d = framedGraph.getVertex(v, Datum.class);
-			System.out.println("\t" + d + ", " + d.toString());
-		}
+//		System.out.println("Datum vertices:");
+//		for (Vertex v : titanGraph.query().has("class", Datum.class.getName())
+//				.vertices()) {
+//			Datum d = framedGraph.getVertex(v, Datum.class);
+//			System.out.println("\t" + d + ", " + d.toString());
+//		}
 
-		TitanGraphQuery q = titanGraph.query().has("location", Geo.WITHIN,
-				Geoshape.circle(-40.1, 90.1, 100));
-		System.out.println("Geo.WITHIN vertices:");
-		for (Vertex v : q.vertices())
-			System.out.println("\t" + v + ", " + v.getPropertyKeys());
+//		TitanGraphQuery q = titanGraph.query().has("location", Geo.WITHIN,
+//				Geoshape.circle(-40.1, 90.1, 100));
+//		System.out.println("Geo.WITHIN vertices:");
+//		for (Vertex v : q.vertices())
+//			System.out.println("\t" + v + ", " + v.getPropertyKeys());
 
 		titanGraph.shutdown();
 

@@ -1,13 +1,9 @@
 package stdata.rules;
 
-import java.util.Map;
-
 import stdata.datamodel.ISpaceTimePositionFactory;
-import stdata.datamodel.edges.EdgeFrameFactory;
 import stdata.datamodel.vertices.Datum;
-import stdata.datamodel.vertices.SpatiotemporalContext;
 import stdata.datamodel.vertices.SpaceTimePosition;
-import stdata.datamodel.vertices.VertexFrameFactory;
+import stdata.datamodel.vertices.SpatiotemporalContext;
 import stdata.geo.Geoshape;
 
 import com.tinkerpop.blueprints.Edge;
@@ -25,22 +21,8 @@ public class TemporallyModulatedTrajectoryRule<G extends TransactionalGraph, E e
 	/** The reference location. */
 	long referenceTime = -1L;
 
-	public TemporallyModulatedTrajectoryRule(G baseGraph, E eventGraph,
-			F framedGraph, Map<String, EdgeFrameFactory> edgeFrameFactories,
-			Map<String, VertexFrameFactory> vertexFrameFactories,
-			long temporalResolution) {
-		super(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
-				vertexFrameFactories);
-
-		this.temporalResolution = temporalResolution;
-	}
-
-	public TemporallyModulatedTrajectoryRule(G baseGraph, E eventGraph,
-			F framedGraph, Map<String, EdgeFrameFactory> edgeFrameFactories,
-			Map<String, VertexFrameFactory> vertexFrameFactories,
-			IRuleDelegate delegate, long temporalResolution) {
-		super(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
-				vertexFrameFactories, delegate);
+	public TemporallyModulatedTrajectoryRule(long temporalResolution) {
+		super();
 
 		this.temporalResolution = temporalResolution;
 	}

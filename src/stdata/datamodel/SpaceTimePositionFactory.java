@@ -9,7 +9,7 @@ import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.datamodel.vertices.VertexFrameFactory;
 import stdata.geo.Geoshape;
 
-public class SpaceTimePositionFactory<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>, T extends VertexFrame>
+public class SpaceTimePositionFactory<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
 		extends VertexFrameFactory<G, E, F, SpaceTimePosition> implements
 		ISpaceTimePositionFactory {
 

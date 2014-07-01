@@ -1,9 +1,8 @@
-package stdata.datamodel;
+package stdata;
 
 import stdata.geo.Geoshape;
 
-public interface ISpatiotemporalDatabaseDelegate {
-
+public interface ContextProvider {
 	/**
 	 * Called to obtain the current geographic location.
 	 * 
@@ -17,4 +16,11 @@ public interface ISpatiotemporalDatabaseDelegate {
 	 * @return the current time.
 	 */
 	public long getTimestamp();
+
+	/**
+	 * Called to obtain the logical domain.
+	 * 
+	 * @return a String representing the logical domain.
+	 */
+	public String getDomain();
 }

@@ -2,7 +2,8 @@ package stdata.simulator.movingobjects;
 
 import java.util.List;
 
-import stdata.datamodel.ISpatiotemporalDatabaseDelegate;
+import stdata.ContextProvider;
+import stdata.NetworkProvider;
 import stdata.datamodel.SpatiotemporalDatabase;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.Datum.TriggerType;
@@ -21,8 +22,8 @@ import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-public class Host extends MovingObject implements
-		ISpatiotemporalDatabaseDelegate {
+public class Host extends MovingObject implements ContextProvider,
+		NetworkProvider {
 	/** File paths. */
 	String graphDir, logDir;
 
@@ -41,7 +42,7 @@ public class Host extends MovingObject implements
 	double trajectorySpatialResolution;
 
 	/** The host's spatiotemporal graph database. */
-	SpatiotemporalDatabase<TitanGraph> spatiotemporalDB;
+	SpatiotemporalDatabase<TitanGraph> database;
 
 	/** The host's simulation delegate. */
 	IHostDelegate delegate;
@@ -156,13 +157,9 @@ public class Host extends MovingObject implements
 
 			// create a new spatially modulated rule
 			spatiallyModulatedRule = new SpatiallyModulatedTrajectoryRule<TitanGraph, EventGraph<TitanGraph>, FramedGraph<EventGraph<TitanGraph>>>(
-					spatiotemporalDB.baseGraph, spatiotemporalDB.eventGraph,
-					spatiotemporalDB.framedGraph,
-					spatiotemporalDB.edgeFrameFactories,
-					spatiotemporalDB.vertexFrameFactories,
 					trajectorySpatialResolution);
 			// create a datum with the spatially modulated rule
-			spatiallyModulatedDatum = spatiotemporalDB.datumFactory.addDatum(
+			spatiallyModulatedDatum = database.datumFactory.addDatum(
 					phenomenonLocation, location, (long) time,
 					Integer.toString(identifier), null, true,
 					spatiallyModulatedRule);
@@ -172,13 +169,9 @@ public class Host extends MovingObject implements
 
 			// create a new temporally modulated rule
 			temporallyModulatedRule = new TemporallyModulatedTrajectoryRule<TitanGraph, EventGraph<TitanGraph>, FramedGraph<EventGraph<TitanGraph>>>(
-					spatiotemporalDB.baseGraph, spatiotemporalDB.eventGraph,
-					spatiotemporalDB.framedGraph,
-					spatiotemporalDB.edgeFrameFactories,
-					spatiotemporalDB.vertexFrameFactories,
 					trajectoryTemporalResolution);
 			// create a datum with the temporally modulated rule
-			temporallyModulatedDatum = spatiotemporalDB.datumFactory.addDatum(
+			temporallyModulatedDatum = database.datumFactory.addDatum(
 					phenomenonLocation, location, (long) time,
 					Integer.toString(identifier), null, true,
 					temporallyModulatedRule);
@@ -250,8 +243,8 @@ public class Host extends MovingObject implements
 
 	@Override
 	protected void initialize() {
-		spatiotemporalDB = new TitanSpatiotemporalDatabase(
-				Integer.toString(identifier), graphDir, this);
+		database = new TitanSpatiotemporalDatabase(
+				Integer.toString(identifier), graphDir, this, this);
 	}
 
 	@Override
@@ -259,7 +252,7 @@ public class Host extends MovingObject implements
 		// TODO perform post-simulation analysis
 
 		// shutdown spatiotemporalDB
-		spatiotemporalDB.shutdown();
+		database.shutdown();
 	}
 
 	@Override
@@ -271,15 +264,15 @@ public class Host extends MovingObject implements
 			senseNearbyPhenomena(time);
 
 		// commit all database changes that occurred due to sensing
-		spatiotemporalDB.commit();
+		database.commit();
 
 		// update the host's spatiotemporal context
-		spatiotemporalDB.setTemporalContext(time);
-		spatiotemporalDB.setSpatialContext(location);
+		database.setTemporalContext(time);
+		database.setSpatialContext(location);
 
 		// commit spatial and temporal context changes, triggering spatially-
 		// and temporally-modulated rules
-		spatiotemporalDB.commit();
+		database.commit();
 
 		// // trigger trajectory updates per temporal resolution
 		// hostContext.setTimestampTrigger(true);
@@ -288,8 +281,7 @@ public class Host extends MovingObject implements
 		// hostContext.setLocationTrigger(true);
 
 		// update each datum's measured properties
-		Iterable<Datum> datums = spatiotemporalDB
-				.getFramedVertices(Datum.class);
+		Iterable<Datum> datums = database.getFramedVertices(Datum.class);
 		Geoshape phenomenonLocation;
 		for (Datum datum : datums) {
 			// update age
@@ -322,7 +314,7 @@ public class Host extends MovingObject implements
 		}
 
 		// commit all database changes that occurred due to trajectory updates
-		spatiotemporalDB.commit();
+		database.commit();
 
 		// log the running per-time host-level aggregate measurements
 		Logger.appendHostMeasurement(
@@ -345,7 +337,7 @@ public class Host extends MovingObject implements
 						.getRunningStatisticsArray(temporallyModulatedStatistics));
 	}
 
-	/* ISpatiotemporalDatabaseDelegate interface implementation. */
+	/* ContextProvider interface implementation. */
 
 	@Override
 	public Geoshape getLocation() {
@@ -356,4 +348,11 @@ public class Host extends MovingObject implements
 	public long getTimestamp() {
 		return time;
 	}
+
+	@Override
+	public String getDomain() {
+		return Integer.toString(identifier);
+	}
+
+	/* NetworkProvider interface implementation. */
 }

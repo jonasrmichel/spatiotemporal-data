@@ -142,11 +142,8 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * Initializes the framed element index.
 	 */
 	private void initializeFramedElementIndex() {
-		// baseGraph.createKeyIndex(VertexFrameFactory.FRAMED_CLASS_KEY,
-		// Vertex.class);
-		// baseGraph.createKeyIndex(EdgeFrameFactory.FRAMED_CLASS_KEY,
-		// Edge.class);
-		baseGraph.createKeyIndex(FRAMED_CLASS_KEY, Element.class);
+		// only vertex indexing is supported
+		baseGraph.createKeyIndex(FRAMED_CLASS_KEY, Vertex.class);
 	}
 
 	/**

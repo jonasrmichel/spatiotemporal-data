@@ -1,6 +1,5 @@
 package stdata.titan;
 
-import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration.STORAGE_BACKEND_KEY;
 import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration.STORAGE_DIRECTORY_KEY;
 import static com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration.STORAGE_NAMESPACE;
 
@@ -29,10 +28,14 @@ public class TitanSpatiotemporalDatabase extends
 	@Override
 	protected void initializeBaseGraph() {
 		String homeDir = graphDir + File.separator + instance;
+		File folder = new File(homeDir);
+		if (!folder.exists())
+			folder.mkdir();
+		
 		BaseConfiguration config = new BaseConfiguration();
-		config.subset(STORAGE_NAMESPACE)
-				.addProperty(STORAGE_BACKEND_KEY,
-						"com.thinkaurelius.titan.diskstorage.berkeleyje.BerkeleyJEStoreManager");
+//		config.subset(STORAGE_NAMESPACE)
+//				.addProperty(STORAGE_BACKEND_KEY,
+//						"com.thinkaurelius.titan.diskstorage.berkeleyje.BerkeleyJEStoreManager");
 		config.subset(STORAGE_NAMESPACE).addProperty(STORAGE_DIRECTORY_KEY,
 				homeDir);
 

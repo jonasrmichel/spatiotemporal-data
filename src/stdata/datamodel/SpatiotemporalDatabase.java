@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import stdata.ContextProvider;
-import stdata.NetworkProvider;
+import stdata.IContextProvider;
+import stdata.INetworkProvider;
 import stdata.datamodel.edges.EdgeFrameFactory;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.SpaceTimePosition;
@@ -39,10 +39,10 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	protected String graphDir;
 
 	/** The context provider interface. */
-	protected ContextProvider contextProvider;
+	protected IContextProvider contextProvider;
 
 	/** The network provider interface. */
-	protected NetworkProvider networkProvider;
+	protected INetworkProvider networkProvider;
 
 	/** Base graph database. */
 	public G baseGraph;
@@ -63,10 +63,10 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	public IRuleRegistry<G, EventGraph<G>, FramedGraph<EventGraph<G>>> ruleRegistry;
 
 	/** The space-time position factory interface. */
-	public SpaceTimePositionFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>> stpFactory;
+	public ISpaceTimePositionFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>> stpFactory;
 
 	/** The datum factory interface. */
-	public DatumFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>> datumFactory;
+	public IDatumFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>> datumFactory;
 
 	/**
 	 * A limited-scope factory to generate special vertices that represent the
@@ -81,7 +81,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	protected SpatiotemporalContext stContext;
 
 	public SpatiotemporalDatabase(String instance, String graphDir,
-			ContextProvider contextProvider, NetworkProvider networkProvider) {
+			IContextProvider contextProvider, INetworkProvider networkProvider) {
 		this.instance = instance;
 		this.graphDir = graphDir;
 		this.contextProvider = contextProvider;
@@ -93,25 +93,29 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		initializeFramedGraph();
 		initializeFramedElementIndex();
 
-		edgeFrameFactories = new HashMap<String, EdgeFrameFactory>();
-		vertexFrameFactories = new HashMap<String, VertexFrameFactory>();
-
+		// initialize rule registry
 		ruleRegistry = new RuleRegistry<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
 				baseGraph, eventGraph, framedGraph, edgeFrameFactories,
 				vertexFrameFactories, contextProvider, networkProvider);
+		
+		// initialize element factories
 		stpFactory = new SpaceTimePositionFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
 				baseGraph, framedGraph);
 		datumFactory = new DatumFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
 				baseGraph, framedGraph, stpFactory, ruleRegistry);
-
 		stContextFactory = new SpatiotemporalContextFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
 				baseGraph, framedGraph);
 
+		// initialize element frame factory maps
+		edgeFrameFactories = new HashMap<String, EdgeFrameFactory>();
+		vertexFrameFactories = new HashMap<String, VertexFrameFactory>();
+		
 		vertexFrameFactories.put(ISpaceTimePositionFactory.class.getName(),
 				(VertexFrameFactory) stpFactory);
 		vertexFrameFactories.put(IDatumFactory.class.getName(),
 				(VertexFrameFactory) datumFactory);
 
+		// initialize the local notion of space-time context
 		initializeSpatiotemporalContext();
 	}
 

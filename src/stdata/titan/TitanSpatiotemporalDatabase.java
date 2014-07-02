@@ -8,8 +8,8 @@ import java.io.File;
 
 import org.apache.commons.configuration.BaseConfiguration;
 
-import stdata.ContextProvider;
-import stdata.NetworkProvider;
+import stdata.IContextProvider;
+import stdata.INetworkProvider;
 import stdata.datamodel.SpatiotemporalDatabase;
 
 import com.thinkaurelius.titan.core.TitanFactory;
@@ -19,7 +19,7 @@ public class TitanSpatiotemporalDatabase extends
 		SpatiotemporalDatabase<TitanGraph> {
 
 	public TitanSpatiotemporalDatabase(String instance, String graphDir,
-			ContextProvider contextProvider, NetworkProvider networkProvider) {
+			IContextProvider contextProvider, INetworkProvider networkProvider) {
 		super(instance, graphDir, contextProvider, networkProvider);
 		// TODO Auto-generated constructor stub
 	}

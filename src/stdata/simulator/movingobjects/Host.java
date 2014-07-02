@@ -1,12 +1,15 @@
 package stdata.simulator.movingobjects;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import stdata.ContextProvider;
-import stdata.NetworkProvider;
+import stdata.IContextProvider;
+import stdata.INetworkProvider;
 import stdata.datamodel.SpatiotemporalDatabase;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.Datum.TriggerType;
+import stdata.datamodel.vertices.SpaceTimePosition;
 import stdata.geo.Geoshape;
 import stdata.rules.SpatiallyModulatedTrajectoryRule;
 import stdata.rules.TemporallyModulatedTrajectoryRule;
@@ -19,11 +22,12 @@ import stdata.simulator.measurement.RunningStatisticsMap;
 import stdata.titan.TitanSpatiotemporalDatabase;
 
 import com.thinkaurelius.titan.core.TitanGraph;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-public class Host extends MovingObject implements ContextProvider,
-		NetworkProvider {
+public class Host extends MovingObject implements IContextProvider,
+		INetworkProvider {
 	/** File paths. */
 	String graphDir, logDir;
 
@@ -355,4 +359,22 @@ public class Host extends MovingObject implements ContextProvider,
 	}
 
 	/* NetworkProvider interface implementation. */
+	
+	@Override
+	public void send(Datum datum, Iterator<SpaceTimePosition> trajectory) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void send(Map<Datum, Iterator<SpaceTimePosition>> data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void send(Graph graph) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -2,7 +2,7 @@ package stdata;
 
 import stdata.geo.Geoshape;
 
-public interface ContextProvider {
+public interface IContextProvider {
 	/**
 	 * Called to obtain the current geographic location.
 	 * 

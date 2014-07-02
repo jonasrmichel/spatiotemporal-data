@@ -2,8 +2,8 @@ package stdata.rules;
 
 import java.util.Map;
 
-import stdata.ContextProvider;
-import stdata.NetworkProvider;
+import stdata.IContextProvider;
+import stdata.INetworkProvider;
 import stdata.datamodel.edges.EdgeFrameFactory;
 import stdata.datamodel.vertices.VertexFrameFactory;
 
@@ -28,18 +28,32 @@ public abstract class Rule<G extends TransactionalGraph, E extends EventGraph<G>
 	protected Map<String, VertexFrameFactory> vertexFrameFactories;
 
 	/** A context provider . */
-	protected ContextProvider contextProvider;
-	
+	protected IContextProvider contextProvider;
+
 	/** A network provider through which to send data. */
-	protected NetworkProvider networkProvider;
+	protected INetworkProvider networkProvider;
 
 	/** The rule's delegate interface (a rule container vertex). */
 	protected IRuleDelegate delegate = null;
 
+	/**
+	 * Initializes the rule with references to all of its necessary parameters.
+	 * A rule is initialized by the {@link RuleRegistry}; this avoids placing
+	 * all these parameters in a big bloated constructor.
+	 * 
+	 * @param baseGraph
+	 * @param eventGraph
+	 * @param framedGraph
+	 * @param edgeFrameFactories
+	 * @param vertexFrameFactories
+	 * @param contextProvider
+	 * @param networkProvider
+	 * @param delegate
+	 */
 	protected void initialize(G baseGraph, E eventGraph, F framedGraph,
 			Map<String, EdgeFrameFactory> edgeFrameFactories,
 			Map<String, VertexFrameFactory> vertexFrameFactories,
-			ContextProvider contextProvider, NetworkProvider networkProvider,
+			IContextProvider contextProvider, INetworkProvider networkProvider,
 			IRuleDelegate delegate) {
 		this.baseGraph = baseGraph;
 		this.eventGraph = eventGraph;

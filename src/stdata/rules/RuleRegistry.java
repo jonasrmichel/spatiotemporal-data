@@ -3,8 +3,8 @@ package stdata.rules;
 import java.util.HashMap;
 import java.util.Map;
 
-import stdata.ContextProvider;
-import stdata.NetworkProvider;
+import stdata.IContextProvider;
+import stdata.INetworkProvider;
 import stdata.datamodel.edges.EdgeFrameFactory;
 import stdata.datamodel.vertices.Datum;
 import stdata.datamodel.vertices.RuleContainer;
@@ -23,15 +23,15 @@ public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>,
 	private Map<String, EdgeFrameFactory> edgeFrameFactories;
 	private Map<String, VertexFrameFactory> vertexFrameFactories;
 
-	private ContextProvider contextProvider;
-	private NetworkProvider networkProvider;
+	private IContextProvider contextProvider;
+	private INetworkProvider networkProvider;
 
 	Map<Object, Rule<G, E, F>> rules;
 
 	public RuleRegistry(G baseGraph, E eventGraph, F framedGraph,
 			Map<String, EdgeFrameFactory> edgeFrameFactories,
 			Map<String, VertexFrameFactory> vertexFrameFactories,
-			ContextProvider contextProvider, NetworkProvider networkProvider) {
+			IContextProvider contextProvider, INetworkProvider networkProvider) {
 		this.baseGraph = baseGraph;
 		this.eventGraph = eventGraph;
 		this.framedGraph = framedGraph;
@@ -58,7 +58,7 @@ public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>,
 		RuleContainer ruleContainer = (RuleContainer) framedGraph.addVertex(
 				null, RuleContainer.class);
 
-		// intialize the rule
+		// intialize the rule with the container as its delegate
 		rule.initialize(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
 				vertexFrameFactories, contextProvider, networkProvider,
 				ruleContainer);

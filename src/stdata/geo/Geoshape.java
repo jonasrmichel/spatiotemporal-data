@@ -160,6 +160,10 @@ public class Geoshape {
         SpatialRelation r = getSpatialRelation(other);
         return r==SpatialRelation.INTERSECTS || r==SpatialRelation.CONTAINS || r==SpatialRelation.WITHIN;
     }
+    
+    public boolean contain(Geoshape other) {
+    	return getSpatialRelation(other)==SpatialRelation.CONTAINS;
+    }
 
     public boolean within(Geoshape outer) {
         return getSpatialRelation(outer)==SpatialRelation.WITHIN;

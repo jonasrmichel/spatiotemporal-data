@@ -2,8 +2,6 @@ package stdata.rules;
 
 import stdata.datamodel.SpatiotemporalDatabase;
 import stdata.datamodel.vertices.SpatiotemporalContext;
-import stdata.simulator.SimulationManager;
-import stdata.simulator.Util;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
@@ -19,12 +17,6 @@ public abstract class SpatiotemporalContextRule<G extends TransactionalGraph, E 
 
 	@Override
 	public void vertexPropertyChanged(Vertex vertex, String key, Object value) {
-		if (SimulationManager.debug)
-			Util.report(SpatiotemporalContextRule.class,
-					"vertexPropertyChanged(): " + vertex.toString() + " " + key
-							+ ": "
-							+ (value != null ? value.toString() : "null"));
-
 		if (!vertex.getProperty(SpatiotemporalDatabase.FRAMED_CLASS_KEY)
 				.equals(SpatiotemporalContext.class.getName()))
 			return;

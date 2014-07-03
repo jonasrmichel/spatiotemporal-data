@@ -10,20 +10,13 @@ import com.tinkerpop.frames.Incidence;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
 
-public interface Datum extends VertexFrame {
+public interface Datum extends GeoVertex {
 	/** The delegate to make callbacks on. */
 	@Property("delegate")
 	public IDatumDelegate getDelegate();
 
 	@Property("delegate")
 	public void setDelegate(IDatumDelegate delegate);
-
-	/** Geospatial location of the sensed phenomenon this datum represents. */
-	@Property("location")
-	public Geoshape getLocation();
-
-	@Property("location")
-	public void setLocation(Geoshape location);
 
 	/** The head of the datum's trajectory. */
 	@Adjacency(label = "trajectory-head")

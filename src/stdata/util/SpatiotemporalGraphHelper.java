@@ -10,6 +10,15 @@ import com.tinkerpop.blueprints.util.GraphHelper;
 
 public class SpatiotemporalGraphHelper extends GraphHelper {
 
+	/**
+	 * Create an in-memory graph comprising the provided vertices and edges.
+	 * 
+	 * @param vertices
+	 *            the subgraph's vertices.
+	 * @param edges
+	 *            the subgraph's edges.
+	 * @return an in-memory graph comprising the vertices and edges.
+	 */
 	public static Graph subgraph(final Iterable<Vertex> vertices,
 			final Iterable<Edge> edges) {
 		Graph subgraph = new TinkerGraph();

@@ -8,7 +8,6 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Incidence;
 import com.tinkerpop.frames.Property;
-import com.tinkerpop.frames.VertexFrame;
 
 public interface Datum extends GeoVertex {
 	/** The delegate to make callbacks on. */

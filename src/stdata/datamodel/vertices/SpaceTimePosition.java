@@ -1,11 +1,8 @@
 package stdata.datamodel.vertices;
 
-import stdata.geo.Geoshape;
-
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;
-import com.tinkerpop.frames.VertexFrame;
 
 public interface SpaceTimePosition extends GeoVertex {
 //	/** Latitude property. */

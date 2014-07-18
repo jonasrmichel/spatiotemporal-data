@@ -202,82 +202,80 @@ public class GremlinInterpreter {
 		if (stepParts.length > 1)
 			args = Arrays.copyOfRange(stepParts, 1, stepParts.length);
 
-		switch (stepName) {
-		case "_":
+		if (stepName.equals("_"))
 			return _(pipeline, args);
-		case "aggregate":
+		else if (stepName.equals("aggregate"))
 			return aggregate(pipeline, args);
-		case "as":
+		else if (stepName.equals("as"))
 			return as(pipeline, args);
-		case "back":
+		else if (stepName.equals("back"))
 			return back(pipeline, args);
-		case "both":
+		else if (stepName.equals("both"))
 			return both(pipeline, args);
-		case "bothE":
+		else if (stepName.equals("bothE"))
 			return bothE(pipeline, args);
-		case "bothV":
+		else if (stepName.equals("bothV"))
 			return bothV(pipeline, args);
-		case "cap":
+		else if (stepName.equals("cap"))
 			return cap(pipeline, args);
-		case "dedup":
+		else if (stepName.equals("dedup"))
 			return dedup(pipeline, args);
-		case "exhaustMerge":
+		else if (stepName.equals("exhaustMerge"))
 			return exhaustMerge(pipeline, args);
-		case "fairMerge":
+		else if (stepName.equals("fairMerge"))
 			return fairMerge(pipeline, args);
-		case "gather":
+		else if (stepName.equals("gather"))
 			return gather(pipeline, args);
-		case "groupCount":
+		else if (stepName.equals("groupCount"))
 			return groupCount(pipeline, args);
-		case "has":
+		else if (stepName.equals("has"))
 			return has(pipeline, args);
-		case "hasNot":
+		else if (stepName.equals("hasNot"))
 			return hasNot(pipeline, args);
-		case "id":
+		else if (stepName.equals("id"))
 			return id(pipeline, args);
-		case "in":
+		else if (stepName.equals("in"))
 			return in(pipeline, args);
-		case "inE":
+		else if (stepName.equals("inE"))
 			return inE(pipeline, args);
-		case "inV":
+		else if (stepName.equals("inV"))
 			return inV(pipeline, args);
-		case "interval":
+		else if (stepName.equals("interval"))
 			return interval(pipeline, args);
-		case "label":
+		else if (stepName.equals("label"))
 			return label(pipeline, args);
-		case "map":
+		else if (stepName.equals("map"))
 			return map(pipeline, args);
-		case "memoize":
+		else if (stepName.equals("memoize"))
 			return memoize(pipeline, args);
-		case "optional":
+		else if (stepName.equals("optional"))
 			return optional(pipeline, args);
-		case "order":
+		else if (stepName.equals("order"))
 			return order(pipeline, args);
-		case "out":
+		else if (stepName.equals("out"))
 			return out(pipeline, args);
-		case "outE":
+		else if (stepName.equals("outE"))
 			return outE(pipeline, args);
-		case "outV":
+		else if (stepName.equals("outV"))
 			return outV(pipeline, args);
-		case "property":
+		else if (stepName.equals("property"))
 			return property(pipeline, args);
-		case "random":
+		else if (stepName.equals("random"))
 			return random(pipeline, args);
-		case "range":
+		else if (stepName.equals("range"))
 			return range(pipeline, args);
-		case "scatter":
+		else if (stepName.equals("scatter"))
 			return scatter(pipeline, args);
-		case "select":
+		else if (stepName.equals("select"))
 			return select(pipeline, args);
-		case "simplePath":
+		else if (stepName.equals("simplePath"))
 			return simplePath(pipeline, args);
-		case "store":
+		else if (stepName.equals("store"))
 			return store(pipeline, args);
-		case "table":
+		else if (stepName.equals("table"))
 			return table(pipeline, args);
-		default:
+		else
 			throw new UnsupportedOperationException();
-		}
 
 	}
 
@@ -329,26 +327,18 @@ public class GremlinInterpreter {
 	private static Tokens.T parseToken(String arg) {
 		Tokens.T t = null;
 
-		switch (arg) {
-		case "T.gt":
+		if (arg.equals("T.gt"))
 			t = Tokens.T.gt;
-			break;
-		case "T.lt":
+		else if (arg.equals("T.lt"))
 			t = Tokens.T.lt;
-			break;
-		case "T.eq":
+		else if (arg.equals("T.eq"))
 			t = Tokens.T.eq;
-			break;
-		case "T.gte":
+		else if (arg.equals("T.gte"))
 			t = Tokens.T.gte;
-			break;
-		case "T.lte":
+		else if (arg.equals("T.lte"))
 			t = Tokens.T.lte;
-			break;
-		case "T.neq":
+		else if (arg.equals("T.neq"))
 			t = Tokens.T.neq;
-			break;
-		}
 
 		return t;
 	}

@@ -1,0 +1,31 @@
+package edu.utexas.ece.mpc.stdata.datamodel;
+
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
+import com.tinkerpop.frames.FramedGraph;
+
+import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpatiotemporalContext;
+import edu.utexas.ece.mpc.stdata.datamodel.vertices.VertexFrameFactory;
+import edu.utexas.ece.mpc.stdata.geo.Geoshape;
+
+public class SpatiotemporalContextFactory<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
+		extends VertexFrameFactory<G, E, F, SpatiotemporalContext> implements
+		ISpatiotemporalContextFactory {
+
+	public SpatiotemporalContextFactory(G baseGraph, F framedGraph) {
+		super(baseGraph, framedGraph);
+	}
+
+	/* ISpatiotemporalContextFactory interface implementation. */
+
+	@Override
+	public SpatiotemporalContext addSpatiotemporalContext(Geoshape location,
+			long timestamp) {
+		SpatiotemporalContext stContext = addFramedVertex(null,
+				SpatiotemporalContext.class);
+		stContext.setLocation(location);
+		stContext.setTimestamp(timestamp);
+
+		return stContext;
+	}
+}

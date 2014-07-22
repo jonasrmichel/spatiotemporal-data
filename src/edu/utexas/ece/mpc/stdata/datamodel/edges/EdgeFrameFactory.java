@@ -7,17 +7,18 @@ import com.tinkerpop.frames.FramedGraph;
 
 import edu.utexas.ece.mpc.stdata.datamodel.SpatiotemporalDatabase;
 
-public class EdgeFrameFactory<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>, T extends EdgeFrame> {
-	protected G baseGraph;
-	protected F framedGraph;
+public class EdgeFrameFactory<T extends EdgeFrame> {
+	protected TransactionalGraph baseGraph;
+	protected FramedGraph framedGraph;
 
-	public EdgeFrameFactory(G baseGraph, F framedGraph) {
+	public EdgeFrameFactory(TransactionalGraph baseGraph,
+			FramedGraph framedGraph) {
 		this.baseGraph = baseGraph;
 		this.framedGraph = framedGraph;
 	}
 
 	public T addEdge(Object id, Class<T> kind) {
-		T edge = framedGraph.addVertex(id, kind);
+		T edge = (T) framedGraph.addVertex(id, kind);
 
 		// set a special property that indicates this edge is framed
 		edge.asEdge().setProperty(SpatiotemporalDatabase.FRAMED_CLASS_KEY,

@@ -1,10 +1,7 @@
 package edu.utexas.ece.mpc.stdata.rules;
 
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
-import com.tinkerpop.frames.FramedGraph;
 
 import edu.utexas.ece.mpc.stdata.datamodel.ISpaceTimePositionFactory;
 import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
@@ -12,8 +9,7 @@ import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpaceTimePosition;
 import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpatiotemporalContext;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 
-public class SpatiallyModulatedTrajectoryRule<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
-		extends SpatiotemporalContextRule<G, E, F> {
+public class SpatiallyModulatedTrajectoryRule extends SpatiotemporalContextRule {
 	/** The spatial trajectory resolution (meters). */
 	double spatialResolution;
 
@@ -86,8 +82,8 @@ public class SpatiallyModulatedTrajectoryRule<G extends TransactionalGraph, E ex
 
 			} else {
 				pos = (SpaceTimePosition) vertexFrameFactories.get(
-						ISpaceTimePositionFactory.class.getName())
-						.addVertex(null, SpaceTimePosition.class);
+						ISpaceTimePositionFactory.class.getName()).addVertex(
+						null, SpaceTimePosition.class);
 				pos.setLocation(location);
 				pos.setTimestamp(timestamp);
 

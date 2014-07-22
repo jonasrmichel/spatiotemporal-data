@@ -1,15 +1,11 @@
 package edu.utexas.ece.mpc.stdata.rules;
 
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
-import com.tinkerpop.frames.FramedGraph;
 
 import edu.utexas.ece.mpc.stdata.datamodel.SpatiotemporalDatabase;
 import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpatiotemporalContext;
 
-public abstract class SpatiotemporalContextRule<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
-		extends GraphChangedRule<G, E, F> {
+public abstract class SpatiotemporalContextRule extends GraphChangedRule {
 
 	public SpatiotemporalContextRule() {
 		super();
@@ -23,12 +19,13 @@ public abstract class SpatiotemporalContextRule<G extends TransactionalGraph, E 
 
 		if (key.equals(SpatiotemporalContext.LOCATION_KEY)) {
 			// the host's location changed
-			locationChanged(framedGraph.frame(vertex,
+			locationChanged((SpatiotemporalContext) framedGraph.frame(vertex,
 					SpatiotemporalContext.class));
 
 		} else if (key.equals(SpatiotemporalContext.TIMESTAMP_KEY)) {
 			// the host's time changed
-			timeChanged(framedGraph.frame(vertex, SpatiotemporalContext.class));
+			timeChanged((SpatiotemporalContext) framedGraph.frame(vertex,
+					SpatiotemporalContext.class));
 		}
 	}
 

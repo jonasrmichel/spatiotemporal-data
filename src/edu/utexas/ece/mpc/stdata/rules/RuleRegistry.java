@@ -14,11 +14,10 @@ import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
 import edu.utexas.ece.mpc.stdata.datamodel.vertices.RuleContainer;
 import edu.utexas.ece.mpc.stdata.datamodel.vertices.VertexFrameFactory;
 
-public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
-		implements IRuleRegistry<G, E, F> {
-	private G baseGraph;
-	private E eventGraph;
-	private F framedGraph;
+public class RuleRegistry implements IRuleRegistry {
+	private TransactionalGraph baseGraph;
+	private EventGraph eventGraph;
+	private FramedGraph framedGraph;
 
 	private Map<Class, EdgeFrameFactory> edgeFrameFactories;
 	private Map<Class, VertexFrameFactory> vertexFrameFactories;
@@ -26,9 +25,10 @@ public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>,
 	private IContextProvider contextProvider;
 	private INetworkProvider networkProvider;
 
-	Map<Object, Rule<G, E, F>> rules;
+	Map<Object, Rule> rules;
 
-	public RuleRegistry(G baseGraph, E eventGraph, F framedGraph,
+	public RuleRegistry(TransactionalGraph baseGraph, EventGraph eventGraph,
+			FramedGraph framedGraph,
 			Map<Class, EdgeFrameFactory> edgeFrameFactories,
 			Map<Class, VertexFrameFactory> vertexFrameFactories,
 			IContextProvider contextProvider, INetworkProvider networkProvider) {
@@ -42,18 +42,18 @@ public class RuleRegistry<G extends TransactionalGraph, E extends EventGraph<G>,
 		this.contextProvider = contextProvider;
 		this.networkProvider = networkProvider;
 
-		rules = new HashMap<Object, Rule<G, E, F>>();
+		rules = new HashMap<Object, Rule>();
 	}
 
 	/* IRuleRegistry interface implementation. */
 
 	@Override
-	public RuleContainer registerRule(Rule<G, E, F> rule) {
+	public RuleContainer registerRule(Rule rule) {
 		return registerRule(rule, null);
 	}
 
 	@Override
-	public RuleContainer registerRule(Rule<G, E, F> rule, Datum datum) {
+	public RuleContainer registerRule(Rule rule, Datum datum) {
 		// create the rule's container vertex
 		RuleContainer ruleContainer = (RuleContainer) framedGraph.addVertex(
 				null, RuleContainer.class);

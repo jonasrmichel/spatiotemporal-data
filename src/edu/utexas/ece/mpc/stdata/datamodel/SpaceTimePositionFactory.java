@@ -1,19 +1,17 @@
 package edu.utexas.ece.mpc.stdata.datamodel;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
-import com.tinkerpop.frames.VertexFrame;
 
 import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpaceTimePosition;
 import edu.utexas.ece.mpc.stdata.datamodel.vertices.VertexFrameFactory;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 
-public class SpaceTimePositionFactory<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
-		extends VertexFrameFactory<G, E, F, SpaceTimePosition> implements
+public class SpaceTimePositionFactory extends
+		VertexFrameFactory<SpaceTimePosition> implements
 		ISpaceTimePositionFactory {
 
-	public SpaceTimePositionFactory(G baseGraph, F framedGraph) {
+	public SpaceTimePositionFactory(TransactionalGraph baseGraph, FramedGraph framedGraph) {
 		super(baseGraph, framedGraph);
 		// TODO Auto-generated constructor stub
 	}

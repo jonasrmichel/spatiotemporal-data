@@ -11,15 +11,15 @@ import edu.utexas.ece.mpc.stdata.INetworkProvider;
 import edu.utexas.ece.mpc.stdata.datamodel.edges.EdgeFrameFactory;
 import edu.utexas.ece.mpc.stdata.datamodel.vertices.VertexFrameFactory;
 
-public abstract class Rule<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>> {
+public abstract class Rule {
 	/** The rule's base graph. */
-	protected G baseGraph;
+	protected TransactionalGraph baseGraph;
 
 	/** The rule's event graph wrapper. */
-	protected E eventGraph;
+	protected EventGraph eventGraph;
 
 	/** The rule's framed graph wrapper. */
-	protected F framedGraph;
+	protected FramedGraph framedGraph;
 
 	/** Holds a map of edge frame factories keyed on their class. */
 	protected Map<Class, EdgeFrameFactory> edgeFrameFactories;
@@ -50,7 +50,8 @@ public abstract class Rule<G extends TransactionalGraph, E extends EventGraph<G>
 	 * @param networkProvider
 	 * @param delegate
 	 */
-	protected void initialize(G baseGraph, E eventGraph, F framedGraph,
+	protected void initialize(TransactionalGraph baseGraph,
+			EventGraph eventGraph, FramedGraph framedGraph,
 			Map<Class, EdgeFrameFactory> edgeFrameFactories,
 			Map<Class, VertexFrameFactory> vertexFrameFactories,
 			IContextProvider contextProvider, INetworkProvider networkProvider,

@@ -9,7 +9,6 @@ import java.util.Map;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 
 import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
@@ -19,15 +18,13 @@ import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
 import edu.utexas.ece.mpc.stdata.rules.Rule;
 
-public class DatumFactory<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
-		extends VertexFrameFactory<G, E, F, Datum> implements
-		IDatumFactory<G, E, F>, IDatumDelegate {
+public class DatumFactory extends VertexFrameFactory<Datum> implements
+		IDatumFactory, IDatumDelegate {
 	private ISpaceTimePositionFactory stpFactory;
-	private IRuleRegistry<G, E, F> ruleRegistry;
+	private IRuleRegistry ruleRegistry;
 
-	public DatumFactory(G baseGraph, F framedGraph,
-			ISpaceTimePositionFactory stpFactory,
-			IRuleRegistry<G, E, F> ruleRegistry) {
+	public DatumFactory(TransactionalGraph baseGraph, FramedGraph framedGraph,
+			ISpaceTimePositionFactory stpFactory, IRuleRegistry ruleRegistry) {
 		super(baseGraph, framedGraph);
 
 		this.stpFactory = stpFactory;
@@ -39,7 +36,7 @@ public class DatumFactory<G extends TransactionalGraph, E extends EventGraph<G>,
 	@Override
 	public Datum addDatum(Geoshape phenomenonLoc, Geoshape hostLoc,
 			long timestamp, String domain, List<Datum> context,
-			boolean measurable, Rule<G, E, F> rule) {
+			boolean measurable, Rule rule) {
 		// create the datum
 		Datum datum = addVertex(null, Datum.class);
 		datum.setDelegate(this);

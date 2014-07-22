@@ -60,19 +60,19 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	public Map<Class, VertexFrameFactory> vertexFrameFactories;
 
 	/** The spatiotemporal rule registry interface. */
-	public IRuleRegistry<G, EventGraph<G>, FramedGraph<EventGraph<G>>> ruleRegistry;
+	public IRuleRegistry ruleRegistry;
 
 	/** The space-time position factory interface. */
-	public ISpaceTimePositionFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>> stpFactory;
+	public ISpaceTimePositionFactory stpFactory;
 
 	/** The datum factory interface. */
-	public IDatumFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>> datumFactory;
+	public IDatumFactory datumFactory;
 
 	/**
 	 * A limited-scope factory to generate special vertices that represent the
 	 * host's spatiotemporal context.
 	 */
-	protected SpatiotemporalContextFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>> stContextFactory;
+	protected SpatiotemporalContextFactory stContextFactory;
 
 	/**
 	 * A special vertex that provides the graph database with access to the
@@ -94,17 +94,16 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		initializeFramedElementIndex();
 
 		// initialize rule registry
-		ruleRegistry = new RuleRegistry<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
-				baseGraph, eventGraph, framedGraph, edgeFrameFactories,
-				vertexFrameFactories, contextProvider, networkProvider);
+		ruleRegistry = new RuleRegistry(baseGraph, eventGraph, framedGraph,
+				edgeFrameFactories, vertexFrameFactories, contextProvider,
+				networkProvider);
 
 		// initialize element factories
-		stpFactory = new SpaceTimePositionFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
-				baseGraph, framedGraph);
-		datumFactory = new DatumFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
-				baseGraph, framedGraph, stpFactory, ruleRegistry);
-		stContextFactory = new SpatiotemporalContextFactory<G, EventGraph<G>, FramedGraph<EventGraph<G>>>(
-				baseGraph, framedGraph);
+		stpFactory = new SpaceTimePositionFactory(baseGraph, framedGraph);
+		datumFactory = new DatumFactory(baseGraph, framedGraph, stpFactory,
+				ruleRegistry);
+		stContextFactory = new SpatiotemporalContextFactory(baseGraph,
+				framedGraph);
 
 		// initialize element frame factory maps
 		edgeFrameFactories = new HashMap<Class, EdgeFrameFactory>();

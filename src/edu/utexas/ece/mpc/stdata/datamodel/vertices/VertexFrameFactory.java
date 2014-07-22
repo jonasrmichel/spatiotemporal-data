@@ -7,17 +7,17 @@ import com.tinkerpop.frames.VertexFrame;
 
 import edu.utexas.ece.mpc.stdata.datamodel.SpatiotemporalDatabase;
 
-public class VertexFrameFactory<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>, T extends VertexFrame> {
-	protected G baseGraph;
-	protected F framedGraph;
+public class VertexFrameFactory<T extends VertexFrame> {
+	protected TransactionalGraph baseGraph;
+	protected FramedGraph framedGraph;
 
-	public VertexFrameFactory(G baseGraph, F framedGraph) {
+	public VertexFrameFactory(TransactionalGraph baseGraph, FramedGraph framedGraph) {
 		this.baseGraph = baseGraph;
 		this.framedGraph = framedGraph;
 	}
 
 	public T addVertex(Object id, Class<T> kind) {
-		T vertex = framedGraph.addVertex(id, kind);
+		T vertex = (T) framedGraph.addVertex(id, kind);
 
 		// set a special property that indicates this vertex is framed
 		vertex.asVertex().setProperty(SpatiotemporalDatabase.FRAMED_CLASS_KEY,

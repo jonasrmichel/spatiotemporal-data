@@ -2,16 +2,11 @@ package edu.utexas.ece.mpc.stdata.datamodel;
 
 import java.util.List;
 
-import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
-import com.tinkerpop.frames.FramedGraph;
-
 import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 import edu.utexas.ece.mpc.stdata.rules.Rule;
 
-public interface IDatumFactory<G extends TransactionalGraph, E extends EventGraph<G>, F extends FramedGraph<EventGraph<G>>>
-		extends IDatumDelegate {
+public interface IDatumFactory extends IDatumDelegate {
 
 	/**
 	 * Creates a new datum with the provided parameters.
@@ -35,6 +30,6 @@ public interface IDatumFactory<G extends TransactionalGraph, E extends EventGrap
 	 */
 	public Datum addDatum(Geoshape phenomenonLoc, Geoshape hostLoc,
 			long timestamp, String domain, List<Datum> context,
-			boolean measurable, Rule<G, E, F> rule);
+			boolean measurable, Rule rule);
 
 }

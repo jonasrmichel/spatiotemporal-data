@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.tinkerpop.blueprints.Graph;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpaceTimePosition;
+import edu.utexas.ece.mpc.stdata.vertices.Datum;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
 
 public interface INetworkProvider {
 	

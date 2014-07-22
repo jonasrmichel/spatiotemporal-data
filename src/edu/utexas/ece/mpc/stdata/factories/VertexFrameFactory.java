@@ -1,19 +1,23 @@
-package edu.utexas.ece.mpc.stdata.datamodel.vertices;
+package edu.utexas.ece.mpc.stdata.factories;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.VertexFrame;
 
-import edu.utexas.ece.mpc.stdata.datamodel.SpatiotemporalDatabase;
+import edu.utexas.ece.mpc.stdata.SpatiotemporalDatabase;
+import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
+import edu.utexas.ece.mpc.stdata.rules.Rule;
 
-public class VertexFrameFactory<T extends VertexFrame> {
+public abstract class VertexFrameFactory<T extends VertexFrame> {
 	protected TransactionalGraph baseGraph;
 	protected FramedGraph framedGraph;
+	protected IRuleRegistry ruleRegistry;
 
-	public VertexFrameFactory(TransactionalGraph baseGraph, FramedGraph framedGraph) {
+	public VertexFrameFactory(TransactionalGraph baseGraph,
+			FramedGraph framedGraph, IRuleRegistry ruleRegistry) {
 		this.baseGraph = baseGraph;
 		this.framedGraph = framedGraph;
+		this.ruleRegistry = ruleRegistry;
 	}
 
 	public T addVertex(Object id, Class<T> kind) {
@@ -25,5 +29,4 @@ public class VertexFrameFactory<T extends VertexFrame> {
 
 		return vertex;
 	}
-
 }

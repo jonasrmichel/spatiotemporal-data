@@ -1,4 +1,4 @@
-package edu.utexas.ece.mpc.stdata.datamodel;
+package edu.utexas.ece.mpc.stdata;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,16 +17,19 @@ import com.tinkerpop.frames.EdgeFrame;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.VertexFrame;
 
-import edu.utexas.ece.mpc.stdata.IContextProvider;
-import edu.utexas.ece.mpc.stdata.INetworkProvider;
-import edu.utexas.ece.mpc.stdata.datamodel.edges.EdgeFrameFactory;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpaceTimePosition;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpatiotemporalContext;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.VertexFrameFactory;
+import edu.utexas.ece.mpc.stdata.factories.DatumFactory;
+import edu.utexas.ece.mpc.stdata.factories.EdgeFrameFactory;
+import edu.utexas.ece.mpc.stdata.factories.IDatumFactory;
+import edu.utexas.ece.mpc.stdata.factories.ISpaceTimePositionFactory;
+import edu.utexas.ece.mpc.stdata.factories.SpaceTimePositionFactory;
+import edu.utexas.ece.mpc.stdata.factories.SpatiotemporalContextFactory;
+import edu.utexas.ece.mpc.stdata.factories.VertexFrameFactory;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
 import edu.utexas.ece.mpc.stdata.rules.RuleRegistry;
+import edu.utexas.ece.mpc.stdata.vertices.Datum;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
+import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContext;
 
 public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyIndexableGraph> {
 	/** The framed class type property key. */
@@ -45,34 +48,34 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	protected INetworkProvider networkProvider;
 
 	/** Base graph database. */
-	public G baseGraph;
+	protected G baseGraph;
 
 	/** Event graph wrapper. */
-	public EventGraph<G> eventGraph;
+	protected EventGraph<G> eventGraph;
 
 	/** Framed graph wrapper. */
-	public FramedGraph<EventGraph<G>> framedGraph;
+	protected FramedGraph<EventGraph<G>> framedGraph;
 
 	/** EdgeFrame factories. */
-	public Map<Class, EdgeFrameFactory> edgeFrameFactories;
+	protected Map<Class, EdgeFrameFactory> edgeFrameFactories;
 
 	/** VertexFrame factories. */
-	public Map<Class, VertexFrameFactory> vertexFrameFactories;
+	protected Map<Class, VertexFrameFactory> vertexFrameFactories;
 
 	/** The spatiotemporal rule registry interface. */
-	public IRuleRegistry ruleRegistry;
+	protected IRuleRegistry ruleRegistry;
 
 	/** The space-time position factory interface. */
-	public ISpaceTimePositionFactory stpFactory;
+	// protected ISpaceTimePositionFactory stpFactory;
 
 	/** The datum factory interface. */
-	public IDatumFactory datumFactory;
+	// protected IDatumFactory datumFactory;
 
 	/**
 	 * A limited-scope factory to generate special vertices that represent the
 	 * host's spatiotemporal context.
 	 */
-	protected SpatiotemporalContextFactory stContextFactory;
+	private SpatiotemporalContextFactory stContextFactory;
 
 	/**
 	 * A special vertex that provides the graph database with access to the
@@ -98,21 +101,20 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 				edgeFrameFactories, vertexFrameFactories, contextProvider,
 				networkProvider);
 
-		// initialize element factories
-		stpFactory = new SpaceTimePositionFactory(baseGraph, framedGraph);
-		datumFactory = new DatumFactory(baseGraph, framedGraph, stpFactory,
-				ruleRegistry);
-		stContextFactory = new SpatiotemporalContextFactory(baseGraph,
-				framedGraph);
-
-		// initialize element frame factory maps
-		edgeFrameFactories = new HashMap<Class, EdgeFrameFactory>();
-		vertexFrameFactories = new HashMap<Class, VertexFrameFactory>();
-
-		vertexFrameFactories.put(SpaceTimePosition.class,
+		// initialize framed element factories
+		SpaceTimePositionFactory stpFactory = new SpaceTimePositionFactory(
+				baseGraph, framedGraph, ruleRegistry);
+		addVertexFrameFactory(SpaceTimePosition.class,
 				(VertexFrameFactory) stpFactory);
-		vertexFrameFactories
-				.put(Datum.class, (VertexFrameFactory) datumFactory);
+
+		DatumFactory datumFactory = new DatumFactory(baseGraph, framedGraph,
+				ruleRegistry, contextProvider, stpFactory);
+		addVertexFrameFactory(Datum.class, (VertexFrameFactory) datumFactory);
+
+		stContextFactory = new SpatiotemporalContextFactory(baseGraph,
+				framedGraph, ruleRegistry);
+		addVertexFrameFactory(SpatiotemporalContext.class,
+				(VertexFrameFactory) stContextFactory);
 
 		// initialize the local notion of space-time context
 		initializeSpatiotemporalContext();
@@ -176,6 +178,34 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	}
 
 	/**
+	 * Returns an iterator over all the framed vertices in the graph database
+	 * with the provided frame class.
+	 * 
+	 * @param kind
+	 *            a VertexFrame class.
+	 * @return an iterator over the vertices framed as the provided class.
+	 */
+	public <F extends VertexFrame> Iterable<F> getFramedVertices(Class<F> kind) {
+		Iterable<Vertex> vertices = baseGraph.getVertices(FRAMED_CLASS_KEY,
+				kind.getName());
+		Iterable<F> framedVertices = framedGraph.frameVertices(vertices, kind);
+
+		return framedVertices;
+	}
+
+	/**
+	 * Returns the factory associated with the provided edge frame type.
+	 * 
+	 * @param type
+	 *            an edge frame type.
+	 * @return the edge frame factory associated with the provided type.
+	 */
+	public <T extends EdgeFrame> EdgeFrameFactory<T> getEdgeFrameFactory(
+			Class<T> type) {
+		return edgeFrameFactories.get(type);
+	} // FIXME Do we really only want ContextualRelation extensions?
+
+	/**
 	 * Registers a edge vertex factory with the database.
 	 * 
 	 * @param type
@@ -183,10 +213,25 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * @param vertexFactory
 	 *            the {@link EdgeFrameFactory} to register.
 	 */
-	public <T extends EdgeFrame> void addEdgeFactory(Class<T> type,
+	public <T extends EdgeFrame> void addEdgeFrameFactory(Class<T> type,
 			EdgeFrameFactory edgeFactory) {
+		if (edgeFrameFactories == null)
+			edgeFrameFactories = new HashMap<Class, EdgeFrameFactory>();
+
 		edgeFrameFactories.put(type, edgeFactory);
-	}
+	} // FIXME Do we really only want ContextualRelationFactory extensions?
+
+	/**
+	 * Returns the factory associated with the provided vertex frame type.
+	 * 
+	 * @param type
+	 *            an edge frame type.
+	 * @return the edge frame factory associated with the provided type.
+	 */
+	public <T extends VertexFrame> VertexFrameFactory<T> getVertexFrameFactory(
+			Class<T> type) {
+		return vertexFrameFactories.get(type);
+	} // FIXME Do we really only want Datum extensions?
 
 	/**
 	 * Registers a frame vertex factory with the database.
@@ -196,9 +241,39 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * @param vertexFactory
 	 *            the {@link VertexFrameFactory} to register.
 	 */
-	public <T extends VertexFrame> void addVertexFactory(Class<T> type,
+	public <T extends VertexFrame> void addVertexFrameFactory(Class<T> type,
 			VertexFrameFactory vertexFactory) {
+		if (vertexFrameFactories == null)
+			vertexFrameFactories = new HashMap<Class, VertexFrameFactory>();
+
 		vertexFrameFactories.put(type, vertexFactory);
+	} // FIXME Do we really only want DatumFactory extensions?
+
+	/**
+	 * Returns the rule registry interface.
+	 * 
+	 * @return the database's rule registry interface.
+	 */
+	public IRuleRegistry getRuleRegistry() {
+		return ruleRegistry;
+	}
+
+	/**
+	 * Returns the space-time position factory interface.
+	 * 
+	 * @return the database's space-time position factory interface.
+	 */
+	public ISpaceTimePositionFactory getSpaceTimePositionFactory() {
+		return (SpaceTimePositionFactory) getVertexFrameFactory(SpaceTimePosition.class);
+	}
+
+	/**
+	 * Returns the datum factory interface.
+	 * 
+	 * @return the database's datum factory interface.
+	 */
+	public IDatumFactory getDatumFactory() {
+		return (DatumFactory) getVertexFrameFactory(Datum.class);
 	}
 
 	/**
@@ -218,22 +293,6 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	}
 
 	/**
-	 * Returns an iterator over all the framed vertices in the graph database
-	 * with the provided frame class.
-	 * 
-	 * @param kind
-	 *            a VertexFrame class.
-	 * @return an iterator over the vertices framed as the provided class.
-	 */
-	public <F extends VertexFrame> Iterable<F> getFramedVertices(Class<F> kind) {
-		Iterable<Vertex> vertices = baseGraph.getVertices(FRAMED_CLASS_KEY,
-				kind.getName());
-		Iterable<F> framedVertices = framedGraph.frameVertices(vertices, kind);
-
-		return framedVertices;
-	}
-
-	/**
 	 * Copies the provided graph into the spatiotemporal graph database,
 	 * updating each datum type vertex's spatiotemporal metadata.
 	 * 
@@ -248,7 +307,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		for (Vertex fromVertex : graph.getVertices()) {
 			Vertex toVertex = baseGraph.addVertex(fromVertex.getId());
 
-			// check if vertex is datum type
+			// check if the vertex is datum type
 			if (toVertex.getPropertyKeys().contains(FRAMED_CLASS_KEY)
 					&& toVertex.getProperty(FRAMED_CLASS_KEY).equals(
 							Datum.class.getName())) {
@@ -270,11 +329,12 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		}
 
 		// update datum's spatiotemporal metadata
-		SpaceTimePosition position = stpFactory.addSpaceTimePosition(
-				contextProvider.getLocation(), contextProvider.getTimestamp(),
-				contextProvider.getDomain());
+		SpaceTimePosition position = getSpaceTimePositionFactory()
+				.addSpaceTimePosition(contextProvider.getLocation(),
+						contextProvider.getTimestamp(),
+						contextProvider.getDomain());
 		for (Datum datum : data) {
-			datumFactory.append(datum, position);
+			getDatumFactory().append(datum, position);
 		}
 	}
 }

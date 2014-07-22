@@ -4,7 +4,7 @@ import java.util.NoSuchElementException;
 
 import com.tinkerpop.pipes.AbstractPipe;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.GeoVertex;
+import edu.utexas.ece.mpc.stdata.vertices.GeoVertex;
 
 public class CoordinateFilterPipe extends AbstractPipe<GeoVertex, GeoVertex> implements GeoFilterPipe<GeoVertex> {
 	

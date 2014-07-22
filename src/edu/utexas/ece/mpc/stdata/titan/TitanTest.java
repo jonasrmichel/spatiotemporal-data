@@ -17,9 +17,9 @@ import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
 import com.tinkerpop.frames.FramedGraph;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpaceTimePosition;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
+import edu.utexas.ece.mpc.stdata.vertices.Datum;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
 
 public class TitanTest {
 	public static final String INDEX = "test-index";

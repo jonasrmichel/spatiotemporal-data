@@ -1,13 +1,13 @@
-package edu.utexas.ece.mpc.stdata.datamodel.edges;
+package edu.utexas.ece.mpc.stdata.edges;
 
 import com.tinkerpop.frames.Domain;
 import com.tinkerpop.frames.EdgeFrame;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.Range;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
+import edu.utexas.ece.mpc.stdata.vertices.Datum;
 
-public interface Context extends EdgeFrame {
+public interface ContextualRelation extends EdgeFrame {
 	@Property("relation")
 	public String getRelation();
 

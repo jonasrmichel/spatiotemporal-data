@@ -3,11 +3,11 @@ package edu.utexas.ece.mpc.stdata.rules;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
-import edu.utexas.ece.mpc.stdata.datamodel.ISpaceTimePositionFactory;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpaceTimePosition;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpatiotemporalContext;
+import edu.utexas.ece.mpc.stdata.factories.ISpaceTimePositionFactory;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
+import edu.utexas.ece.mpc.stdata.vertices.Datum;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
+import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContext;
 
 public class SpatiallyModulatedTrajectoryRule extends SpatiotemporalContextRule {
 	/** The spatial trajectory resolution (meters). */

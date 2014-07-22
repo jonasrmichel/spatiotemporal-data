@@ -1,4 +1,4 @@
-package edu.utexas.ece.mpc.stdata.datamodel.vertices;
+package edu.utexas.ece.mpc.stdata.vertices;
 
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;

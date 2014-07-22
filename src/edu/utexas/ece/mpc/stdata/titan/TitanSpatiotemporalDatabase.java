@@ -12,7 +12,7 @@ import com.thinkaurelius.titan.core.TitanGraph;
 
 import edu.utexas.ece.mpc.stdata.IContextProvider;
 import edu.utexas.ece.mpc.stdata.INetworkProvider;
-import edu.utexas.ece.mpc.stdata.datamodel.SpatiotemporalDatabase;
+import edu.utexas.ece.mpc.stdata.SpatiotemporalDatabase;
 
 public class TitanSpatiotemporalDatabase extends
 		SpatiotemporalDatabase<TitanGraph> {

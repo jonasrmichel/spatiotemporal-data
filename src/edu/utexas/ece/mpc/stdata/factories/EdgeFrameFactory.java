@@ -1,20 +1,23 @@
-package edu.utexas.ece.mpc.stdata.datamodel.edges;
+package edu.utexas.ece.mpc.stdata.factories;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.EdgeFrame;
 import com.tinkerpop.frames.FramedGraph;
 
-import edu.utexas.ece.mpc.stdata.datamodel.SpatiotemporalDatabase;
+import edu.utexas.ece.mpc.stdata.SpatiotemporalDatabase;
+import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
+import edu.utexas.ece.mpc.stdata.rules.Rule;
 
-public class EdgeFrameFactory<T extends EdgeFrame> {
+public abstract class EdgeFrameFactory<T extends EdgeFrame> {
 	protected TransactionalGraph baseGraph;
 	protected FramedGraph framedGraph;
+	protected IRuleRegistry ruleRegistry;
 
 	public EdgeFrameFactory(TransactionalGraph baseGraph,
-			FramedGraph framedGraph) {
+			FramedGraph framedGraph, IRuleRegistry ruleRegistry) {
 		this.baseGraph = baseGraph;
 		this.framedGraph = framedGraph;
+		this.ruleRegistry = ruleRegistry;
 	}
 
 	public T addEdge(Object id, Class<T> kind) {

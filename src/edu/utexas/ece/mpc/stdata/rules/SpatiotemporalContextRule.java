@@ -2,8 +2,8 @@ package edu.utexas.ece.mpc.stdata.rules;
 
 import com.tinkerpop.blueprints.Vertex;
 
-import edu.utexas.ece.mpc.stdata.datamodel.SpatiotemporalDatabase;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpatiotemporalContext;
+import edu.utexas.ece.mpc.stdata.SpatiotemporalDatabase;
+import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContext;
 
 public abstract class SpatiotemporalContextRule extends GraphChangedRule {
 

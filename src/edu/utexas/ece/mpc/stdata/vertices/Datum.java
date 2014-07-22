@@ -1,12 +1,11 @@
-package edu.utexas.ece.mpc.stdata.datamodel.vertices;
+package edu.utexas.ece.mpc.stdata.vertices;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Incidence;
 import com.tinkerpop.frames.Property;
 
-import edu.utexas.ece.mpc.stdata.datamodel.IDatumDelegate;
-import edu.utexas.ece.mpc.stdata.datamodel.edges.Context;
+import edu.utexas.ece.mpc.stdata.edges.ContextualRelation;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 
 public interface Datum extends GeoVertex {
@@ -33,7 +32,7 @@ public interface Datum extends GeoVertex {
 	public Iterable<Datum> getContextData();
 
 	@Incidence(label = "context")
-	public Iterable<Context> getContext();
+	public Iterable<ContextualRelation> getContext();
 
 	@Adjacency(label = "context")
 	public void setContextData(Iterable<Datum> data);
@@ -42,13 +41,13 @@ public interface Datum extends GeoVertex {
 	public void addContextData(Datum datum);
 
 	@Incidence(label = "context")
-	public Context addContext(Datum datum);
+	public ContextualRelation addContext(Datum datum);
 
 	@Adjacency(label = "context")
 	public void removeContextData(Datum datum);
 
 	@Incidence(label = "context")
-	public void removeContext(Context context);
+	public void removeContext(ContextualRelation context);
 
 	/*
 	 * Special simulation-specific properties and methods. We can't just extend

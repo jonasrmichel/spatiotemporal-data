@@ -1,19 +1,19 @@
-package edu.utexas.ece.mpc.stdata.datamodel;
+package edu.utexas.ece.mpc.stdata.factories;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpatiotemporalContext;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.VertexFrameFactory;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
+import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
+import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContext;
 
 public class SpatiotemporalContextFactory extends
 		VertexFrameFactory<SpatiotemporalContext> implements
 		ISpatiotemporalContextFactory {
 
 	public SpatiotemporalContextFactory(TransactionalGraph baseGraph,
-			FramedGraph framedGraph) {
-		super(baseGraph, framedGraph);
+			FramedGraph framedGraph, IRuleRegistry ruleRegistry) {
+		super(baseGraph, framedGraph, ruleRegistry);
 	}
 
 	/* ISpatiotemporalContextFactory interface implementation. */

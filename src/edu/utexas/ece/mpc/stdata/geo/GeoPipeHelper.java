@@ -1,6 +1,6 @@
 package edu.utexas.ece.mpc.stdata.geo;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.GeoVertex;
+import edu.utexas.ece.mpc.stdata.vertices.GeoVertex;
 
 public class GeoPipeHelper {
 

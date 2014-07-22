@@ -15,9 +15,9 @@ import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.gremlin.java.GremlinPipeline;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpaceTimePosition;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
+import edu.utexas.ece.mpc.stdata.vertices.Datum;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
 
 public class Playground {
 

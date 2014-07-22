@@ -2,7 +2,7 @@ package edu.utexas.ece.mpc.stdata.geo;
 
 import com.tinkerpop.gremlin.java.GremlinPipeline;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.GeoVertex;
+import edu.utexas.ece.mpc.stdata.vertices.GeoVertex;
 
 public class GeoGremlinPipeline<S, E> extends GremlinPipeline<S, E> {
 

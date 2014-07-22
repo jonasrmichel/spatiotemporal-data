@@ -5,14 +5,16 @@ import java.util.Map;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
+import com.tinkerpop.frames.EdgeFrame;
 import com.tinkerpop.frames.FramedGraph;
+import com.tinkerpop.frames.VertexFrame;
 
 import edu.utexas.ece.mpc.stdata.IContextProvider;
 import edu.utexas.ece.mpc.stdata.INetworkProvider;
-import edu.utexas.ece.mpc.stdata.datamodel.edges.EdgeFrameFactory;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.RuleContainer;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.VertexFrameFactory;
+import edu.utexas.ece.mpc.stdata.factories.EdgeFrameFactory;
+import edu.utexas.ece.mpc.stdata.factories.VertexFrameFactory;
+import edu.utexas.ece.mpc.stdata.vertices.Datum;
+import edu.utexas.ece.mpc.stdata.vertices.RuleContainer;
 
 public class RuleRegistry implements IRuleRegistry {
 	private TransactionalGraph baseGraph;
@@ -53,7 +55,7 @@ public class RuleRegistry implements IRuleRegistry {
 	}
 
 	@Override
-	public RuleContainer registerRule(Rule rule, Datum datum) {
+	public RuleContainer registerRule(Rule rule, Datum... data) {
 		// create the rule's container vertex
 		RuleContainer ruleContainer = (RuleContainer) framedGraph.addVertex(
 				null, RuleContainer.class);
@@ -64,7 +66,8 @@ public class RuleRegistry implements IRuleRegistry {
 				ruleContainer);
 
 		// configure the graph references to governed data
-		ruleContainer.addGoverns(datum);
+		for (Datum datum : data)
+			ruleContainer.addGoverns(datum);
 
 		// register the rule
 		rules.put(ruleContainer.asVertex().getId(), rule);

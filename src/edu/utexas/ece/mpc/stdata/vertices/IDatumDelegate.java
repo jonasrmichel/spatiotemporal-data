@@ -1,10 +1,8 @@
-package edu.utexas.ece.mpc.stdata.datamodel;
+package edu.utexas.ece.mpc.stdata.vertices;
 
 import java.util.Iterator;
 import java.util.Map;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpaceTimePosition;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 
 public interface IDatumDelegate {

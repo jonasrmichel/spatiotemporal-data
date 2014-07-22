@@ -1,4 +1,4 @@
-package edu.utexas.ece.mpc.stdata.datamodel;
+package edu.utexas.ece.mpc.stdata.factories;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,32 +11,30 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.frames.FramedGraph;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpaceTimePosition;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.VertexFrameFactory;
+import edu.utexas.ece.mpc.stdata.IContextProvider;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
 import edu.utexas.ece.mpc.stdata.rules.Rule;
+import edu.utexas.ece.mpc.stdata.vertices.Datum;
+import edu.utexas.ece.mpc.stdata.vertices.IDatumDelegate;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
 
 public class DatumFactory extends VertexFrameFactory<Datum> implements
 		IDatumFactory, IDatumDelegate {
-	private ISpaceTimePositionFactory stpFactory;
-	private IRuleRegistry ruleRegistry;
+	protected IContextProvider contextProvider;
+	protected ISpaceTimePositionFactory stpFactory;
 
 	public DatumFactory(TransactionalGraph baseGraph, FramedGraph framedGraph,
-			ISpaceTimePositionFactory stpFactory, IRuleRegistry ruleRegistry) {
-		super(baseGraph, framedGraph);
+			IRuleRegistry ruleRegistry, IContextProvider contextProvider,
+			ISpaceTimePositionFactory stpFactory) {
+		super(baseGraph, framedGraph, ruleRegistry);
 
+		this.contextProvider = contextProvider;
 		this.stpFactory = stpFactory;
-		this.ruleRegistry = ruleRegistry;
 	}
 
-	/* IDatumFactory interface implementation. */
-
-	@Override
-	public Datum addDatum(Geoshape phenomenonLoc, Geoshape hostLoc,
-			long timestamp, String domain, List<Datum> context,
-			boolean measurable, Rule rule) {
+	private Datum addDatum(Geoshape phenomenonLoc, List<Datum> context,
+			Rule rule, boolean measurable) {
 		// create the datum
 		Datum datum = addVertex(null, Datum.class);
 		datum.setDelegate(this);
@@ -44,13 +42,16 @@ public class DatumFactory extends VertexFrameFactory<Datum> implements
 
 		// initialize the datum's spatiotemporal trajectory
 		if (!measurable) {
-			SpaceTimePosition pos = stpFactory.addSpaceTimePosition(hostLoc,
-					timestamp, domain);
+			SpaceTimePosition pos = stpFactory
+					.addSpaceTimePosition(contextProvider.getLocation(),
+							contextProvider.getTimestamp(),
+							contextProvider.getDomain());
 
 			append(datum, pos);
 
 		} else {
-			appendMeasured(datum, hostLoc, timestamp);
+			appendMeasured(datum, contextProvider.getLocation(),
+					contextProvider.getTimestamp());
 
 		}
 
@@ -59,13 +60,26 @@ public class DatumFactory extends VertexFrameFactory<Datum> implements
 		if (context != null)
 			datum.setContextData((Iterable<Datum>) context);
 
-		// commit changes
-		// baseGraph.commit();
-
 		// register the datum's rule
 		ruleRegistry.registerRule(rule, datum);
 
+		// commit changes
+		// baseGraph.commit();
+
 		return datum;
+	}
+
+	/* IDatumFactory interface implementation. */
+
+	@Override
+	public Datum addDatum(Geoshape phenomenonLoc, List<Datum> context, Rule rule) {
+		return addDatum(phenomenonLoc, context, rule, false);
+	}
+
+	@Override
+	public Datum addMeasurableDatum(Geoshape phenomenonLoc,
+			List<Datum> context, Rule rule) {
+		return addDatum(phenomenonLoc, context, rule, true);
 	}
 
 	/* IDatumDelegate interface implementation. */

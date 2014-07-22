@@ -8,8 +8,8 @@ import com.tinkerpop.frames.FramedGraph;
 
 import edu.utexas.ece.mpc.stdata.IContextProvider;
 import edu.utexas.ece.mpc.stdata.INetworkProvider;
-import edu.utexas.ece.mpc.stdata.datamodel.edges.EdgeFrameFactory;
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.VertexFrameFactory;
+import edu.utexas.ece.mpc.stdata.factories.EdgeFrameFactory;
+import edu.utexas.ece.mpc.stdata.factories.VertexFrameFactory;
 
 public abstract class Rule {
 	/** The rule's base graph. */

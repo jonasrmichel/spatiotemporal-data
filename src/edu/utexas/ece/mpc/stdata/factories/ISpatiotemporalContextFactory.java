@@ -1,7 +1,7 @@
-package edu.utexas.ece.mpc.stdata.datamodel;
+package edu.utexas.ece.mpc.stdata.factories;
 
-import edu.utexas.ece.mpc.stdata.datamodel.vertices.SpatiotemporalContext;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
+import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContext;
 
 public interface ISpatiotemporalContextFactory {
 

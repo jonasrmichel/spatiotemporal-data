@@ -23,7 +23,7 @@ public class SpaceTimePositionFactory<G extends TransactionalGraph, E extends Ev
 	@Override
 	public SpaceTimePosition addSpaceTimePosition(Geoshape location,
 			long timestamp, String domain) {
-		SpaceTimePosition pos = addFramedVertex(null, SpaceTimePosition.class);
+		SpaceTimePosition pos = addVertex(null, SpaceTimePosition.class);
 		pos.setLocation(location);
 		pos.setTimestamp(timestamp);
 		pos.setDomain(domain);

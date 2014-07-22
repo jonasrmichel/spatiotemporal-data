@@ -41,7 +41,7 @@ public class DatumFactory<G extends TransactionalGraph, E extends EventGraph<G>,
 			long timestamp, String domain, List<Datum> context,
 			boolean measurable, Rule<G, E, F> rule) {
 		// create the datum
-		Datum datum = addFramedVertex(null, Datum.class);
+		Datum datum = addVertex(null, Datum.class);
 		datum.setDelegate(this);
 		datum.setIsMeasurable(measurable);
 

@@ -16,7 +16,7 @@ public class VertexFrameFactory<G extends TransactionalGraph, E extends EventGra
 		this.framedGraph = framedGraph;
 	}
 
-	public T addFramedVertex(Object id, Class<T> kind) {
+	public T addVertex(Object id, Class<T> kind) {
 		T vertex = framedGraph.addVertex(id, kind);
 
 		// set a special property that indicates this vertex is framed

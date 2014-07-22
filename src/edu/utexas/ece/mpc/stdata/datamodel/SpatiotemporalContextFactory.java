@@ -21,7 +21,7 @@ public class SpatiotemporalContextFactory<G extends TransactionalGraph, E extend
 	@Override
 	public SpatiotemporalContext addSpatiotemporalContext(Geoshape location,
 			long timestamp) {
-		SpatiotemporalContext stContext = addFramedVertex(null,
+		SpatiotemporalContext stContext = addVertex(null,
 				SpatiotemporalContext.class);
 		stContext.setLocation(location);
 		stContext.setTimestamp(timestamp);

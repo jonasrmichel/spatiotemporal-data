@@ -179,27 +179,27 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	/**
 	 * Registers a edge vertex factory with the database.
 	 * 
-	 * @param clazz
+	 * @param type
 	 *            the {@link EdgeFrame} class the factory produces.
 	 * @param vertexFactory
 	 *            the {@link EdgeFrameFactory} to register.
 	 */
-	public <T extends EdgeFrame> void addEdgeFactory(Class<T> clazz,
+	public <T extends EdgeFrame> void addEdgeFactory(Class<T> type,
 			EdgeFrameFactory edgeFactory) {
-		edgeFrameFactories.put(clazz, edgeFactory);
+		edgeFrameFactories.put(type, edgeFactory);
 	}
 
 	/**
 	 * Registers a frame vertex factory with the database.
 	 * 
-	 * @param clazz
+	 * @param type
 	 *            the {@link VertexFrame} class the factory produces.
 	 * @param vertexFactory
 	 *            the {@link VertexFrameFactory} to register.
 	 */
-	public <T extends VertexFrame> void addVertexFactory(Class<T> clazz,
+	public <T extends VertexFrame> void addVertexFactory(Class<T> type,
 			VertexFrameFactory vertexFactory) {
-		vertexFrameFactories.put(clazz, vertexFactory);
+		vertexFrameFactories.put(type, vertexFactory);
 	}
 
 	/**

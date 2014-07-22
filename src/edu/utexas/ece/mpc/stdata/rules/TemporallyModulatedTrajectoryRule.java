@@ -93,7 +93,7 @@ public class TemporallyModulatedTrajectoryRule<G extends TransactionalGraph, E e
 			} else {
 				pos = (SpaceTimePosition) vertexFrameFactories.get(
 						ISpaceTimePositionFactory.class.getName())
-						.addFramedVertex(null, SpaceTimePosition.class);
+						.addVertex(null, SpaceTimePosition.class);
 				pos.setLocation(location);
 				pos.setTimestamp(timestamp);
 

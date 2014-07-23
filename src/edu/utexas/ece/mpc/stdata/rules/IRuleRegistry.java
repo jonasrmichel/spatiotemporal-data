@@ -1,5 +1,7 @@
 package edu.utexas.ece.mpc.stdata.rules;
 
+import com.tinkerpop.frames.VertexFrame;
+
 import edu.utexas.ece.mpc.stdata.vertices.Datum;
 import edu.utexas.ece.mpc.stdata.vertices.RuleContainer;
 
@@ -24,4 +26,9 @@ public interface IRuleRegistry {
 	 * @return the rule's container in the graph database.
 	 */
 	public RuleContainer registerRule(Rule rule, Datum... data);
+	
+	
+	
+	public <V extends VertexFrame> RuleContainer registerRule(Rule rule, V... vertices);
+	
 }

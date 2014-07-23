@@ -76,14 +76,15 @@ public class SpatiallyModulatedTrajectoryRule extends SpatiotemporalContextRule 
 
 		// trigger trajectory updates
 		SpaceTimePosition pos;
-		for (Datum datum : delegate.getGoverns()) {
+		Iterable<Datum> goverenedData = delegate.getGoverns();
+		for (Datum datum : goverenedData) {
 			if (datum.getIsMeasurable()) {
 				datum.getDelegate().appendMeasured(datum, location, timestamp);
 
 			} else {
 				pos = (SpaceTimePosition) vertexFrameFactories.get(
-						ISpaceTimePositionFactory.class.getName()).addVertex(
-						null, SpaceTimePosition.class);
+						SpaceTimePosition.class).addVertex(null,
+						SpaceTimePosition.class);
 				pos.setLocation(location);
 				pos.setTimestamp(timestamp);
 

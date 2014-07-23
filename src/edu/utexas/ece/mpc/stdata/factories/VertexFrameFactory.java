@@ -29,4 +29,14 @@ public abstract class VertexFrameFactory<T extends VertexFrame> {
 
 		return vertex;
 	}
+
+	public T addVertex(Object id, Class<T> kind, Rule rule) {
+		T vertex = addVertex(id, kind);
+
+		// register the vertex's rule
+		if (rule != null)
+			ruleRegistry.registerRule(rule, vertex);
+
+		return vertex;
+	}
 }

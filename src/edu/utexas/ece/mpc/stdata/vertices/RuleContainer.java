@@ -7,7 +7,8 @@ import com.tinkerpop.frames.VertexFrame;
 import edu.utexas.ece.mpc.stdata.rules.IRuleDelegate;
 import edu.utexas.ece.mpc.stdata.rules.Rule;
 
-public interface RuleContainer extends VertexFrame, IRuleDelegate {
+public interface RuleContainer<V extends VertexFrame> extends VertexFrame,
+		IRuleDelegate<V> {
 	/** The contained rule. */
 	@Property("rule")
 	public Rule getRule();
@@ -15,14 +16,14 @@ public interface RuleContainer extends VertexFrame, IRuleDelegate {
 	@Property("rule")
 	public void setRule(Rule rule);
 
-	/** A rule may explicitly govern one or more datum. */
+	/** A rule may explicitly govern one or more vertices. */
 	@Adjacency(label = "governs")
-	public Iterable<Datum> getGoverns();
+	public Iterable<V> getGoverns();
 
 	@Adjacency(label = "governs")
-	public void setGoverns(Iterable<Datum> data);
+	public void setGoverns(Iterable<V> vertices);
 
 	@Adjacency(label = "governs")
-	public void addGoverns(Datum datum);
+	public void addGoverns(V vertex);
 
 }

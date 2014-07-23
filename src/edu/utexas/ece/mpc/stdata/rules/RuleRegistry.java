@@ -75,4 +75,26 @@ public class RuleRegistry implements IRuleRegistry {
 		return ruleContainer;
 	}
 
+	@Override
+	public <V extends VertexFrame> RuleContainer<V> registerRule(Rule rule,
+			V... vertices) {
+		// create the rule's container vertex
+		RuleContainer<V> ruleContainer = (RuleContainer<V>) framedGraph
+				.addVertex(null, RuleContainer.class);
+
+		// intialize the rule with the container as its delegate
+		rule.initialize(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
+				vertexFrameFactories, contextProvider, networkProvider,
+				ruleContainer);
+
+		// configure the graph references to governed data
+		for (V vertex : vertices)
+			ruleContainer.addGoverns(vertex);
+
+		// register the rule
+		rules.put(ruleContainer.asVertex().getId(), rule);
+
+		return ruleContainer;
+	}
+
 }

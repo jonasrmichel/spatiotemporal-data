@@ -36,7 +36,7 @@ public class DatumFactory extends VertexFrameFactory<Datum> implements
 	private Datum addDatum(Geoshape phenomenonLoc, List<Datum> context,
 			Rule rule, boolean measurable) {
 		// create the datum
-		Datum datum = addVertex(null, Datum.class);
+		Datum datum = addVertex(null, Datum.class, rule);
 		datum.setDelegate(this);
 		datum.setIsMeasurable(measurable);
 
@@ -60,8 +60,8 @@ public class DatumFactory extends VertexFrameFactory<Datum> implements
 		if (context != null)
 			datum.setContextData((Iterable<Datum>) context);
 
-		// register the datum's rule
-		ruleRegistry.registerRule(rule, datum);
+		// // register the datum's rule
+		// ruleRegistry.registerRule(rule, datum);
 
 		// commit changes
 		// baseGraph.commit();

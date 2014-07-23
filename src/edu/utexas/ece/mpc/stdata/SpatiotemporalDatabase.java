@@ -21,6 +21,7 @@ import edu.utexas.ece.mpc.stdata.factories.DatumFactory;
 import edu.utexas.ece.mpc.stdata.factories.EdgeFrameFactory;
 import edu.utexas.ece.mpc.stdata.factories.IDatumFactory;
 import edu.utexas.ece.mpc.stdata.factories.ISpaceTimePositionFactory;
+import edu.utexas.ece.mpc.stdata.factories.ISpatiotemporalContextFactory;
 import edu.utexas.ece.mpc.stdata.factories.SpaceTimePositionFactory;
 import edu.utexas.ece.mpc.stdata.factories.SpatiotemporalContextFactory;
 import edu.utexas.ece.mpc.stdata.factories.VertexFrameFactory;
@@ -65,18 +66,6 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	/** The spatiotemporal rule registry interface. */
 	protected IRuleRegistry ruleRegistry;
 
-	/** The space-time position factory interface. */
-	// protected ISpaceTimePositionFactory stpFactory;
-
-	/** The datum factory interface. */
-	// protected IDatumFactory datumFactory;
-
-	/**
-	 * A limited-scope factory to generate special vertices that represent the
-	 * host's spatiotemporal context.
-	 */
-	private SpatiotemporalContextFactory stContextFactory;
-
 	/**
 	 * A special vertex that provides the graph database with access to the
 	 * host's geospatial location and notion of time.
@@ -111,8 +100,8 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 				ruleRegistry, contextProvider, stpFactory);
 		addVertexFrameFactory(Datum.class, (VertexFrameFactory) datumFactory);
 
-		stContextFactory = new SpatiotemporalContextFactory(baseGraph,
-				framedGraph, ruleRegistry);
+		SpatiotemporalContextFactory stContextFactory = new SpatiotemporalContextFactory(
+				baseGraph, framedGraph, ruleRegistry);
 		addVertexFrameFactory(SpatiotemporalContext.class,
 				(VertexFrameFactory) stContextFactory);
 
@@ -151,7 +140,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * Initializes the graph's special spatiotemporal context vertex.
 	 */
 	private void initializeSpatiotemporalContext() {
-		stContext = stContextFactory.addSpatiotemporalContext(
+		stContext = getSpatiotemporalContextFactory().addSpatiotemporalContext(
 				contextProvider.getLocation(), contextProvider.getTimestamp());
 	}
 
@@ -203,7 +192,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	public <T extends EdgeFrame> EdgeFrameFactory<T> getEdgeFrameFactory(
 			Class<T> type) {
 		return edgeFrameFactories.get(type);
-	} // FIXME Do we really only want ContextualRelation extensions?
+	}
 
 	/**
 	 * Registers a edge vertex factory with the database.
@@ -219,7 +208,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 			edgeFrameFactories = new HashMap<Class, EdgeFrameFactory>();
 
 		edgeFrameFactories.put(type, edgeFactory);
-	} // FIXME Do we really only want ContextualRelationFactory extensions?
+	}
 
 	/**
 	 * Returns the factory associated with the provided vertex frame type.
@@ -231,7 +220,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	public <T extends VertexFrame> VertexFrameFactory<T> getVertexFrameFactory(
 			Class<T> type) {
 		return vertexFrameFactories.get(type);
-	} // FIXME Do we really only want Datum extensions?
+	}
 
 	/**
 	 * Registers a frame vertex factory with the database.
@@ -247,7 +236,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 			vertexFrameFactories = new HashMap<Class, VertexFrameFactory>();
 
 		vertexFrameFactories.put(type, vertexFactory);
-	} // FIXME Do we really only want DatumFactory extensions?
+	}
 
 	/**
 	 * Returns the rule registry interface.
@@ -274,6 +263,15 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 */
 	public IDatumFactory getDatumFactory() {
 		return (DatumFactory) getVertexFrameFactory(Datum.class);
+	}
+
+	/**
+	 * Returns the spatiotemporal context factory interface.
+	 * 
+	 * @return the database's spatiotemporal factory interface.
+	 */
+	private ISpatiotemporalContextFactory getSpatiotemporalContextFactory() {
+		return (ISpatiotemporalContextFactory) getVertexFrameFactory(SpatiotemporalContext.class);
 	}
 
 	/**

@@ -83,14 +83,15 @@ public class TemporallyModulatedTrajectoryRule extends
 
 		// trigger trajectory updates
 		SpaceTimePosition pos;
-		for (Datum datum : delegate.getGoverns()) {
+		Iterable<Datum> governedData = delegate.getGoverns();
+		for (Datum datum : governedData) {
 			if (datum.getIsMeasurable()) {
 				datum.getDelegate().appendMeasured(datum, location, timestamp);
 
 			} else {
 				pos = (SpaceTimePosition) vertexFrameFactories.get(
-						ISpaceTimePositionFactory.class.getName()).addVertex(
-						null, SpaceTimePosition.class);
+						SpaceTimePosition.class).addVertex(null,
+						SpaceTimePosition.class);
 				pos.setLocation(location);
 				pos.setTimestamp(timestamp);
 

@@ -48,10 +48,10 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 		this.stpFactory = stpFactory;
 	}
 
-	private D addDatum(Geoshape phenomenonLoc, List<D> context, Rule rule,
-			boolean measurable) {
+	private D addDatum(boolean measurable, Geoshape phenomenonLoc,
+			List<D> context, Rule... rules) {
 		// create the datum
-		D datum = addVertex(null, rule);
+		D datum = addVertex(null, rules);
 		datum.setDelegate(this);
 		datum.setIsMeasurable(measurable);
 
@@ -87,14 +87,14 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 	/* IDatumFactory interface implementation. */
 
 	@Override
-	public D addDatum(Geoshape phenomenonLoc, List<D> context, Rule rule) {
-		return addDatum(phenomenonLoc, context, rule, false);
+	public D addDatum(Geoshape phenomenonLoc, List<D> context, Rule... rules) {
+		return addDatum(false, phenomenonLoc, context, rules);
 	}
 
 	@Override
 	public D addMeasurableDatum(Geoshape phenomenonLoc, List<D> context,
-			Rule rule) {
-		return addDatum(phenomenonLoc, context, rule, true);
+			Rule... rules) {
+		return addDatum(true, phenomenonLoc, context, rules);
 	}
 
 	/* IDatumDelegate interface implementation. */

@@ -17,11 +17,11 @@ public interface IDatumFactory<D extends Datum> extends IDatumDelegate {
 	 * @param context
 	 *            any initial explicit contextual relations this datum will
 	 *            have.
-	 * @param rule
-	 *            a rule that explicitly governs this datum.
+	 * @param rules
+	 *            unregistered rules that explicitly govern this datum.
 	 * @return the newly created datum.
 	 */
-	public D addDatum(Geoshape phenomenonLoc, List<D> context, Rule rule);
+	public D addDatum(Geoshape phenomenonLoc, List<D> context, Rule... rules);
 
 	/**
 	 * Creates a new measurable datum with the provided parameters.
@@ -31,10 +31,10 @@ public interface IDatumFactory<D extends Datum> extends IDatumDelegate {
 	 * @param context
 	 *            any initial explicit contextual relations this datum will
 	 *            have.
-	 * @param rule
-	 *            a rule that explicitly governs this datum.
+	 * @param rules
+	 *            unregistered rules that explicitly governs this datum.
 	 * @return the newly created datum.
 	 */
 	public D addMeasurableDatum(Geoshape phenomenonLoc, List<D> context,
-			Rule rule);
+			Rule... rules);
 }

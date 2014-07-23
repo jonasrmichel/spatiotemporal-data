@@ -54,12 +54,14 @@ public abstract class VertexFrameFactory<T extends VertexFrame> {
 		return vertex;
 	}
 
-	public T addVertex(Object id, Rule rule) {
+	public T addVertex(Object id, Rule... rules) {
 		T vertex = addVertex(id);
 
 		// register the vertex's rule
-		if (rule != null)
-			ruleRegistry.registerRule(rule, vertex);
+		if (rules != null) {
+			for (Rule rule : rules)
+				ruleRegistry.registerRule(rule, vertex);
+		}
 
 		return vertex;
 	}

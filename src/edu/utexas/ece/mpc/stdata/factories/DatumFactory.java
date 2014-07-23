@@ -19,24 +19,39 @@ import edu.utexas.ece.mpc.stdata.vertices.Datum;
 import edu.utexas.ece.mpc.stdata.vertices.IDatumDelegate;
 import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
 
-public class DatumFactory extends VertexFrameFactory<Datum> implements
-		IDatumFactory, IDatumDelegate {
+public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
+		implements IDatumFactory<D>, IDatumDelegate {
 	protected IContextProvider contextProvider;
 	protected ISpaceTimePositionFactory stpFactory;
 
-	public DatumFactory(TransactionalGraph baseGraph, FramedGraph framedGraph,
-			IRuleRegistry ruleRegistry, IContextProvider contextProvider,
+	public DatumFactory(Class<D> type) {
+		super(type);
+	}
+
+	public DatumFactory(Class<D> type, TransactionalGraph baseGraph,
+			FramedGraph framedGraph, IRuleRegistry ruleRegistry,
+			IContextProvider contextProvider,
 			ISpaceTimePositionFactory stpFactory) {
-		super(baseGraph, framedGraph, ruleRegistry);
+		super(type, baseGraph, framedGraph, ruleRegistry);
 
 		this.contextProvider = contextProvider;
 		this.stpFactory = stpFactory;
 	}
 
-	private Datum addDatum(Geoshape phenomenonLoc, List<Datum> context,
-			Rule rule, boolean measurable) {
+	public void initialize(TransactionalGraph baseGraph,
+			FramedGraph framedGraph, IRuleRegistry ruleRegistry,
+			IContextProvider contextProvider,
+			ISpaceTimePositionFactory stpFactory) {
+		initialize(baseGraph, framedGraph, ruleRegistry);
+
+		this.contextProvider = contextProvider;
+		this.stpFactory = stpFactory;
+	}
+
+	private D addDatum(Geoshape phenomenonLoc, List<D> context, Rule rule,
+			boolean measurable) {
 		// create the datum
-		Datum datum = addVertex(null, Datum.class, rule);
+		D datum = addVertex(null, rule);
 		datum.setDelegate(this);
 		datum.setIsMeasurable(measurable);
 
@@ -72,13 +87,13 @@ public class DatumFactory extends VertexFrameFactory<Datum> implements
 	/* IDatumFactory interface implementation. */
 
 	@Override
-	public Datum addDatum(Geoshape phenomenonLoc, List<Datum> context, Rule rule) {
+	public D addDatum(Geoshape phenomenonLoc, List<D> context, Rule rule) {
 		return addDatum(phenomenonLoc, context, rule, false);
 	}
 
 	@Override
-	public Datum addMeasurableDatum(Geoshape phenomenonLoc,
-			List<Datum> context, Rule rule) {
+	public D addMeasurableDatum(Geoshape phenomenonLoc, List<D> context,
+			Rule rule) {
 		return addDatum(phenomenonLoc, context, rule, true);
 	}
 

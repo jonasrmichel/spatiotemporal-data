@@ -14,7 +14,7 @@ public abstract class SpatiotemporalContextRule extends GraphChangedRule {
 	@Override
 	public void vertexPropertyChanged(Vertex vertex, String key, Object value) {
 		if (!vertex.getProperty(SpatiotemporalDatabase.FRAMED_CLASS_KEY)
-				.equals(SpatiotemporalContext.class.getName()))
+				.equals(SpatiotemporalContext.class))
 			return;
 
 		if (key.equals(SpatiotemporalContext.LOCATION_KEY)) {

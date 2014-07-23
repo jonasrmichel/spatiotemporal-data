@@ -11,9 +11,13 @@ public class SpaceTimePositionFactory extends
 		VertexFrameFactory<SpaceTimePosition> implements
 		ISpaceTimePositionFactory {
 
+	public SpaceTimePositionFactory() {
+		super(SpaceTimePosition.class);
+	}
+
 	public SpaceTimePositionFactory(TransactionalGraph baseGraph,
 			FramedGraph framedGraph, IRuleRegistry ruleRegistry) {
-		super(baseGraph, framedGraph, ruleRegistry);
+		super(SpaceTimePosition.class, baseGraph, framedGraph, ruleRegistry);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -22,7 +26,7 @@ public class SpaceTimePositionFactory extends
 	@Override
 	public SpaceTimePosition addSpaceTimePosition(Geoshape location,
 			long timestamp, String domain) {
-		SpaceTimePosition pos = addVertex(null, SpaceTimePosition.class);
+		SpaceTimePosition pos = addVertex(null);
 		pos.setLocation(location);
 		pos.setTimestamp(timestamp);
 		pos.setDomain(domain);

@@ -90,15 +90,16 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 				edgeFrameFactories, vertexFrameFactories, contextProvider,
 				networkProvider);
 
-		// initialize framed element factories
+		// initialize the built-in framed element factories
 		SpaceTimePositionFactory stpFactory = new SpaceTimePositionFactory(
 				baseGraph, framedGraph, ruleRegistry);
 		addVertexFrameFactory(SpaceTimePosition.class,
 				(VertexFrameFactory) stpFactory);
 
-		DatumFactory datumFactory = new DatumFactory(baseGraph, framedGraph,
-				ruleRegistry, contextProvider, stpFactory);
-		addVertexFrameFactory(Datum.class, (VertexFrameFactory) datumFactory);
+		DatumFactory<Datum> rawDatumFactory = new DatumFactory<Datum>(
+				Datum.class, baseGraph, framedGraph, ruleRegistry,
+				contextProvider, stpFactory);
+		addVertexFrameFactory(Datum.class, (VertexFrameFactory) rawDatumFactory);
 
 		SpatiotemporalContextFactory stContextFactory = new SpatiotemporalContextFactory(
 				baseGraph, framedGraph, ruleRegistry);
@@ -176,7 +177,8 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 */
 	public <F extends VertexFrame> Iterable<F> getFramedVertices(Class<F> kind) {
 		Iterable<Vertex> vertices = baseGraph.getVertices(FRAMED_CLASS_KEY,
-				kind.getName());
+				kind);
+
 		Iterable<F> framedVertices = framedGraph.frameVertices(vertices, kind);
 
 		return framedVertices;
@@ -207,6 +209,9 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		if (edgeFrameFactories == null)
 			edgeFrameFactories = new HashMap<Class, EdgeFrameFactory>();
 
+		if (!edgeFactory.initialized())
+			edgeFactory.initialize(baseGraph, framedGraph, ruleRegistry);
+
 		edgeFrameFactories.put(type, edgeFactory);
 	}
 
@@ -235,6 +240,9 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		if (vertexFrameFactories == null)
 			vertexFrameFactories = new HashMap<Class, VertexFrameFactory>();
 
+		if (!vertexFactory.initialized())
+			vertexFactory.initialize(baseGraph, framedGraph, ruleRegistry);
+
 		vertexFrameFactories.put(type, vertexFactory);
 	}
 
@@ -257,12 +265,12 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	}
 
 	/**
-	 * Returns the datum factory interface.
+	 * Returns the raw datum factory interface.
 	 * 
 	 * @return the database's datum factory interface.
 	 */
-	public IDatumFactory getDatumFactory() {
-		return (DatumFactory) getVertexFrameFactory(Datum.class);
+	public IDatumFactory<Datum> getRawDatumFactory() {
+		return (DatumFactory<Datum>) getVertexFrameFactory(Datum.class);
 	}
 
 	/**
@@ -297,7 +305,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * @param graph
 	 *            the graph to copy from
 	 */
-	public void add(Graph graph) {
+	public <D extends Datum> void add(Graph graph) {
 		// a cache for datum type vertices
 		HashSet<Datum> data = new HashSet<Datum>();
 
@@ -305,10 +313,10 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		for (Vertex fromVertex : graph.getVertices()) {
 			Vertex toVertex = baseGraph.addVertex(fromVertex.getId());
 
-			// check if the vertex is datum type
+			// check if the vertex is datum type or derivative
 			if (toVertex.getPropertyKeys().contains(FRAMED_CLASS_KEY)
-					&& toVertex.getProperty(FRAMED_CLASS_KEY).equals(
-							Datum.class.getName())) {
+					&& Datum.class.isAssignableFrom((Class<D>) toVertex
+							.getProperty(FRAMED_CLASS_KEY))) {
 				data.add(framedGraph.frame(toVertex, Datum.class));
 			}
 
@@ -332,7 +340,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 						contextProvider.getTimestamp(),
 						contextProvider.getDomain());
 		for (Datum datum : data) {
-			getDatumFactory().append(datum, position);
+			getRawDatumFactory().append(datum, position);
 		}
 	}
 }

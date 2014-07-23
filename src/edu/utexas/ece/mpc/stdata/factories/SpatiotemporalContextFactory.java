@@ -11,9 +11,13 @@ public class SpatiotemporalContextFactory extends
 		VertexFrameFactory<SpatiotemporalContext> implements
 		ISpatiotemporalContextFactory {
 
+	public SpatiotemporalContextFactory() {
+		super(SpatiotemporalContext.class);
+	}
+
 	public SpatiotemporalContextFactory(TransactionalGraph baseGraph,
 			FramedGraph framedGraph, IRuleRegistry ruleRegistry) {
-		super(baseGraph, framedGraph, ruleRegistry);
+		super(SpatiotemporalContext.class, baseGraph, framedGraph, ruleRegistry);
 	}
 
 	/* ISpatiotemporalContextFactory interface implementation. */
@@ -21,8 +25,7 @@ public class SpatiotemporalContextFactory extends
 	@Override
 	public SpatiotemporalContext addSpatiotemporalContext(Geoshape location,
 			long timestamp) {
-		SpatiotemporalContext stContext = addVertex(null,
-				SpatiotemporalContext.class);
+		SpatiotemporalContext stContext = addVertex(null);
 		stContext.setLocation(location);
 		stContext.setTimestamp(timestamp);
 

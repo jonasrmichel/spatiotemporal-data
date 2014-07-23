@@ -7,7 +7,7 @@ import edu.utexas.ece.mpc.stdata.rules.Rule;
 import edu.utexas.ece.mpc.stdata.vertices.Datum;
 import edu.utexas.ece.mpc.stdata.vertices.IDatumDelegate;
 
-public interface IDatumFactory extends IDatumDelegate {
+public interface IDatumFactory<D extends Datum> extends IDatumDelegate {
 
 	/**
 	 * Creates a new datum with the provided parameters.
@@ -21,7 +21,7 @@ public interface IDatumFactory extends IDatumDelegate {
 	 *            a rule that explicitly governs this datum.
 	 * @return the newly created datum.
 	 */
-	public Datum addDatum(Geoshape phenomenonLoc, List<Datum> context, Rule rule);
+	public D addDatum(Geoshape phenomenonLoc, List<D> context, Rule rule);
 
 	/**
 	 * Creates a new measurable datum with the provided parameters.
@@ -35,6 +35,6 @@ public interface IDatumFactory extends IDatumDelegate {
 	 *            a rule that explicitly governs this datum.
 	 * @return the newly created datum.
 	 */
-	public Datum addMeasurableDatum(Geoshape phenomenonLoc,
-			List<Datum> context, Rule rule);
+	public D addMeasurableDatum(Geoshape phenomenonLoc, List<D> context,
+			Rule rule);
 }

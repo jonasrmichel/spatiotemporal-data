@@ -10,9 +10,13 @@ public class ContextualRelationFatory extends
 		EdgeFrameFactory<ContextualRelation> implements
 		IContextualRelationFactory {
 
+	public ContextualRelationFatory() {
+		super(ContextualRelation.class);
+	}
+
 	public ContextualRelationFatory(TransactionalGraph baseGraph,
 			FramedGraph framedGraph, IRuleRegistry ruleRegistry) {
-		super(baseGraph, framedGraph, ruleRegistry);
+		super(ContextualRelation.class, baseGraph, framedGraph, ruleRegistry);
 		// TODO Auto-generated constructor stub
 	}
 

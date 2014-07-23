@@ -13,25 +13,49 @@ public abstract class VertexFrameFactory<T extends VertexFrame> {
 	protected FramedGraph framedGraph;
 	protected IRuleRegistry ruleRegistry;
 
-	public VertexFrameFactory(TransactionalGraph baseGraph,
+	protected Class<T> type;
+
+	private boolean initialized;
+
+	public VertexFrameFactory(Class<T> type) {
+		this.type = type;
+
+		initialized = false;
+	}
+
+	public VertexFrameFactory(Class<T> type, TransactionalGraph baseGraph,
+			FramedGraph framedGraph, IRuleRegistry ruleRegistry) {
+		this.type = type;
+
+		initialize(baseGraph, framedGraph, ruleRegistry);
+	}
+
+	public void initialize(TransactionalGraph baseGraph,
 			FramedGraph framedGraph, IRuleRegistry ruleRegistry) {
 		this.baseGraph = baseGraph;
 		this.framedGraph = framedGraph;
 		this.ruleRegistry = ruleRegistry;
+
+		initialized = true;
 	}
 
-	public T addVertex(Object id, Class<T> kind) {
-		T vertex = (T) framedGraph.addVertex(id, kind);
+	public boolean initialized() {
+		return initialized;
+	}
 
-		// set a special property that indicates this vertex is framed
+	public T addVertex(Object id) {
+		T vertex = (T) framedGraph.addVertex(id, type);
+
+		// set a special property that indicates this vertex is framed and its
+		// framed class
 		vertex.asVertex().setProperty(SpatiotemporalDatabase.FRAMED_CLASS_KEY,
-				kind.getName());
+				type);
 
 		return vertex;
 	}
 
-	public T addVertex(Object id, Class<T> kind, Rule rule) {
-		T vertex = addVertex(id, kind);
+	public T addVertex(Object id, Rule rule) {
+		T vertex = addVertex(id);
 
 		// register the vertex's rule
 		if (rule != null)

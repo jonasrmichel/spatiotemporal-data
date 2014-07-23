@@ -90,8 +90,7 @@ public class TemporallyModulatedTrajectoryRule extends
 
 			} else {
 				pos = (SpaceTimePosition) vertexFrameFactories.get(
-						SpaceTimePosition.class).addVertex(null,
-						SpaceTimePosition.class);
+						SpaceTimePosition.class).addVertex(null);
 				pos.setLocation(location);
 				pos.setTimestamp(timestamp);
 

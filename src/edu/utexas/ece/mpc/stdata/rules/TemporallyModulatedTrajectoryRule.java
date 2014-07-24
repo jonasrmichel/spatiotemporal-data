@@ -13,9 +13,9 @@ public class TemporallyModulatedTrajectoryRule extends
 		SpatiotemporalContextRule {
 
 	/** The temporal trajectory resolution (seconds). */
-	double temporalResolution;
+	long temporalResolution;
 
-	/** The reference location. */
+	/** The reference time. */
 	long referenceTime = -1L;
 
 	public TemporallyModulatedTrajectoryRule(long temporalResolution) {
@@ -77,8 +77,13 @@ public class TemporallyModulatedTrajectoryRule extends
 		Geoshape location = hostContext.getLocation();
 		long timestamp = hostContext.getTimestamp();
 
+		// if (referenceTime >= 0
+		// && (timestamp - referenceTime) % temporalResolution != 0)
+		// return;
+
+		// FIXME use uniform units!!!
 		if (referenceTime >= 0
-				&& (timestamp - referenceTime) % temporalResolution != 0)
+				&& (timestamp - referenceTime) < temporalResolution)
 			return;
 
 		// trigger trajectory updates

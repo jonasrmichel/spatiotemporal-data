@@ -146,6 +146,15 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	}
 
 	/**
+	 * Updates the graph's notion of space and time to match that of the
+	 * database's context provider.
+	 */
+	public void updateSpatiotemporalContext() {
+		setSpatialContext(contextProvider.getLocation());
+		setTemporalContext(contextProvider.getTimestamp());
+	}
+
+	/**
 	 * Sets the spatial component of the graph's special spatiotemporal context
 	 * vertex.
 	 * 

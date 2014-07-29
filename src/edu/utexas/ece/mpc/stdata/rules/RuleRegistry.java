@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
-import com.tinkerpop.frames.EdgeFrame;
+import com.tinkerpop.blueprints.util.wrappers.event.EventTransactionalGraph;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.VertexFrame;
 
@@ -18,7 +17,7 @@ import edu.utexas.ece.mpc.stdata.vertices.RuleContainer;
 
 public class RuleRegistry implements IRuleRegistry {
 	private TransactionalGraph baseGraph;
-	private EventGraph eventGraph;
+	private EventTransactionalGraph eventGraph;
 	private FramedGraph framedGraph;
 
 	private Map<Class, EdgeFrameFactory> edgeFrameFactories;
@@ -29,8 +28,8 @@ public class RuleRegistry implements IRuleRegistry {
 
 	Map<Object, Rule> rules;
 
-	public RuleRegistry(TransactionalGraph baseGraph, EventGraph eventGraph,
-			FramedGraph framedGraph,
+	public RuleRegistry(TransactionalGraph baseGraph,
+			EventTransactionalGraph eventGraph, FramedGraph framedGraph,
 			Map<Class, EdgeFrameFactory> edgeFrameFactories,
 			Map<Class, VertexFrameFactory> vertexFrameFactories,
 			IContextProvider contextProvider, INetworkProvider networkProvider) {

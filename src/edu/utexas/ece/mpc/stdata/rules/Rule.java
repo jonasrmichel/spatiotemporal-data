@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventTransactionalGraph;
 import com.tinkerpop.frames.FramedGraph;
 
 import edu.utexas.ece.mpc.stdata.IContextProvider;
@@ -16,7 +17,7 @@ public abstract class Rule {
 	protected TransactionalGraph baseGraph;
 
 	/** The rule's event graph wrapper. */
-	protected EventGraph eventGraph;
+	protected EventTransactionalGraph eventGraph;
 
 	/** The rule's framed graph wrapper. */
 	protected FramedGraph framedGraph;
@@ -51,7 +52,7 @@ public abstract class Rule {
 	 * @param delegate
 	 */
 	protected void initialize(TransactionalGraph baseGraph,
-			EventGraph eventGraph, FramedGraph framedGraph,
+			EventTransactionalGraph eventGraph, FramedGraph framedGraph,
 			Map<Class, EdgeFrameFactory> edgeFrameFactories,
 			Map<Class, VertexFrameFactory> vertexFrameFactories,
 			IContextProvider contextProvider, INetworkProvider networkProvider,

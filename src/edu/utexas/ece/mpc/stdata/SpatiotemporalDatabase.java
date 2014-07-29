@@ -12,7 +12,7 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
-import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventTransactionalGraph;
 import com.tinkerpop.frames.EdgeFrame;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.VertexFrame;
@@ -52,10 +52,10 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	protected G baseGraph;
 
 	/** Event graph wrapper. */
-	protected EventGraph<G> eventGraph;
+	protected EventTransactionalGraph<G> eventGraph;
 
 	/** Framed graph wrapper. */
-	protected FramedGraph<EventGraph<G>> framedGraph;
+	protected FramedGraph<EventTransactionalGraph<G>> framedGraph;
 
 	/** EdgeFrame factories. */
 	protected Map<Class, EdgeFrameFactory> edgeFrameFactories;
@@ -119,14 +119,14 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * Wraps the base graph for event listening.
 	 */
 	private void initializeEventGraph() {
-		eventGraph = new EventGraph<G>(baseGraph);
+		eventGraph = new EventTransactionalGraph<G>(baseGraph);
 	}
 
 	/**
 	 * Wraps the event graph for object framing.
 	 */
 	private void initializeFramedGraph() {
-		framedGraph = new FramedGraph<EventGraph<G>>(eventGraph);
+		framedGraph = new FramedGraph<EventTransactionalGraph<G>>(eventGraph);
 	}
 
 	/**

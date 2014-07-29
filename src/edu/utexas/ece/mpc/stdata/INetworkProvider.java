@@ -5,21 +5,11 @@ import java.util.Map;
 
 import com.tinkerpop.blueprints.Graph;
 
-import edu.utexas.ece.mpc.stdata.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
+import edu.utexas.ece.mpc.stdata.rules.Rule;
+import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
 
 public interface INetworkProvider {
-	/**
-	 * Called to send a datum over a network connection. This method may or may
-	 * not attach spatiotemporal metadata by default.
-	 * 
-	 * @param type
-	 *            the datum or derivative type.
-	 * @param datum
-	 *            the datum to send.
-	 */
-	public <D extends Datum> void send(Class<D> type, D datum);
-
 	/**
 	 * Called to send a datum over a network connection optionally along with
 	 * its spatiotemporal metadata.
@@ -31,9 +21,11 @@ public interface INetworkProvider {
 	 * @param attachTrajectory
 	 *            whether or not to send the datum's spatiotemporal trajectory
 	 *            with the datum.
+	 * @param rules
+	 *            rules associated with the datum.
 	 */
-	public <D extends Datum> void send(Class<D> type, D datum,
-			boolean attachTrajectory);
+	public <D extends DatumVertex> void send(Class<D> type, D datum,
+			boolean attachTrajectory, Rule... rules);
 
 	/**
 	 * Called to send a datum and its associated spatiotemporal metadata over a
@@ -45,28 +37,10 @@ public interface INetworkProvider {
 	 *            the datum to send.
 	 * @param trajectory
 	 *            the datum's spatiotemporal trajectory.
+	 * @param rules
+	 *            rules associated with the datum.
 	 */
-	public <D extends Datum> void send(Class<D> type, D datum,
-			Iterator<SpaceTimePosition> trajectory);
-
-	/**
-	 * Called to send multiple datums and their associated spatiotemporal
-	 * metadata over a network connection.
-	 * 
-	 * @param type
-	 *            the datum or derivative type.
-	 * @param data
-	 *            a map of datums to their spatiotemporal trajectories to send.
-	 */
-	public <D extends Datum> void send(Class<D> type,
-			Map<D, Iterator<SpaceTimePosition>> data);
-
-	/**
-	 * Called to send a graph over a network connection.
-	 * 
-	 * @param graph
-	 *            the graph to send.
-	 */
-	public void send(Graph graph);
+	public <D extends DatumVertex> void send(Class<D> type, D datum,
+			Iterator<SpaceTimePositionVertex> trajectory, Rule... rules);
 
 }

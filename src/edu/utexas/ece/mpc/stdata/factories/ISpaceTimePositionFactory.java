@@ -1,7 +1,7 @@
 package edu.utexas.ece.mpc.stdata.factories;
 
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
-import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
 
 public interface ISpaceTimePositionFactory {
 
@@ -16,6 +16,6 @@ public interface ISpaceTimePositionFactory {
 	 *            a logical domain.
 	 * @return the created space-time position.
 	 */
-	public SpaceTimePosition addSpaceTimePosition(Geoshape location,
+	public SpaceTimePositionVertex addSpaceTimePosition(Geoshape location,
 			long timestamp, String domain);
 }

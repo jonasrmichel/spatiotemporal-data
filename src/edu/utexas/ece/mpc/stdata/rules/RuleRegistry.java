@@ -12,8 +12,8 @@ import edu.utexas.ece.mpc.stdata.IContextProvider;
 import edu.utexas.ece.mpc.stdata.INetworkProvider;
 import edu.utexas.ece.mpc.stdata.factories.EdgeFrameFactory;
 import edu.utexas.ece.mpc.stdata.factories.VertexFrameFactory;
-import edu.utexas.ece.mpc.stdata.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.vertices.RuleContainer;
+import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
+import edu.utexas.ece.mpc.stdata.vertices.RuleContainerVertex;
 
 public class RuleRegistry implements IRuleRegistry {
 	private TransactionalGraph baseGraph;
@@ -49,15 +49,15 @@ public class RuleRegistry implements IRuleRegistry {
 	/* IRuleRegistry interface implementation. */
 
 	@Override
-	public RuleContainer registerRule(Rule rule) {
+	public RuleContainerVertex registerRule(Rule rule) {
 		return registerRule(rule, null);
 	}
 
 	@Override
-	public RuleContainer registerRule(Rule rule, Datum... data) {
+	public RuleContainerVertex registerRule(Rule rule, DatumVertex... data) {
 		// create the rule's container vertex
-		RuleContainer ruleContainer = (RuleContainer) framedGraph.addVertex(
-				null, RuleContainer.class);
+		RuleContainerVertex ruleContainer = (RuleContainerVertex) framedGraph.addVertex(
+				null, RuleContainerVertex.class);
 
 		// intialize the rule with the container as its delegate
 		rule.initialize(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
@@ -65,7 +65,7 @@ public class RuleRegistry implements IRuleRegistry {
 				ruleContainer);
 
 		// configure the graph references to governed data
-		for (Datum datum : data)
+		for (DatumVertex datum : data)
 			ruleContainer.addGoverns(datum);
 
 		// register the rule
@@ -75,11 +75,11 @@ public class RuleRegistry implements IRuleRegistry {
 	}
 
 	@Override
-	public <V extends VertexFrame> RuleContainer<V> registerRule(Rule rule,
+	public <V extends VertexFrame> RuleContainerVertex<V> registerRule(Rule rule,
 			V... vertices) {
 		// create the rule's container vertex
-		RuleContainer<V> ruleContainer = (RuleContainer<V>) framedGraph
-				.addVertex(null, RuleContainer.class);
+		RuleContainerVertex<V> ruleContainer = (RuleContainerVertex<V>) framedGraph
+				.addVertex(null, RuleContainerVertex.class);
 
 		// intialize the rule with the container as its delegate
 		rule.initialize(baseGraph, eventGraph, framedGraph, edgeFrameFactories,

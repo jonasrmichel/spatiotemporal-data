@@ -5,28 +5,28 @@ import com.tinkerpop.frames.FramedGraph;
 
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
-import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
 
 public class SpaceTimePositionFactory extends
-		VertexFrameFactory<SpaceTimePosition> implements
+		VertexFrameFactory<SpaceTimePositionVertex> implements
 		ISpaceTimePositionFactory {
 
 	public SpaceTimePositionFactory() {
-		super(SpaceTimePosition.class);
+		super(SpaceTimePositionVertex.class);
 	}
 
 	public SpaceTimePositionFactory(TransactionalGraph baseGraph,
 			FramedGraph framedGraph, IRuleRegistry ruleRegistry) {
-		super(SpaceTimePosition.class, baseGraph, framedGraph, ruleRegistry);
+		super(SpaceTimePositionVertex.class, baseGraph, framedGraph, ruleRegistry);
 		// TODO Auto-generated constructor stub
 	}
 
 	/* ISpaceTimePositionFactory interface implementation. */
 
 	@Override
-	public SpaceTimePosition addSpaceTimePosition(Geoshape location,
+	public SpaceTimePositionVertex addSpaceTimePosition(Geoshape location,
 			long timestamp, String domain) {
-		SpaceTimePosition pos = addVertex(null);
+		SpaceTimePositionVertex pos = addVertex(null);
 		pos.setLocation(location);
 		pos.setTimestamp(timestamp);
 		pos.setDomain(domain);

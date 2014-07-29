@@ -7,7 +7,7 @@ import com.tinkerpop.frames.VertexFrame;
 import edu.utexas.ece.mpc.stdata.rules.IRuleDelegate;
 import edu.utexas.ece.mpc.stdata.rules.Rule;
 
-public interface RuleContainer<V extends VertexFrame> extends VertexFrame,
+public interface RuleContainerVertex<V extends VertexFrame> extends VertexFrame,
 		IRuleDelegate<V> {
 	/** The contained rule. */
 	@Property("rule")

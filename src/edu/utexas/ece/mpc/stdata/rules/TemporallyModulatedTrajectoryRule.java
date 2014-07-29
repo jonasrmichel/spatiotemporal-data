@@ -5,9 +5,9 @@ import com.tinkerpop.blueprints.Vertex;
 
 import edu.utexas.ece.mpc.stdata.factories.ISpaceTimePositionFactory;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
-import edu.utexas.ece.mpc.stdata.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
-import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContext;
+import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
+import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContextVertex;
 
 public class TemporallyModulatedTrajectoryRule extends
 		SpatiotemporalContextRule {
@@ -67,13 +67,13 @@ public class TemporallyModulatedTrajectoryRule extends
 	}
 
 	@Override
-	public void locationChanged(SpatiotemporalContext hostContext) {
+	public void locationChanged(SpatiotemporalContextVertex hostContext) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void timeChanged(SpatiotemporalContext hostContext) {
+	public void timeChanged(SpatiotemporalContextVertex hostContext) {
 		Geoshape location = hostContext.getLocation();
 		long timestamp = hostContext.getTimestamp();
 
@@ -87,19 +87,19 @@ public class TemporallyModulatedTrajectoryRule extends
 			return;
 
 		// trigger trajectory updates
-		SpaceTimePosition pos;
-		Iterable<Datum> governedData = delegate.getGoverns();
-		for (Datum datum : governedData) {
+		SpaceTimePositionVertex pos;
+		Iterable<DatumVertex> governedData = delegate.getGoverns();
+		for (DatumVertex datum : governedData) {
 			if (datum.getIsMeasurable()) {
-				datum.getDelegate().appendMeasured(datum, location, timestamp);
+				datum.getDelegate().prependMeasuredPseudo(datum, location, timestamp);
 
 			} else {
-				pos = (SpaceTimePosition) vertexFrameFactories.get(
-						SpaceTimePosition.class).addVertex(null);
+				pos = (SpaceTimePositionVertex) vertexFrameFactories.get(
+						SpaceTimePositionVertex.class).addVertex(null);
 				pos.setLocation(location);
 				pos.setTimestamp(timestamp);
 
-				datum.getDelegate().append(datum, pos);
+				datum.getDelegate().prepend(datum, pos);
 			}
 		}
 

@@ -5,7 +5,7 @@ import com.tinkerpop.frames.EdgeFrame;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.Range;
 
-import edu.utexas.ece.mpc.stdata.vertices.Datum;
+import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
 
 public interface ContextualRelation extends EdgeFrame {
 	@Property("relation")
@@ -15,9 +15,9 @@ public interface ContextualRelation extends EdgeFrame {
 	public void setRelation(String relation);
 
 	@Domain
-	public Datum getDatumTo();
+	public DatumVertex getDatumTo();
 
 	@Range
-	public Datum getDatumFrom();
+	public DatumVertex getDatumFrom();
 
 }

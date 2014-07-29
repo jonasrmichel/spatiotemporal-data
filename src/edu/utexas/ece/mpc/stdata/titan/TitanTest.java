@@ -18,8 +18,8 @@ import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListene
 import com.tinkerpop.frames.FramedGraph;
 
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
-import edu.utexas.ece.mpc.stdata.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
+import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
 
 public class TitanTest {
 	public static final String INDEX = "test-index";
@@ -127,12 +127,12 @@ public class TitanTest {
 				eventGraph);
 
 		// populate the framed graph
-		Datum datum = framedGraph.addVertex(null, Datum.class);
+		DatumVertex datum = framedGraph.addVertex(null, DatumVertex.class);
 		datum.setIsMeasurable(false);
 		datum.asVertex().setProperty("key-1", "value-1");
 
-		SpaceTimePosition position = framedGraph.addVertex(null,
-				SpaceTimePosition.class);
+		SpaceTimePositionVertex position = framedGraph.addVertex(null,
+				SpaceTimePositionVertex.class);
 		position.setLocation(Geoshape.point(-40, 90));
 		position.setTimestamp(System.currentTimeMillis());
 

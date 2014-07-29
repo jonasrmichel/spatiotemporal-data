@@ -28,9 +28,9 @@ import edu.utexas.ece.mpc.stdata.factories.VertexFrameFactory;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
 import edu.utexas.ece.mpc.stdata.rules.RuleRegistry;
-import edu.utexas.ece.mpc.stdata.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
-import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContext;
+import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
+import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContextVertex;
 
 public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyIndexableGraph> {
 	/** The framed class type property key. */
@@ -70,7 +70,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * A special vertex that provides the graph database with access to the
 	 * host's geospatial location and notion of time.
 	 */
-	protected SpatiotemporalContext stContext;
+	protected SpatiotemporalContextVertex stContext;
 
 	public SpatiotemporalDatabase(String instance, String graphDir,
 			IContextProvider contextProvider, INetworkProvider networkProvider) {
@@ -93,17 +93,18 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		// initialize the built-in framed element factories
 		SpaceTimePositionFactory stpFactory = new SpaceTimePositionFactory(
 				baseGraph, framedGraph, ruleRegistry);
-		addVertexFrameFactory(SpaceTimePosition.class,
+		addVertexFrameFactory(SpaceTimePositionVertex.class,
 				(VertexFrameFactory) stpFactory);
 
-		DatumFactory<Datum> rawDatumFactory = new DatumFactory<Datum>(
-				Datum.class, baseGraph, framedGraph, ruleRegistry,
+		DatumFactory<DatumVertex> rawDatumFactory = new DatumFactory<DatumVertex>(
+				DatumVertex.class, baseGraph, framedGraph, ruleRegistry,
 				contextProvider, stpFactory);
-		addVertexFrameFactory(Datum.class, (VertexFrameFactory) rawDatumFactory);
+		addVertexFrameFactory(DatumVertex.class,
+				(VertexFrameFactory) rawDatumFactory);
 
 		SpatiotemporalContextFactory stContextFactory = new SpatiotemporalContextFactory(
 				baseGraph, framedGraph, ruleRegistry);
-		addVertexFrameFactory(SpatiotemporalContext.class,
+		addVertexFrameFactory(SpatiotemporalContextVertex.class,
 				(VertexFrameFactory) stContextFactory);
 
 		// initialize the local notion of space-time context
@@ -270,7 +271,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * @return the database's space-time position factory interface.
 	 */
 	public ISpaceTimePositionFactory getSpaceTimePositionFactory() {
-		return (SpaceTimePositionFactory) getVertexFrameFactory(SpaceTimePosition.class);
+		return (SpaceTimePositionFactory) getVertexFrameFactory(SpaceTimePositionVertex.class);
 	}
 
 	/**
@@ -278,8 +279,8 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * 
 	 * @return the database's datum factory interface.
 	 */
-	public IDatumFactory<Datum> getRawDatumFactory() {
-		return (DatumFactory<Datum>) getVertexFrameFactory(Datum.class);
+	public IDatumFactory<DatumVertex> getRawDatumFactory() {
+		return (DatumFactory<DatumVertex>) getVertexFrameFactory(DatumVertex.class);
 	}
 
 	/**
@@ -288,7 +289,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * @return the database's spatiotemporal factory interface.
 	 */
 	private ISpatiotemporalContextFactory getSpatiotemporalContextFactory() {
-		return (ISpatiotemporalContextFactory) getVertexFrameFactory(SpatiotemporalContext.class);
+		return (ISpatiotemporalContextFactory) getVertexFrameFactory(SpatiotemporalContextVertex.class);
 	}
 
 	/**
@@ -314,9 +315,9 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * @param graph
 	 *            the graph to copy from
 	 */
-	public <D extends Datum> void add(Graph graph) {
+	public <D extends DatumVertex> void add(Graph graph) {
 		// a cache for datum type vertices
-		HashSet<Datum> data = new HashSet<Datum>();
+		HashSet<DatumVertex> data = new HashSet<DatumVertex>();
 
 		// add vertices
 		for (Vertex fromVertex : graph.getVertices()) {
@@ -324,9 +325,9 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 
 			// check if the vertex is datum type or derivative
 			if (toVertex.getPropertyKeys().contains(FRAMED_CLASS_KEY)
-					&& Datum.class.isAssignableFrom((Class<D>) toVertex
+					&& DatumVertex.class.isAssignableFrom((Class<D>) toVertex
 							.getProperty(FRAMED_CLASS_KEY))) {
-				data.add(framedGraph.frame(toVertex, Datum.class));
+				data.add(framedGraph.frame(toVertex, DatumVertex.class));
 			}
 
 			ElementHelper.copyProperties(fromVertex, toVertex);
@@ -344,12 +345,12 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		}
 
 		// update datum's spatiotemporal metadata
-		SpaceTimePosition position = getSpaceTimePositionFactory()
+		SpaceTimePositionVertex position = getSpaceTimePositionFactory()
 				.addSpaceTimePosition(contextProvider.getLocation(),
 						contextProvider.getTimestamp(),
 						contextProvider.getDomain());
-		for (Datum datum : data) {
-			getRawDatumFactory().append(datum, position);
+		for (DatumVertex datum : data) {
+			getRawDatumFactory().prepend(datum, position);
 		}
 	}
 }

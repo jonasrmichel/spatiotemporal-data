@@ -8,43 +8,50 @@ import com.tinkerpop.frames.Property;
 import edu.utexas.ece.mpc.stdata.edges.ContextualRelation;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 
-public interface Datum extends GeoVertex {
+public interface DatumVertex extends GeoVertex {
 	/** The delegate to make callbacks on. */
 	@Property("delegate")
-	public IDatumDelegate getDelegate();
+	public IDatumVertexDelegate getDelegate();
 
 	@Property("delegate")
-	public void setDelegate(IDatumDelegate delegate);
+	public void setDelegate(IDatumVertexDelegate delegate);
 
 	/** The head of the datum's trajectory. */
 	@Adjacency(label = "trajectory-head")
-	public SpaceTimePosition getTrajectoryHead();
+	public SpaceTimePositionVertex getTrajectoryHead();
 
 	@Adjacency(label = "trajectory-head")
-	public void setTrajectoryHead(SpaceTimePosition position);
+	public void setTrajectoryHead(SpaceTimePositionVertex position);
+	
+	/** The tail of the datum's trajectory. */
+	@Adjacency(label = "trajectory-tail")
+	public SpaceTimePositionVertex getTrajectoryTail();
+
+	@Adjacency(label = "trajectory-tail")
+	public void setTrajectoryTail(SpaceTimePositionVertex position);
 
 	/** The unordered datum trajectory. */
 	@Adjacency(label = "trajectory", direction = Direction.BOTH)
-	public Iterable<SpaceTimePosition> getTrajectory();
+	public Iterable<SpaceTimePositionVertex> getTrajectory();
 
 	/** Contextual relations. */
 	@Adjacency(label = "context")
-	public Iterable<Datum> getContextData();
+	public Iterable<DatumVertex> getContextData();
 
 	@Incidence(label = "context")
 	public Iterable<ContextualRelation> getContext();
 
 	@Adjacency(label = "context")
-	public void setContextData(Iterable<Datum> data);
+	public void setContextData(Iterable<DatumVertex> data);
 
 	@Adjacency(label = "context")
-	public void addContextData(Datum datum);
+	public void addContextData(DatumVertex datum);
 
 	@Incidence(label = "context")
-	public ContextualRelation addContext(Datum datum);
+	public ContextualRelation addContext(DatumVertex datum);
 
 	@Adjacency(label = "context")
-	public void removeContextData(Datum datum);
+	public void removeContextData(DatumVertex datum);
 
 	@Incidence(label = "context")
 	public void removeContext(ContextualRelation context);

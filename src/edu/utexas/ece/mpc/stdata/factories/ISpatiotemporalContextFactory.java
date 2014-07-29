@@ -1,7 +1,7 @@
 package edu.utexas.ece.mpc.stdata.factories;
 
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
-import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContext;
+import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContextVertex;
 
 public interface ISpatiotemporalContextFactory {
 
@@ -14,6 +14,6 @@ public interface ISpatiotemporalContextFactory {
 	 *            a time.
 	 * @return the newly created spatiotemporal context vertex.
 	 */
-	public SpatiotemporalContext addSpatiotemporalContext(Geoshape location,
+	public SpatiotemporalContextVertex addSpatiotemporalContext(Geoshape location,
 			long timestamp);
 }

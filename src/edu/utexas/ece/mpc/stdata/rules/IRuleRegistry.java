@@ -2,8 +2,8 @@ package edu.utexas.ece.mpc.stdata.rules;
 
 import com.tinkerpop.frames.VertexFrame;
 
-import edu.utexas.ece.mpc.stdata.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.vertices.RuleContainer;
+import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
+import edu.utexas.ece.mpc.stdata.vertices.RuleContainerVertex;
 
 public interface IRuleRegistry {
 
@@ -14,7 +14,7 @@ public interface IRuleRegistry {
 	 *            the rule to register.
 	 * @return the rule's container in the graph database.
 	 */
-	public RuleContainer registerRule(Rule rule);
+	public RuleContainerVertex registerRule(Rule rule);
 
 	/**
 	 * Registers a new rule that explicitly governs the provided datum.
@@ -25,10 +25,10 @@ public interface IRuleRegistry {
 	 *            the datums that the rule governs.
 	 * @return the rule's container in the graph database.
 	 */
-	public RuleContainer registerRule(Rule rule, Datum... data);
+	public RuleContainerVertex registerRule(Rule rule, DatumVertex... data);
 	
 	
 	
-	public <V extends VertexFrame> RuleContainer registerRule(Rule rule, V... vertices);
+	public <V extends VertexFrame> RuleContainerVertex registerRule(Rule rule, V... vertices);
 	
 }

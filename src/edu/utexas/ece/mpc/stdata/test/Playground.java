@@ -16,8 +16,8 @@ import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.gremlin.java.GremlinPipeline;
 
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
-import edu.utexas.ece.mpc.stdata.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
+import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
 
 public class Playground {
 
@@ -47,18 +47,18 @@ public class Playground {
 		// partitionGraph.setWritePartition("data");
 
 		// create a new datum
-		Datum datum = framedGraph.addVertex(null, Datum.class);
+		DatumVertex datum = framedGraph.addVertex(null, DatumVertex.class);
 		datum.asVertex().setProperty("key-1", "value-1");
 
 		// update the index
-		index.put("class", Datum.class.getName(), datum.asVertex());
+		index.put("class", DatumVertex.class.getName(), datum.asVertex());
 
 		// set write partition
 		// partitionGraph.setWritePartition("trajectories");
 
 		// initialize the datum's trajectory
-		SpaceTimePosition position = framedGraph.addVertex(null,
-				SpaceTimePosition.class);
+		SpaceTimePositionVertex position = framedGraph.addVertex(null,
+				SpaceTimePositionVertex.class);
 		// position.setLatitude(-40);
 		// position.setLongitude(90);
 		position.setLocation(Geoshape.point(-40, 90));
@@ -67,7 +67,7 @@ public class Playground {
 //		datum.add(position);
 
 		// update the index
-		index.put("class", SpaceTimePosition.class.getName(),
+		index.put("class", SpaceTimePositionVertex.class.getName(),
 				position.asVertex());
 
 		// read explicit partitions
@@ -86,24 +86,24 @@ public class Playground {
 		// read index, O(log(n))
 		System.out.println("index reading, O(log(n))...");
 		System.out.println("indexed data vertices: ");
-		for (Vertex v : index.get("class", Datum.class.getName()))
+		for (Vertex v : index.get("class", DatumVertex.class.getName()))
 			System.out.println("\t" + v + " " + v.getPropertyKeys());
 		System.out.println();
 		System.out.println("indexed trajectory vertices: ");
-		for (Vertex v : index.get("class", SpaceTimePosition.class.getName()))
+		for (Vertex v : index.get("class", SpaceTimePositionVertex.class.getName()))
 			System.out.println("\t" + v + " " + v.getPropertyKeys());
 
 		// read implicit (logical) partitions, O(n)
 		System.out.println();
 		System.out.println("graph scanning, O(n)...");
 		System.out.println("data vertices:");
-		for (Vertex v : framedGraph.getVertices("class", Datum.class.getName()))
+		for (Vertex v : framedGraph.getVertices("class", DatumVertex.class.getName()))
 			// requires linear scan of all vertices
 			System.out.println("\t" + v + " " + v.getPropertyKeys());
 		System.out.println();
 		System.out.println("trajectories verticies:");
 		for (Vertex v : framedGraph.getVertices("class",
-				SpaceTimePosition.class.getName()))
+				SpaceTimePositionVertex.class.getName()))
 			// requires linear scan of all vertices
 			System.out.println("\t" + v + " " + v.getPropertyKeys());
 
@@ -122,7 +122,7 @@ public class Playground {
 					+ e.getVertex(Direction.IN) + ")");
 
 		System.out.println("datum's entire trajectory:");
-		for (SpaceTimePosition p : datum.getTrajectory())
+		for (SpaceTimePositionVertex p : datum.getTrajectory())
 			System.out.println("\t" + p);
 
 		System.out.println();

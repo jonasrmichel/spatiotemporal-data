@@ -5,7 +5,7 @@ import com.tinkerpop.frames.VertexFrame;
 
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 
-public interface SpatiotemporalContext extends VertexFrame {
+public interface SpatiotemporalContextVertex extends VertexFrame {
 	public static final String LOCATION_KEY = "location";
 	public static final String TIMESTAMP_KEY = "timestamp";
 	

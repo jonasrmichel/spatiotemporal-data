@@ -3,7 +3,7 @@ package edu.utexas.ece.mpc.stdata.rules;
 import com.tinkerpop.blueprints.Vertex;
 
 import edu.utexas.ece.mpc.stdata.SpatiotemporalDatabase;
-import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContext;
+import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContextVertex;
 
 public abstract class SpatiotemporalContextRule extends GraphChangedRule {
 
@@ -14,18 +14,18 @@ public abstract class SpatiotemporalContextRule extends GraphChangedRule {
 	@Override
 	public void vertexPropertyChanged(Vertex vertex, String key, Object value) {
 		if (!vertex.getProperty(SpatiotemporalDatabase.FRAMED_CLASS_KEY)
-				.equals(SpatiotemporalContext.class))
+				.equals(SpatiotemporalContextVertex.class))
 			return;
 
-		if (key.equals(SpatiotemporalContext.LOCATION_KEY)) {
+		if (key.equals(SpatiotemporalContextVertex.LOCATION_KEY)) {
 			// the host's location changed
-			locationChanged((SpatiotemporalContext) framedGraph.frame(vertex,
-					SpatiotemporalContext.class));
+			locationChanged((SpatiotemporalContextVertex) framedGraph.frame(vertex,
+					SpatiotemporalContextVertex.class));
 
-		} else if (key.equals(SpatiotemporalContext.TIMESTAMP_KEY)) {
+		} else if (key.equals(SpatiotemporalContextVertex.TIMESTAMP_KEY)) {
 			// the host's time changed
-			timeChanged((SpatiotemporalContext) framedGraph.frame(vertex,
-					SpatiotemporalContext.class));
+			timeChanged((SpatiotemporalContextVertex) framedGraph.frame(vertex,
+					SpatiotemporalContextVertex.class));
 		}
 	}
 
@@ -34,13 +34,13 @@ public abstract class SpatiotemporalContextRule extends GraphChangedRule {
 	 * 
 	 * @param location
 	 */
-	public abstract void locationChanged(SpatiotemporalContext hostContext);
+	public abstract void locationChanged(SpatiotemporalContextVertex hostContext);
 
 	/**
 	 * Called when the host's time changes.
 	 * 
 	 * @param time
 	 */
-	public abstract void timeChanged(SpatiotemporalContext hostContext);
+	public abstract void timeChanged(SpatiotemporalContextVertex hostContext);
 
 }

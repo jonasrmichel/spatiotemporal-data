@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;
 
-public interface SpaceTimePosition extends GeoVertex {
+public interface SpaceTimePositionVertex extends GeoVertex {
 //	/** Latitude property. */
 //	@Property("latitude")
 //	public float getLatitude();
@@ -35,23 +35,23 @@ public interface SpaceTimePosition extends GeoVertex {
 	
 	/** Datum whose trajectory this space-time position is part of. */
 	@Adjacency(label = "trajectory")
-	public Datum getDatum();
+	public DatumVertex getDatum();
 
 	@Adjacency(label = "trajectory")
-	public void setDatum(Datum datum);
+	public void setDatum(DatumVertex datum);
 
 	/** Forward and backward directions in the trajectory. */
 	@Adjacency(label = "next", direction = Direction.OUT)
-	public SpaceTimePosition getNext();
+	public SpaceTimePositionVertex getNext();
 
 	@Adjacency(label = "next", direction = Direction.OUT)
-	public void setNext(SpaceTimePosition position);
+	public void setNext(SpaceTimePositionVertex position);
 
 	@Adjacency(label = "previous", direction = Direction.IN)
-	public SpaceTimePosition getPrevious();
+	public SpaceTimePositionVertex getPrevious();
 
 	@Adjacency(label = "previous", direction = Direction.IN)
-	public void setPrevious(SpaceTimePosition position);
+	public void setPrevious(SpaceTimePositionVertex position);
 
 	// TODO: encode get/can/is logic as GremlinGroovy annotations
 	// https://github.com/tinkerpop/frames/wiki/Gremlin-Groovy

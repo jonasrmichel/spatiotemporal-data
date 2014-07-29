@@ -15,12 +15,12 @@ import edu.utexas.ece.mpc.stdata.IContextProvider;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
 import edu.utexas.ece.mpc.stdata.rules.Rule;
-import edu.utexas.ece.mpc.stdata.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.vertices.IDatumDelegate;
-import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePosition;
+import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
+import edu.utexas.ece.mpc.stdata.vertices.IDatumVertexDelegate;
+import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
 
-public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
-		implements IDatumFactory<D>, IDatumDelegate {
+public class DatumFactory<D extends DatumVertex> extends VertexFrameFactory<D>
+		implements IDatumFactory<D>, IDatumVertexDelegate {
 	protected IContextProvider contextProvider;
 	protected ISpaceTimePositionFactory stpFactory;
 
@@ -57,15 +57,11 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 
 		// initialize the datum's spatiotemporal trajectory
 		if (!measurable) {
-			SpaceTimePosition pos = stpFactory
-					.addSpaceTimePosition(contextProvider.getLocation(),
-							contextProvider.getTimestamp(),
-							contextProvider.getDomain());
-
-			append(datum, pos);
+			prepend(datum, contextProvider.getLocation(),
+					contextProvider.getTimestamp(), contextProvider.getDomain());
 
 		} else {
-			appendMeasured(datum, contextProvider.getLocation(),
+			prependMeasuredPseudo(datum, contextProvider.getLocation(),
 					contextProvider.getTimestamp());
 
 		}
@@ -73,7 +69,7 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 		datum.setLocation(phenomenonLoc);
 
 		if (context != null)
-			datum.setContextData((Iterable<Datum>) context);
+			datum.setContextData((Iterable<DatumVertex>) context);
 
 		// // register the datum's rule
 		// ruleRegistry.registerRule(rule, datum);
@@ -97,12 +93,15 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 		return addDatum(true, phenomenonLoc, context, rules);
 	}
 
-	/* IDatumDelegate interface implementation. */
+	/* IDatumVertexDelegate interface implementation. */
 
 	@Override
-	public Iterator<SpaceTimePosition> getTrajectory(Datum datum) {
-		ArrayList<SpaceTimePosition> trajectory = new ArrayList<SpaceTimePosition>();
-		SpaceTimePosition position = datum.getTrajectoryHead();
+	public Iterator<SpaceTimePositionVertex> getTrajectory(DatumVertex datum) {
+		if (datum == null)
+			return null;
+
+		ArrayList<SpaceTimePositionVertex> trajectory = new ArrayList<SpaceTimePositionVertex>();
+		SpaceTimePositionVertex position = datum.getTrajectoryHead();
 		while (position != null) {
 			trajectory.add(position);
 			position = position.getPrevious();
@@ -112,10 +111,13 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 	}
 
 	@Override
-	public Map<Datum, Iterator<SpaceTimePosition>> getTrajectories(
-			Iterator<Datum> data) {
-		Map<Datum, Iterator<SpaceTimePosition>> trajectories = new HashMap<Datum, Iterator<SpaceTimePosition>>();
-		Datum datum;
+	public Map<DatumVertex, Iterator<SpaceTimePositionVertex>> getTrajectories(
+			Iterator<DatumVertex> data) {
+		if (data == null)
+			return null;
+
+		Map<DatumVertex, Iterator<SpaceTimePositionVertex>> trajectories = new HashMap<DatumVertex, Iterator<SpaceTimePositionVertex>>();
+		DatumVertex datum;
 		while (data.hasNext()) {
 			datum = data.next();
 			trajectories.put(datum, getTrajectory(datum));
@@ -125,9 +127,12 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 	}
 
 	@Override
-	public void append(Datum datum, SpaceTimePosition position) {
+	public void prepend(DatumVertex datum, SpaceTimePositionVertex position) {
+		if (datum == null)
+			return;
+
 		if (datum.getIsMeasurable()) {
-			appendMeasured(datum, position);
+			prependMeasured(datum, position);
 			return;
 		}
 
@@ -135,22 +140,42 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 		position.setDatum(datum);
 
 		// place the new space-time position into the datum's trajectory
-		SpaceTimePosition trajectoryHead = datum.getTrajectoryHead();
+		SpaceTimePositionVertex trajectoryHead = datum.getTrajectoryHead();
 		position.setPrevious(trajectoryHead);
-		if (trajectoryHead != null)
+		if (trajectoryHead != null) {
 			trajectoryHead.setNext(position);
+
+		} else { // the trajectory is empty
+			// tail == head
+			datum.setTrajectoryTail(position);
+		}
 
 		// update the datum's trajectory head
 		datum.setTrajectoryHead(position);
 	}
 
 	@Override
-	public void appendMeasured(Datum datum, SpaceTimePosition position) {
+	public void prepend(DatumVertex datum, Geoshape location, long timestamp,
+			String domain) {
+		if (datum == null)
+			return;
+
+		SpaceTimePositionVertex position = stpFactory.addSpaceTimePosition(
+				location, timestamp, domain);
+		prepend(datum, position);
+	}
+
+	@Override
+	public void prependMeasured(DatumVertex datum,
+			SpaceTimePositionVertex position) {
+		if (datum == null)
+			return;
+
 		// configure the new space-time position
 		position.setDatum(datum);
 
 		// place the new space-time position into the datum's trajectory
-		SpaceTimePosition trajectoryHead = datum.getTrajectoryHead();
+		SpaceTimePositionVertex trajectoryHead = datum.getTrajectoryHead();
 		position.setPrevious(trajectoryHead);
 		if (trajectoryHead != null) {
 			trajectoryHead.setNext(position);
@@ -170,6 +195,9 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 			datum.setAge(0);
 			datum.setDistanceHostCreation(0);
 			datum.setDistancePhenomenonCreation(0);
+
+			// tail == head
+			datum.setTrajectoryTail(position);
 		}
 
 		// update the datum's trajectory head
@@ -177,7 +205,22 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 	}
 
 	@Override
-	public void appendMeasured(Datum datum, Geoshape location, long timestamp) {
+	public void prependMeasured(DatumVertex datum, Geoshape location,
+			long timestamp, String domain) {
+		if (datum == null)
+			return;
+
+		SpaceTimePositionVertex position = stpFactory.addSpaceTimePosition(
+				location, timestamp, domain);
+		prependMeasured(datum, position);
+	}
+
+	@Override
+	public void prependMeasuredPseudo(DatumVertex datum, Geoshape location,
+			long timestamp) {
+		if (datum == null)
+			return;
+
 		try {
 			updateSize(datum);
 			updateLength(datum, location, datum.getPreviousLocation());
@@ -198,13 +241,108 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 	}
 
 	@Override
-	public void updateSize(Datum datum) {
+	public void append(DatumVertex datum, SpaceTimePositionVertex position) {
+		if (datum == null)
+			return;
+
+		if (datum.getIsMeasurable()) {
+			appendMeasured(datum, position);
+			return;
+		}
+
+		// configure the new space-time position
+		position.setDatum(datum);
+
+		// place the new space-time position into the datum's trajectory
+		SpaceTimePositionVertex trajectoryTail = datum.getTrajectoryTail();
+		position.setNext(trajectoryTail);
+		if (trajectoryTail != null) {
+			trajectoryTail.setPrevious(position);
+
+		} else { // the trajectory is empty
+			// head == tail
+			datum.setTrajectoryHead(position);
+		}
+
+		// update the datum's trajectory tail
+		datum.setTrajectoryTail(position);
+	}
+
+	@Override
+	public void append(DatumVertex datum, Geoshape location, long timestamp,
+			String domain) {
+		if (datum == null)
+			return;
+
+		SpaceTimePositionVertex position = stpFactory.addSpaceTimePosition(
+				location, timestamp, domain);
+		append(datum, position);
+	}
+
+	@Override
+	public void appendMeasured(DatumVertex datum,
+			SpaceTimePositionVertex position) {
+		if (datum == null)
+			return;
+
+		// configure the new space-time position
+		position.setDatum(datum);
+
+		// place the new space-time position into the datum's trajectory
+		SpaceTimePositionVertex trajectoryTail = datum.getTrajectoryTail();
+		position.setNext(trajectoryTail);
+		if (trajectoryTail != null) {
+			trajectoryTail.setPrevious(position);
+
+			// update measurements
+			updateSize(datum);
+			updateLength(datum, position, trajectoryTail);
+			// age, distance-host-creation, and distance-phenomenon-creation
+			// are updated by the host carrying the datum each time step
+
+		} else { // the trajectory is empty
+			// initialize measurements
+			datum.setCreationTime(position.getTimestamp());
+			datum.setCreationLocation(position.getLocation());
+			datum.setSize(0);
+			datum.setLength(0);
+			datum.setAge(0);
+			datum.setDistanceHostCreation(0);
+			datum.setDistancePhenomenonCreation(0);
+
+			// head == tail
+			datum.setTrajectoryHead(position);
+		}
+
+		// update the datum's trajectory tail
+		datum.setTrajectoryTail(position);
+	}
+
+	@Override
+	public void appendMeasured(DatumVertex datum, Geoshape location,
+			long timestamp, String domain) {
+		if (datum == null)
+			return;
+
+		SpaceTimePositionVertex position = stpFactory.addSpaceTimePosition(
+				location, timestamp, domain);
+		appendMeasured(datum, position);
+	}
+
+	@Override
+	public void updateSize(DatumVertex datum) {
+		if (datum == null)
+			return;
+
 		datum.setSize(datum.getSize() + 1);
 	}
 
 	@Override
-	public void updateLength(Datum datum, SpaceTimePosition fromPos,
-			SpaceTimePosition toPos) {
+	public void updateLength(DatumVertex datum,
+			SpaceTimePositionVertex fromPos, SpaceTimePositionVertex toPos) {
+		if (datum == null)
+			return;
+
 		double distance = fromPos.getLocation().getPoint()
 				.distance(toPos.getLocation().getPoint())
 				* KM_TO_M;
@@ -213,7 +351,10 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 	}
 
 	@Override
-	public void updateLength(Datum datum, Geoshape fromLoc, Geoshape toLoc) {
+	public void updateLength(DatumVertex datum, Geoshape fromLoc, Geoshape toLoc) {
+		if (datum == null)
+			return;
+
 		double distance = fromLoc.getPoint().distance(toLoc.getPoint())
 				* KM_TO_M;
 
@@ -221,12 +362,18 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 	}
 
 	@Override
-	public void updateAge(Datum datum, long timestamp) {
+	public void updateAge(DatumVertex datum, long timestamp) {
+		if (datum == null)
+			return;
+
 		datum.setAge(timestamp - datum.getCreationTime());
 	}
 
 	@Override
-	public void updateDistanceHostCreation(Datum datum, Geoshape hostLoc) {
+	public void updateDistanceHostCreation(DatumVertex datum, Geoshape hostLoc) {
+		if (datum == null)
+			return;
+
 		double distance = hostLoc.getPoint().distance(
 				datum.getCreationLocation().getPoint())
 				* KM_TO_M;
@@ -235,8 +382,11 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 	}
 
 	@Override
-	public void updateDistancePhenomenonCreation(Datum datum,
+	public void updateDistancePhenomenonCreation(DatumVertex datum,
 			Geoshape phenomenonLoc) {
+		if (datum == null)
+			return;
+
 		double distance = phenomenonLoc.getPoint().distance(
 				datum.getLocation().getPoint())
 				* KM_TO_M;
@@ -245,9 +395,12 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 	}
 
 	@Override
-	public void delete(Datum datum) {
+	public void delete(DatumVertex datum) {
+		if (datum == null)
+			return;
+
 		// delete the datum's spatiotemporal metadata
-		for (SpaceTimePosition position : datum.getTrajectory()) {
+		for (SpaceTimePositionVertex position : datum.getTrajectory()) {
 			// delete all edges incident to this space-time position
 			for (Edge edge : position.asVertex().getEdges(Direction.BOTH))
 				baseGraph.removeEdge(edge);
@@ -265,8 +418,11 @@ public class DatumFactory<D extends Datum> extends VertexFrameFactory<D>
 	}
 
 	@Override
-	public void delete(Iterator<Datum> data) {
-		Datum datum;
+	public void delete(Iterator<DatumVertex> data) {
+		if (data == null)
+			return;
+
+		DatumVertex datum;
 		while (data.hasNext()) {
 			datum = data.next();
 			delete(datum);

@@ -4,10 +4,10 @@ import java.util.List;
 
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 import edu.utexas.ece.mpc.stdata.rules.Rule;
-import edu.utexas.ece.mpc.stdata.vertices.Datum;
-import edu.utexas.ece.mpc.stdata.vertices.IDatumDelegate;
+import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
+import edu.utexas.ece.mpc.stdata.vertices.IDatumVertexDelegate;
 
-public interface IDatumFactory<D extends Datum> extends IDatumDelegate {
+public interface IDatumFactory<D extends DatumVertex> extends IDatumVertexDelegate {
 
 	/**
 	 * Creates a new datum with the provided parameters.

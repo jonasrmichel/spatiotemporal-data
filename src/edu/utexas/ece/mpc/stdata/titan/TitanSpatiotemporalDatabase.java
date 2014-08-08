@@ -30,7 +30,7 @@ public class TitanSpatiotemporalDatabase extends
 		String homeDir = graphDir + File.separator + instance;
 		File folder = new File(homeDir);
 		if (!folder.exists())
-			folder.mkdir();
+			folder.mkdirs();
 		
 		BaseConfiguration config = new BaseConfiguration();
 //		config.subset(STORAGE_NAMESPACE)

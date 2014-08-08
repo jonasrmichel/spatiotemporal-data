@@ -70,7 +70,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * A special vertex that provides the graph database with access to the
 	 * host's geospatial location and notion of time.
 	 */
-	protected SpatiotemporalContextVertex stContext;
+	protected SpatiotemporalContextVertex stContext = null;
 
 	public SpatiotemporalDatabase(String instance, String graphDir,
 			IContextProvider contextProvider, INetworkProvider networkProvider) {
@@ -106,9 +106,6 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 				baseGraph, framedGraph, ruleRegistry);
 		addVertexFrameFactory(SpatiotemporalContextVertex.class,
 				(VertexFrameFactory) stContextFactory);
-
-		// initialize the local notion of space-time context
-		initializeSpatiotemporalContext();
 	}
 
 	/**
@@ -134,8 +131,13 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * Initializes the framed element index.
 	 */
 	private void initializeFramedElementIndex() {
-		// only vertex indexing is supported
-		baseGraph.createKeyIndex(FRAMED_CLASS_KEY, Vertex.class);
+		// (only vertex indexing is supported)
+		try {
+			baseGraph.createKeyIndex(FRAMED_CLASS_KEY, Vertex.class);
+
+		} catch (UnsupportedOperationException e) {
+			// key index already exists
+		}
 	}
 
 	/**
@@ -151,8 +153,15 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * database's context provider.
 	 */
 	public void updateSpatiotemporalContext() {
-		setSpatialContext(contextProvider.getLocation());
-		setTemporalContext(contextProvider.getTimestamp());
+		if (stContext == null) {
+			// this is the first update, the context must be initialized
+			initializeSpatiotemporalContext();
+
+		} else {
+			// update the existing context vertex
+			setSpatialContext(contextProvider.getLocation());
+			setTemporalContext(contextProvider.getTimestamp());
+		}
 	}
 
 	/**
@@ -163,6 +172,11 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 *            a geospatial location.
 	 */
 	public void setSpatialContext(Geoshape location) {
+		// "reattach" to the special spatiotemporal context vertex within the
+		// current transaction
+		stContext = framedGraph.getVertex(stContext.asVertex().getId(),
+				SpatiotemporalContextVertex.class);
+
 		stContext.setLocation(location);
 	}
 
@@ -174,6 +188,11 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 *            a timestamp.
 	 */
 	public void setTemporalContext(long timestamp) {
+		// "reattach" to the special spatiotemporal context vertex within the
+		// current transaction
+		stContext = framedGraph.getVertex(stContext.asVertex().getId(),
+				SpatiotemporalContextVertex.class);
+
 		stContext.setTimestamp(timestamp);
 	}
 

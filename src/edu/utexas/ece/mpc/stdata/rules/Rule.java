@@ -36,6 +36,10 @@ public abstract class Rule {
 
 	/** The rule's delegate interface (a rule container vertex). */
 	protected IRuleDelegate delegate = null;
+	
+	public Rule() {
+		
+	}
 
 	/**
 	 * Initializes the rule with references to all of its necessary parameters.

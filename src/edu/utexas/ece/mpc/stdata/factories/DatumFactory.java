@@ -52,7 +52,7 @@ public class DatumFactory<D extends DatumVertex> extends VertexFrameFactory<D>
 			List<D> context, Rule... rules) {
 		// create the datum
 		D datum = addVertex(null, rules);
-		datum.setDelegate(this);
+		datum.setType(type);
 		datum.setIsMeasurable(measurable);
 
 		// initialize the datum's spatiotemporal trajectory

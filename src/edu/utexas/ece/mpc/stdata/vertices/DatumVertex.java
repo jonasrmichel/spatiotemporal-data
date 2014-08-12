@@ -9,12 +9,12 @@ import edu.utexas.ece.mpc.stdata.edges.ContextualRelation;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 
 public interface DatumVertex extends GeoVertex {
-	/** The delegate to make callbacks on. */
-	@Property("delegate")
-	public IDatumVertexDelegate getDelegate();
-
-	@Property("delegate")
-	public void setDelegate(IDatumVertexDelegate delegate);
+	/** The DatumVertex derivative type. */
+	@Property("datum-type")
+	public <D extends DatumVertex> Class<D> getType();
+	
+	@Property("datum-type")
+	public <D extends DatumVertex> void setType(Class<D> type);
 
 	/** The head of the datum's trajectory. */
 	@Adjacency(label = "trajectory-head")

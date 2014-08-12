@@ -31,15 +31,16 @@ public class TitanSpatiotemporalDatabase extends
 		File folder = new File(homeDir);
 		if (!folder.exists())
 			folder.mkdirs();
-		
+
 		BaseConfiguration config = new BaseConfiguration();
-//		config.subset(STORAGE_NAMESPACE)
-//				.addProperty(STORAGE_BACKEND_KEY,
-//						"com.thinkaurelius.titan.diskstorage.berkeleyje.BerkeleyJEStoreManager");
+		// config.subset(STORAGE_NAMESPACE)
+		// .addProperty(STORAGE_BACKEND_KEY,
+		// "com.thinkaurelius.titan.diskstorage.berkeleyje.BerkeleyJEStoreManager");
 		config.subset(STORAGE_NAMESPACE).addProperty(STORAGE_DIRECTORY_KEY,
 				homeDir);
 
 		// create the base graph
 		baseGraph = TitanFactory.open(config);
 	}
+
 }

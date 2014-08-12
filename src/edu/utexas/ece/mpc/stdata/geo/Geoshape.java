@@ -31,8 +31,8 @@ public class Geoshape {
 
     //coordinates[0] = latitudes, coordinates[1] = longitudes
     private final float[][] coordinates;
-
-    private Geoshape() {
+    
+    public Geoshape() {
         coordinates = null;
     }
 

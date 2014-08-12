@@ -276,6 +276,24 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	}
 
 	/**
+	 * Registers a datum frame vertex factory with the database.
+	 * 
+	 * @param type
+	 *            the {@link DatumVertex} derivative class the factory produces.
+	 * @param datumFactory
+	 *            the {@link DatumFactory} to register.
+	 */
+	public <D extends DatumVertex> void addDatumFrameFactory(Class<D> type,
+			DatumFactory<D> datumFactory) {
+		addVertexFrameFactory(type, datumFactory);
+
+		// the datum factory will already be initialized, but it sill needs a
+		// context provider interface and the space-time position factory
+		datumFactory.initialize(baseGraph, framedGraph, ruleRegistry,
+				contextProvider, getSpaceTimePositionFactory());
+	}
+
+	/**
 	 * Returns the rule registry interface.
 	 * 
 	 * @return the database's rule registry interface.

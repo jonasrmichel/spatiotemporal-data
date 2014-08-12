@@ -3,9 +3,9 @@ package edu.utexas.ece.mpc.stdata.rules;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
-import edu.utexas.ece.mpc.stdata.factories.ISpaceTimePositionFactory;
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
+import edu.utexas.ece.mpc.stdata.vertices.IDatumVertexDelegate;
 import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
 import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContextVertex;
 
@@ -75,11 +75,17 @@ public class SpatiallyModulatedTrajectoryRule extends SpatiotemporalContextRule 
 			return;
 
 		// trigger trajectory updates
+		IDatumVertexDelegate datumDelegate;
 		SpaceTimePositionVertex pos;
 		Iterable<DatumVertex> goverenedData = delegate.getGoverns();
 		for (DatumVertex datum : goverenedData) {
+			// lookup the delegate for this datum type
+			datumDelegate = (IDatumVertexDelegate) vertexFrameFactories
+					.get(datum.getType());
 			if (datum.getIsMeasurable()) {
-				datum.getDelegate().prependMeasuredPseudo(datum, location, timestamp);
+				// datum.getDelegate().prependMeasuredPseudo(datum, location,
+				// timestamp);
+				datumDelegate.prependMeasuredPseudo(datum, location, timestamp);
 
 			} else {
 				pos = (SpaceTimePositionVertex) vertexFrameFactories.get(
@@ -87,7 +93,8 @@ public class SpatiallyModulatedTrajectoryRule extends SpatiotemporalContextRule 
 				pos.setLocation(location);
 				pos.setTimestamp(timestamp);
 
-				datum.getDelegate().prepend(datum, pos);
+				// datum.getDelegate().prepend(datum, pos);
+				datumDelegate.prepend(datum, pos);
 			}
 		}
 

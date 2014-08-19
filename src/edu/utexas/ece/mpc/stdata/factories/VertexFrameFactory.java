@@ -7,23 +7,24 @@ import com.tinkerpop.frames.VertexFrame;
 import edu.utexas.ece.mpc.stdata.SpatiotemporalDatabase;
 import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
 import edu.utexas.ece.mpc.stdata.rules.Rule;
+import edu.utexas.ece.mpc.stdata.vertices.RuleProxyVertex;
 
-public abstract class VertexFrameFactory<T extends VertexFrame> {
+public abstract class VertexFrameFactory<V extends VertexFrame> {
 	protected TransactionalGraph baseGraph;
 	protected FramedGraph framedGraph;
 	protected IRuleRegistry ruleRegistry;
 
-	protected Class<T> type;
+	protected Class<V> type;
 
 	private boolean initialized;
 
-	public VertexFrameFactory(Class<T> type) {
+	public VertexFrameFactory(Class<V> type) {
 		this.type = type;
 
 		initialized = false;
 	}
 
-	public VertexFrameFactory(Class<T> type, TransactionalGraph baseGraph,
+	public VertexFrameFactory(Class<V> type, TransactionalGraph baseGraph,
 			FramedGraph framedGraph, IRuleRegistry ruleRegistry) {
 		this.type = type;
 
@@ -43,8 +44,8 @@ public abstract class VertexFrameFactory<T extends VertexFrame> {
 		return initialized;
 	}
 
-	public T addVertex(Object id) {
-		T vertex = (T) framedGraph.addVertex(id, type);
+	public V addVertex(Object id) {
+		V vertex = (V) framedGraph.addVertex(id, type);
 
 		// set a special property that indicates this vertex is framed and its
 		// framed class
@@ -54,10 +55,10 @@ public abstract class VertexFrameFactory<T extends VertexFrame> {
 		return vertex;
 	}
 
-	public T addVertex(Object id, Rule... rules) {
-		T vertex = addVertex(id);
+	public V addVertex(Object id, Rule... rules) {
+		V vertex = addVertex(id);
 
-		// register the vertex's rule
+		// register the vertex's rules
 		if (rules != null) {
 			for (Rule rule : rules)
 				ruleRegistry.registerRule(rule, vertex);

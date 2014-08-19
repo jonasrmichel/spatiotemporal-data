@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import android.util.Log;
+
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
@@ -12,7 +14,7 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
-import com.tinkerpop.blueprints.util.wrappers.event.EventTransactionalGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.EdgeFrame;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.VertexFrame;
@@ -34,7 +36,7 @@ import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContextVertex;
 
 public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyIndexableGraph> {
 	/** The framed class type property key. */
-	public static final String FRAMED_CLASS_KEY = "class";
+	public static final String FRAMED_CLASS_KEY = "framed_class";
 
 	/** The database's instance identifier. (Permits multiple local instances.) */
 	protected String instance;
@@ -52,10 +54,10 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	protected G baseGraph;
 
 	/** Event graph wrapper. */
-	protected EventTransactionalGraph<G> eventGraph;
+	protected EventGraph<G> eventGraph;
 
 	/** Framed graph wrapper. */
-	protected FramedGraph<EventTransactionalGraph<G>> framedGraph;
+	protected FramedGraph<EventGraph<G>> framedGraph;
 
 	/** EdgeFrame factories. */
 	protected Map<Class, EdgeFrameFactory> edgeFrameFactories;
@@ -117,14 +119,14 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * Wraps the base graph for event listening.
 	 */
 	private void initializeEventGraph() {
-		eventGraph = new EventTransactionalGraph<G>(baseGraph);
+		eventGraph = new EventGraph<G>(baseGraph);
 	}
 
 	/**
 	 * Wraps the event graph for object framing.
 	 */
 	private void initializeFramedGraph() {
-		framedGraph = new FramedGraph<EventTransactionalGraph<G>>(eventGraph);
+		framedGraph = new FramedGraph<EventGraph<G>>(eventGraph);
 	}
 
 	/**
@@ -176,6 +178,8 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		// current transaction
 		stContext = framedGraph.getVertex(stContext.asVertex().getId(),
 				SpatiotemporalContextVertex.class);
+		
+		Log.d("SpatiotemporalDatabase", "setSpatialContext(): stContext=" + stContext.toString() + " location=" + location);
 
 		stContext.setLocation(location);
 	}
@@ -192,6 +196,8 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 		// current transaction
 		stContext = framedGraph.getVertex(stContext.asVertex().getId(),
 				SpatiotemporalContextVertex.class);
+		
+		Log.d("SpatiotemporalDatabase", "setTemporalContext(): stContext=" + stContext.toString() + " timestamp=" + Long.toString(timestamp));
 
 		stContext.setTimestamp(timestamp);
 	}
@@ -251,8 +257,8 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 *            an edge frame type.
 	 * @return the edge frame factory associated with the provided type.
 	 */
-	public <T extends VertexFrame> VertexFrameFactory<T> getVertexFrameFactory(
-			Class<T> type) {
+	public <V extends VertexFrame> VertexFrameFactory<V> getVertexFrameFactory(
+			Class<V> type) {
 		return vertexFrameFactories.get(type);
 	}
 
@@ -264,7 +270,7 @@ public abstract class SpatiotemporalDatabase<G extends TransactionalGraph & KeyI
 	 * @param vertexFactory
 	 *            the {@link VertexFrameFactory} to register.
 	 */
-	public <T extends VertexFrame> void addVertexFrameFactory(Class<T> type,
+	public <V extends VertexFrame> void addVertexFrameFactory(Class<V> type,
 			VertexFrameFactory vertexFactory) {
 		if (vertexFrameFactories == null)
 			vertexFrameFactories = new HashMap<Class, VertexFrameFactory>();

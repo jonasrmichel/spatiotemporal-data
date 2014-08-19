@@ -17,6 +17,7 @@ import edu.utexas.ece.mpc.stdata.rules.IRuleRegistry;
 import edu.utexas.ece.mpc.stdata.rules.Rule;
 import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
 import edu.utexas.ece.mpc.stdata.vertices.IDatumVertexDelegate;
+import edu.utexas.ece.mpc.stdata.vertices.RuleProxyVertex;
 import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
 
 public class DatumFactory<D extends DatumVertex> extends VertexFrameFactory<D>

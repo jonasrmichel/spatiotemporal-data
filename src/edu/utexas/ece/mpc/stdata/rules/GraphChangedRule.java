@@ -3,7 +3,7 @@ package edu.utexas.ece.mpc.stdata.rules;
 import java.util.Map;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.util.wrappers.event.EventTransactionalGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
 import com.tinkerpop.frames.FramedGraph;
 
@@ -11,6 +11,7 @@ import edu.utexas.ece.mpc.stdata.IContextProvider;
 import edu.utexas.ece.mpc.stdata.INetworkProvider;
 import edu.utexas.ece.mpc.stdata.factories.EdgeFrameFactory;
 import edu.utexas.ece.mpc.stdata.factories.VertexFrameFactory;
+import edu.utexas.ece.mpc.stdata.vertices.RuleProxyVertex;
 
 public abstract class GraphChangedRule extends Rule implements
 		GraphChangedListener {
@@ -28,14 +29,14 @@ public abstract class GraphChangedRule extends Rule implements
 
 	@Override
 	protected void initialize(TransactionalGraph baseGraph,
-			EventTransactionalGraph eventGraph, FramedGraph framedGraph,
+			EventGraph eventGraph, FramedGraph framedGraph,
 			Map<Class, EdgeFrameFactory> edgeFrameFactories,
 			Map<Class, VertexFrameFactory> vertexFrameFactories,
 			IContextProvider contextProvider, INetworkProvider networkProvider,
-			IRuleDelegate delegate) {
+			RuleProxyVertex graphProxy) {
 		super.initialize(baseGraph, eventGraph, framedGraph,
 				edgeFrameFactories, vertexFrameFactories, contextProvider,
-				networkProvider, delegate);
+				networkProvider, graphProxy);
 
 		addListener();
 	}

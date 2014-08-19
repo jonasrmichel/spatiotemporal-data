@@ -2,6 +2,7 @@ package edu.utexas.ece.mpc.stdata.rules;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.frames.VertexFrame;
 
 import edu.utexas.ece.mpc.stdata.geo.Geoshape;
 import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
@@ -9,7 +10,8 @@ import edu.utexas.ece.mpc.stdata.vertices.IDatumVertexDelegate;
 import edu.utexas.ece.mpc.stdata.vertices.SpaceTimePositionVertex;
 import edu.utexas.ece.mpc.stdata.vertices.SpatiotemporalContextVertex;
 
-public class SpatiallyModulatedTrajectoryRule extends SpatiotemporalContextRule {
+public abstract class SpatiallyModulatedTrajectoryRule extends
+		SpatiotemporalContextRule {
 	/** The spatial trajectory resolution (meters). */
 	double spatialResolution;
 
@@ -77,8 +79,12 @@ public class SpatiallyModulatedTrajectoryRule extends SpatiotemporalContextRule 
 		// trigger trajectory updates
 		IDatumVertexDelegate datumDelegate;
 		SpaceTimePositionVertex pos;
-		Iterable<DatumVertex> goverenedData = delegate.getGoverns();
-		for (DatumVertex datum : goverenedData) {
+		Iterable<VertexFrame> goverenedData = getGraphProxy().getGoverns();
+		DatumVertex datum;
+		for (VertexFrame vertex : goverenedData) {
+			datum = (DatumVertex) framedGraph.getVertex(vertex.asVertex()
+					.getId(), DatumVertex.class);
+
 			// lookup the delegate for this datum type
 			datumDelegate = (IDatumVertexDelegate) vertexFrameFactories
 					.get(datum.getType());

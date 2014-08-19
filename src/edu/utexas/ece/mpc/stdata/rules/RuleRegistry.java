@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.util.wrappers.event.EventTransactionalGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.VertexFrame;
 
@@ -12,12 +12,11 @@ import edu.utexas.ece.mpc.stdata.IContextProvider;
 import edu.utexas.ece.mpc.stdata.INetworkProvider;
 import edu.utexas.ece.mpc.stdata.factories.EdgeFrameFactory;
 import edu.utexas.ece.mpc.stdata.factories.VertexFrameFactory;
-import edu.utexas.ece.mpc.stdata.vertices.DatumVertex;
-import edu.utexas.ece.mpc.stdata.vertices.RuleContainerVertex;
+import edu.utexas.ece.mpc.stdata.vertices.RuleProxyVertex;
 
 public class RuleRegistry implements IRuleRegistry {
 	private TransactionalGraph baseGraph;
-	private EventTransactionalGraph eventGraph;
+	private EventGraph eventGraph;
 	private FramedGraph framedGraph;
 
 	private Map<Class, EdgeFrameFactory> edgeFrameFactories;
@@ -28,8 +27,8 @@ public class RuleRegistry implements IRuleRegistry {
 
 	Map<Object, Rule> rules;
 
-	public RuleRegistry(TransactionalGraph baseGraph,
-			EventTransactionalGraph eventGraph, FramedGraph framedGraph,
+	public RuleRegistry(TransactionalGraph baseGraph, EventGraph eventGraph,
+			FramedGraph framedGraph,
 			Map<Class, EdgeFrameFactory> edgeFrameFactories,
 			Map<Class, VertexFrameFactory> vertexFrameFactories,
 			IContextProvider contextProvider, INetworkProvider networkProvider) {
@@ -49,51 +48,48 @@ public class RuleRegistry implements IRuleRegistry {
 	/* IRuleRegistry interface implementation. */
 
 	@Override
-	public RuleContainerVertex registerRule(Rule rule) {
-		return registerRule(rule, null);
+	public void registerRule(Rule rule) {
+		registerRule(rule, null);
 	}
 
-	@Override
-	public RuleContainerVertex registerRule(Rule rule, DatumVertex... data) {
-		// create the rule's container vertex
-		RuleContainerVertex ruleContainer = (RuleContainerVertex) framedGraph.addVertex(
-				null, RuleContainerVertex.class);
+	// @Override
+	// public RuleContainerVertex registerRule(Rule rule, DatumVertex... data) {
+	// // create the rule's container vertex
+	// RuleContainerVertex ruleContainer = (RuleContainerVertex) framedGraph
+	// .addVertex(null, RuleContainerVertex.class);
+	//
+	// // initialize the rule with the container as its delegate
+	// rule.initialize(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
+	// vertexFrameFactories, contextProvider, networkProvider,
+	// ruleContainer);
+	//
+	// // configure the graph references to governed data
+	// for (DatumVertex datum : data)
+	// ruleContainer.addGoverns(datum.asVertex());
+	//
+	// // register the rule
+	// rules.put(ruleContainer.asVertex().getId(), rule);
+	//
+	// return ruleContainer;
+	// }
 
-		// intialize the rule with the container as its delegate
+	@Override
+	public <V extends VertexFrame> void registerRule(Rule rule, V... vertices) {
+		// create a graph proxy for this rule
+		RuleProxyVertex graphProxy = (RuleProxyVertex) framedGraph.addVertex(
+				null, RuleProxyVertex.class);
+
+		// intialize the rule
 		rule.initialize(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
 				vertexFrameFactories, contextProvider, networkProvider,
-				ruleContainer);
+				graphProxy);
 
-		// configure the graph references to governed data
-		for (DatumVertex datum : data)
-			ruleContainer.addGoverns(datum);
-
-		// register the rule
-		rules.put(ruleContainer.asVertex().getId(), rule);
-
-		return ruleContainer;
-	}
-
-	@Override
-	public <V extends VertexFrame> RuleContainerVertex<V> registerRule(Rule rule,
-			V... vertices) {
-		// create the rule's container vertex
-		RuleContainerVertex<V> ruleContainer = (RuleContainerVertex<V>) framedGraph
-				.addVertex(null, RuleContainerVertex.class);
-
-		// intialize the rule with the container as its delegate
-		rule.initialize(baseGraph, eventGraph, framedGraph, edgeFrameFactories,
-				vertexFrameFactories, contextProvider, networkProvider,
-				ruleContainer);
-
-		// configure the graph references to governed data
+		// configure the graph proxy's references to governed data
 		for (V vertex : vertices)
-			ruleContainer.addGoverns(vertex);
+			graphProxy.addGoverns(vertex);
 
-		// register the rule
-		rules.put(ruleContainer.asVertex().getId(), rule);
-
-		return ruleContainer;
+		// register the rule keyed by it's proxy's graph identifier
+		rules.put(graphProxy.asVertex().getId(), rule);
 	}
 
 }
